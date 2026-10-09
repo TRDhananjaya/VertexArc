@@ -1,20 +1,30 @@
-// Database queries for the users table.
 const pool = require("../db");
 
-// Find a user by email — used for login and duplicate checks during registration.
-// Returns the full row including password_hash (needed for bcrypt comparison).
+// Find a user by email
 async function findUserByEmail(email) {
     const result = await pool.query(
         `SELECT id, name, email, password_hash, role, is_active
          FROM users
          WHERE email = $1`,
-        [email] // parameterized query — prevents SQL injection
+        [email]
     );
 
     return result.rows[0] || null;
 }
 
-// Insert a new user and return the created record (excluding password_hash).
+// Find a user by ID for authentication
+async function findUserById(id) {
+    const result = await pool.query(
+        `SELECT id, name, email, role, is_active
+         FROM users
+         WHERE id = $1`,
+        [id]
+    );
+
+    return result.rows[0] || null;
+}
+
+// Create a new user
 async function createUser({ name, email, passwordHash }) {
     const result = await pool.query(
         `INSERT INTO users (name, email, password_hash)
@@ -28,5 +38,6 @@ async function createUser({ name, email, passwordHash }) {
 
 module.exports = {
     findUserByEmail,
+    findUserById,
     createUser
 };

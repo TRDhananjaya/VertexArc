@@ -1,7 +1,6 @@
 // Shared PostgreSQL connection pool — imported by models and routes.
-require("dotenv").config();
-
 const { Pool } = require("pg");
+
 
 // Pool reuses connections across requests instead of creating a new one each time.
 const pool = new Pool({
