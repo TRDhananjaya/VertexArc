@@ -1,5 +1,8 @@
 const express        = require("express");
 const taskController = require("../controllers/taskController");
+const securityReviewController = require("../controllers/securityReviewController");
+const auditLogController = require("../controllers/auditLogController");
+const commentController = require("../controllers/commentController");
 
 const {
     authenticateToken,
@@ -30,6 +33,37 @@ router.patch(
 router.patch(
     "/:taskId/status",
     taskController.updateTaskStatus
+);
+
+// View a task's security checklist
+router.get(
+    "/:taskId/security-review",
+    securityReviewController.getSecurityReview
+);
+
+// Update the checklist as an authorized reviewer
+router.patch(
+    "/:taskId/security-review",
+    requireRole("ADMIN", "PROJECT_MANAGER"),
+    securityReviewController.updateSecurityReview
+);
+
+// View the recorded history of a task
+router.get(
+    "/:taskId/audit-logs",
+    auditLogController.getTaskAuditLogs
+);
+
+// View discussions for a task
+router.get(
+    "/:taskId/comments",
+    commentController.getComments
+);
+
+// Add a discussion comment
+router.post(
+    "/:taskId/comments",
+    commentController.addComment
 );
 
 module.exports = router;

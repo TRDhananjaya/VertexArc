@@ -15,7 +15,9 @@ async function createTask(req, res) {
         const {
             title,
             description = "",
-            priority = "MEDIUM"
+            priority = "MEDIUM",
+            isSecuritySensitive = false,
+            riskLevel = null
         } = req.body ?? {};
 
         if (!isValidId(projectId)) {
@@ -48,6 +50,28 @@ async function createTask(req, res) {
                 message: "Priority must be LOW, MEDIUM, or HIGH"
             });
         }
+  
+        // Security-sensitive tasks must have a valid risk level
+        if (typeof isSecuritySensitive !== "boolean") {
+            return res.status(400).json({
+                message: "isSecuritySensitive must be true or false"
+            });
+        }
+
+        if (
+            isSecuritySensitive &&
+            !["LOW", "MEDIUM", "HIGH"].includes(riskLevel)
+        ) {
+            return res.status(400).json({
+                message: "Security-sensitive tasks require a valid risk level"
+            });
+        }
+
+        if (!isSecuritySensitive && riskLevel !== null) {
+            return res.status(400).json({
+                message: "Normal tasks must not have a risk level"
+            });
+        }
 
         const project = await projectModel.findProjectById(projectId);
 
@@ -75,7 +99,9 @@ async function createTask(req, res) {
             title: title.trim(),
             description: description.trim(),
             priority,
-            userId: req.user.id
+            userId: req.user.id,
+            isSecuritySensitive,
+            riskLevel
         });
 
         return res.status(201).json({
@@ -306,12 +332,14 @@ async function updateTaskStatus(req, res) {
             taskId,
             projectId,
             task.status,
-            status
+            status,
+            req.user.id,
+            isReviewer
         );
 
         if (!updatedTask) {
             return res.status(409).json({
-                message: "Task status changed. Please refresh and try again"
+                message: "Status update blocked. Check the current task status and required security approvals"
             });
         }
 
