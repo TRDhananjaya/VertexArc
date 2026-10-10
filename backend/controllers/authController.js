@@ -1,6 +1,6 @@
 // Handles user registration and login.
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
+const bcrypt    = require("bcrypt");
+const jwt       = require("jsonwebtoken");
 const userModel = require("../models/userModel");
 
 // POST /api/auth/register — validate input, hash password, create user
@@ -15,7 +15,7 @@ async function register(req, res) {
             name.trim().length > 100
         ) {
             return res.status(400).json({
-                message: "Name must be between 1 and 100 characters"
+                message: "Name must be between 1 and 100 characters",
             });
         }
 
@@ -26,7 +26,7 @@ async function register(req, res) {
             !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())
         ) {
             return res.status(400).json({
-                message: "Please provide a valid email address"
+                message: "Please provide a valid email address",
             });
         }
 
@@ -37,19 +37,17 @@ async function register(req, res) {
             Buffer.byteLength(password, "utf8") > 72
         ) {
             return res.status(400).json({
-                message: "Password must be at least 8 characters and no more than 72 UTF-8 bytes"
+                message: "Password must be at least 8 characters and no more than 72 UTF-8 bytes",
             });
         }
 
-        const normalizedName = name.trim();
+        const normalizedName  = name.trim();
         const normalizedEmail = email.trim().toLowerCase();
 
         // Reject duplicate emails before doing the expensive bcrypt hash
         const existingUser = await userModel.findUserByEmail(normalizedEmail);
         if (existingUser) {
-            return res.status(409).json({
-                message: "Email is already registered"
-            });
+            return res.status(409).json({ message: "Email is already registered" });
         }
 
         // Hash password with cost factor 12 (~300 ms, secure for production)
@@ -58,26 +56,18 @@ async function register(req, res) {
         const user = await userModel.createUser({
             name: normalizedName,
             email: normalizedEmail,
-            passwordHash
+            passwordHash,
         });
 
-        return res.status(201).json({
-            message: "Registration successful",
-            user
-        });
+        return res.status(201).json({ message: "Registration successful", user });
     } catch (error) {
         // PostgreSQL unique constraint violation — handles race conditions
         if (error.code === "23505") {
-            return res.status(409).json({
-                message: "Email is already registered"
-            });
+            return res.status(409).json({ message: "Email is already registered" });
         }
 
         console.error("Registration failed:", error.message);
-
-        return res.status(500).json({
-            message: "Registration failed"
-        });
+        return res.status(500).json({ message: "Registration failed" });
     }
 }
 
@@ -92,35 +82,25 @@ async function login(req, res) {
             !email.trim() ||
             !password
         ) {
-            return res.status(400).json({
-                message: "Email and password are required"
-            });
+            return res.status(400).json({ message: "Email and password are required" });
         }
 
         const normalizedEmail = email.trim().toLowerCase();
-
-        const user = await userModel.findUserByEmail(normalizedEmail);
+        const user            = await userModel.findUserByEmail(normalizedEmail);
 
         // Same error for "not found" and "inactive" — prevents user enumeration
         if (!user || !user.is_active) {
-            return res.status(401).json({
-                message: "Invalid email or password"
-            });
+            return res.status(401).json({ message: "Invalid email or password" });
         }
 
         const passwordMatches = await bcrypt.compare(password, user.password_hash);
-
         if (!passwordMatches) {
-            return res.status(401).json({
-                message: "Invalid email or password"
-            });
+            return res.status(401).json({ message: "Invalid email or password" });
         }
 
         if (!process.env.JWT_SECRET) {
             console.error("JWT_SECRET is not configured");
-            return res.status(500).json({
-                message: "Authentication is not configured"
-            });
+            return res.status(500).json({ message: "Authentication is not configured" });
         }
 
         // Sign a short-lived token with only the user ID in the payload
@@ -134,22 +114,16 @@ async function login(req, res) {
             message: "Login successful",
             token,
             user: {
-                id: user.id,
-                name: user.name,
+                id:    user.id,
+                name:  user.name,
                 email: user.email,
-                role: user.role
-            }
+                role:  user.role,
+            },
         });
     } catch (error) {
         console.error("Login failed:", error.message);
-
-        return res.status(500).json({
-            message: "Login failed"
-        });
+        return res.status(500).json({ message: "Login failed" });
     }
 }
 
-module.exports = {
-    register,
-    login
-};
+module.exports = { register, login };
