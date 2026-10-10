@@ -1,5 +1,8 @@
 // Configures Express middleware and mounts all routes. Server startup is in server.js.
 const express = require("express");
+// Configure security-related HTTP response headers
+const helmet = require("helmet");
+
 const pool    = require("./db");
 
 const authRoutes    = require("./routes/authRoutes");
@@ -8,6 +11,8 @@ const projectRoutes = require("./routes/projectRoutes");
 const { authenticateToken, requireRole } = require("./middleware/authMiddleware");
 
 const app = express();
+// Apply security headers to all API responses
+app.use(helmet());
 
 app.use(express.json()); // Parse JSON request bodies
 
@@ -20,24 +25,6 @@ app.use("/api/projects", projectRoutes);
 // Health check
 app.get("/", (req, res) => {
     res.json({ message: "VertexArc API is running" });
-});
-
-// Database connectivity test
-app.get("/api/db-test", async (req, res) => {
-    try {
-        const result = await pool.query(
-            "SELECT current_database() AS database, NOW() AS time"
-        );
-
-        res.json({
-            message:  "Database connection successful",
-            database: result.rows[0].database,
-            time:     result.rows[0].time,
-        });
-    } catch (error) {
-        console.error("Database connection failed:", error.message);
-        res.status(500).json({ message: "Database connection failed" });
-    }
 });
 
 // Admin-only — returns all users (password_hash excluded)
