@@ -1,5 +1,6 @@
 // Project routes — mounted at /api/projects in app.js.
 const express           = require("express");
+const taskRoutes        = require("./taskRoutes");
 const projectController = require("../controllers/projectController");
 
 const { authenticateToken, requireRole } = require("../middleware/authMiddleware");
@@ -27,5 +28,8 @@ router.post(
     requireRole("ADMIN", "PROJECT_MANAGER"),
     projectController.addMember              // Add a user to a project
 );
+
+// Handle tasks belonging to a project
+router.use("/:projectId/tasks", taskRoutes);
 
 module.exports = router;

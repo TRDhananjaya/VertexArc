@@ -1,6 +1,6 @@
 // Handles project requests and validates user permissions.
-const projectModel = require("../models/projectModel");
-const userModel = require("../models/userModel");
+const projectModel  = require("../models/projectModel");
+const userModel     = require("../models/userModel");
 
 // Check whether an ID fits PostgreSQL's positive INTEGER range
 function isValidId(id) {

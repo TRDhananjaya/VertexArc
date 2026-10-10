@@ -22,11 +22,6 @@ app.get("/", (req, res) => {
     res.json({ message: "VertexArc API is running" });
 });
 
-// Protected tasks placeholder — requires a valid JWT
-app.get("/api/tasks", authenticateToken, (req, res) => {
-    res.json({ message: "Tasks retrieved successfully", tasks: [] });
-});
-
 // Database connectivity test
 app.get("/api/db-test", async (req, res) => {
     try {
