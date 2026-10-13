@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "cross-env NODE_ENV=test dotenv -e .env.test -- jest --runInBand",
+    "test": "cross-env NODE_ENV=test dotenv run -f .env.test -- jest --runInBand",
     "test:watch": "jest --watch --runInBand"
   },
   "keywords": [],
