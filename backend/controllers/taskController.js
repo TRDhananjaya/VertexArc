@@ -356,9 +356,97 @@ async function updateTaskStatus(req, res) {
     }
 }
 
+// Allow authorized project managers and admins to edit task details
+async function updateTaskDetails(req, res) {
+    try {
+        const { projectId, taskId } = req.params;
+        const { title, description, priority } = req.body;
+
+        if (!isValidId(projectId) || !isValidId(taskId)) {
+            return res.status(400).json({
+                message: "Invalid project or task ID"
+            });
+        }
+
+        if (
+            typeof title !== "string" ||
+            !title.trim() ||
+            title.trim().length > 150
+        ) {
+            return res.status(400).json({
+                message: "Title must be between 1 and 150 characters"
+            });
+        }
+
+        if (
+            description !== undefined &&
+            description !== null &&
+            (typeof description !== "string" || description.length > 5000)
+        ) {
+            return res.status(400).json({
+                message: "Description must not exceed 5000 characters"
+            });
+        }
+
+        if (!["LOW", "MEDIUM", "HIGH"].includes(priority)) {
+            return res.status(400).json({
+                message: "Priority must be LOW, MEDIUM, or HIGH"
+            });
+        }
+
+        const project = await projectModel.findProjectById(projectId);
+
+        if (!project) {
+            return res.status(404).json({
+                message: "Project not found"
+            });
+        }
+
+        const canManage =
+            req.user.role === "ADMIN" ||
+            (
+                req.user.role === "PROJECT_MANAGER" &&
+                Number(project.created_by) === Number(req.user.id)
+            );
+
+        if (!canManage) {
+            return res.status(403).json({
+                message: "You cannot edit tasks in this project"
+            });
+        }
+
+        const task = await taskModel.updateTaskDetails(
+            taskId,
+            projectId,
+            title.trim(),
+            description === undefined ? null : description,
+            priority
+        );
+
+        if (!task) {
+            return res.status(404).json({
+                message: "Task not found"
+            });
+        }
+
+        return res.status(200).json({
+            message: "Task updated successfully",
+            task
+        });
+
+    } catch (error) {
+        console.error("Update task error:", error);
+
+        return res.status(500).json({
+            message: "Internal server error"
+        });
+    }
+}
+
 module.exports = {
     createTask,
     getTasks,
     assignTask,
     updateTaskStatus,
+    updateTaskDetails
 };

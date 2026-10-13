@@ -29,6 +29,13 @@ router.patch(
     taskController.assignTask
 );
 
+// Edit task title, description, and priority
+router.patch(
+    "/:taskId",
+    requireRole("ADMIN", "PROJECT_MANAGER"),
+    taskController.updateTaskDetails
+);
+
 // Update a task's workflow status
 router.patch(
     "/:taskId/status",

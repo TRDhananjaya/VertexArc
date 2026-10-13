@@ -250,6 +250,22 @@ async function updateTaskStatus(
     }
 }
 
+// Update editable task details without changing its workflow status
+async function updateTaskDetails(taskId, projectId, title, description, priority) {
+    const result = await pool.query(
+        `UPDATE tasks
+                 SET title = $1,
+                     description = $2,
+                     priority = $3,
+                     updated_at = NOW()
+                 WHERE id = $4 AND project_id = $5
+                 RETURNING id, project_id, title, description,
+                           priority, status, assigned_to, updated_at`,
+                [title, description, priority, taskId, projectId]
+            );
+
+            return result.rows[0] || null;
+}
 
 module.exports = {
     createTask,
@@ -257,4 +273,5 @@ module.exports = {
     findTaskById,
     assignTask,
     updateTaskStatus,
+    updateTaskDetails
 };
