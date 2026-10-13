@@ -66,7 +66,8 @@ async function getTasksForProject(projectId) {
          FROM tasks t
          JOIN users creator ON creator.id = t.created_by
          LEFT JOIN users assignee ON assignee.id = t.assigned_to
-         WHERE t.project_id = $1
+         WHERE t.project_id = $1 
+         AND t.deleted_at IS NULL
          ORDER BY t.created_at DESC, t.id DESC`,
         [projectId]
     );
@@ -80,7 +81,8 @@ async function findTaskById(taskId, projectId) {
         `SELECT id, project_id, title, status, assigned_to,
                 is_security_sensitive, risk_level
          FROM tasks
-         WHERE id = $1 AND project_id = $2`,
+         WHERE id = $1 AND project_id = $2
+         AND deleted_at IS NULL`,
         [taskId, projectId]
     );
 
@@ -94,6 +96,7 @@ async function assignTask(taskId, projectId, userId) {
          SET assigned_to = $1,
              updated_at = NOW()
          WHERE id = $2 AND project_id = $3
+         AND deleted_at IS NULL
          RETURNING id, project_id, title, assigned_to, updated_at`,
         [userId, taskId, projectId]
     );
@@ -121,6 +124,7 @@ async function updateTaskStatus(
             `SELECT id, status, assigned_to, is_security_sensitive
              FROM tasks
              WHERE id = $1 AND project_id = $2
+             AND deleted_at IS NULL
              FOR UPDATE`,
             [taskId, projectId]
         );
@@ -267,11 +271,28 @@ async function updateTaskDetails(taskId, projectId, title, description, priority
             return result.rows[0] || null;
 }
 
+// Soft-delete a task while preserving its security history
+async function softDeleteTask(taskId, projectId) {
+    const result = await pool.query(
+        `UPDATE tasks
+         SET deleted_at = NOW(),
+             updated_at = NOW()
+         WHERE id = $1
+           AND project_id = $2
+           AND deleted_at IS NULL
+         RETURNING id, project_id, title, deleted_at`,
+        [taskId, projectId]
+    );
+
+    return result.rows[0] || null;
+}
+
 module.exports = {
     createTask,
     getTasksForProject,
     findTaskById,
     assignTask,
     updateTaskStatus,
-    updateTaskDetails
+    updateTaskDetails,
+    softDeleteTask
 };

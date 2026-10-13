@@ -36,6 +36,13 @@ router.patch(
     taskController.updateTaskDetails
 );
 
+// Delete a task without erasing its audit history
+router.delete(
+    "/:taskId",
+    requireRole("ADMIN", "PROJECT_MANAGER"),
+    taskController.deleteTask
+);
+
 // Update a task's workflow status
 router.patch(
     "/:taskId/status",
