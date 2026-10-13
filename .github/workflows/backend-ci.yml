@@ -40,3 +40,11 @@ jobs:
       # Run the complete Jest test suite
       - name: Run automated tests
         run: npm test
+
+      # Check dependencies for known high and critical vulnerabilities
+      - name: Dependency vulnerability scan
+        run: npm audit --audit-level=high
+
+      # Check production dependencies with a stricter severity threshold
+      - name: Production dependency security scan
+        run: npm audit --omit=dev --audit-level=moderate
