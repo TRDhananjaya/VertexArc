@@ -55,7 +55,7 @@ test("Project creator can soft-delete a task", async () => {
         .set("Authorization", `Bearer ${createToken(2)}`);
 
     expect(response.status).toBe(200);
-    expect(taskModel.softDeleteTask).toHaveBeenCalledWith("5", "1");
+    expect(taskModel.softDeleteTask).toHaveBeenCalledWith("5", "1",2);
 });
 
 // Developers cannot delete tasks

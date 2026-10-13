@@ -129,35 +129,139 @@ async function addMemberToProject(projectId, userId) {
     return result.rows[0] || null;
 }
 
-// Update project details without changing its creator
-async function updateProjectDetails(projectId, name, description) {
-    const result = await pool.query(
-        `UPDATE projects
-         SET name = $1,
-             description = $2,
-             updated_at = NOW()
-         WHERE id = $3
-           AND deleted_at IS NULL
-         RETURNING id, name, description, created_by, updated_at`,
-        [name, description, projectId]
-    );
 
-    return result.rows[0] || null;
+// Update project details and record the change in one transaction
+async function updateProjectDetails(projectId, name, description, actorId) {
+    const client = await pool.connect();
+
+    try {
+        await client.query("BEGIN");
+
+        // Lock the current project before editing
+        const currentResult = await client.query(
+            `SELECT id, name, description
+             FROM projects
+             WHERE id = $1
+               AND deleted_at IS NULL
+             FOR UPDATE`,
+            [projectId]
+        );
+
+        const currentProject = currentResult.rows[0];
+
+        if (!currentProject) {
+            await client.query("ROLLBACK");
+            return null;
+        }
+
+        const updatedResult = await client.query(
+            `UPDATE projects
+             SET name = $1,
+                 description = $2,
+                 updated_at = NOW()
+             WHERE id = $3
+               AND deleted_at IS NULL
+             RETURNING id, name, description, created_by, updated_at`,
+            [name, description, projectId]
+        );
+
+        const updatedProject = updatedResult.rows[0];
+
+        // Record the old and new project details
+        await client.query(
+            `INSERT INTO project_audit_logs
+                (project_id, actor_id, action, old_value, new_value)
+             VALUES ($1, $2, 'PROJECT_UPDATED', $3::jsonb, $4::jsonb)`,
+            [
+                projectId,
+                actorId,
+                JSON.stringify({
+                    name: currentProject.name,
+                    description: currentProject.description
+                }),
+                JSON.stringify({
+                    name: updatedProject.name,
+                    description: updatedProject.description
+                })
+            ]
+        );
+
+        await client.query("COMMIT");
+
+        return updatedProject;
+    } catch (error) {
+        await client.query("ROLLBACK");
+        throw error;
+    } finally {
+        client.release();
+    }
 }
 
-// Soft-delete a project while preserving its tasks and audit history
-async function softDeleteProject(projectId) {
-    const result = await pool.query(
-        `UPDATE projects
-         SET deleted_at = NOW(),
-             updated_at = NOW()
-         WHERE id = $1
-           AND deleted_at IS NULL
-         RETURNING id, name, created_by, deleted_at`,
-        [projectId]
-    );
 
-    return result.rows[0] || null;
+// Soft-delete a project and record the deletion in one transaction
+async function softDeleteProject(projectId, actorId) {
+    const client = await pool.connect();
+
+    try {
+        await client.query("BEGIN");
+
+        // Lock the project to prevent concurrent deletion
+        const projectResult = await client.query(
+            `SELECT id, name, created_by
+             FROM projects
+             WHERE id = $1
+               AND deleted_at IS NULL
+             FOR UPDATE`,
+            [projectId]
+        );
+
+        const project = projectResult.rows[0];
+
+        if (!project) {
+            await client.query("ROLLBACK");
+            return null;
+        }
+
+        // Preserve the project and all its related records
+        const deletedResult = await client.query(
+            `UPDATE projects
+             SET deleted_at = NOW(),
+                 updated_at = NOW()
+             WHERE id = $1
+               AND deleted_at IS NULL
+             RETURNING id, name, created_by, deleted_at`,
+            [projectId]
+        );
+
+        const deletedProject = deletedResult.rows[0];
+
+        // Record who deleted the project and when
+        await client.query(
+            `INSERT INTO project_audit_logs
+                (project_id, actor_id, action, old_value, new_value)
+             VALUES ($1, $2, 'PROJECT_DELETED', $3::jsonb, $4::jsonb)`,
+            [
+                projectId,
+                actorId,
+                JSON.stringify({
+                    name: project.name,
+                    deleted_at: null
+                }),
+                JSON.stringify({
+                    deleted_at: deletedProject.deleted_at
+                })
+            ]
+        );
+
+        await client.query("COMMIT");
+
+        return deletedProject;
+    } catch (error) {
+        await client.query("ROLLBACK");
+        throw error;
+    } finally {
+        client.release();
+    }
 }
 
 module.exports = {

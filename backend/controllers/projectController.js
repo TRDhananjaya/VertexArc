@@ -256,7 +256,8 @@ async function updateProject(req, res) {
         const updatedProject = await projectModel.updateProjectDetails(
             projectId,
             name.trim(),
-            description.trim()
+            description.trim(),
+            req.user.id
         );
 
         if (!updatedProject) {
@@ -305,7 +306,8 @@ async function deleteProject(req, res) {
 
         // Mark the project as deleted instead of removing its records
         const deletedProject = await projectModel.softDeleteProject(
-            projectId
+            projectId,
+            req.user.id
         );
 
         if (!deletedProject) {

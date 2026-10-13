@@ -477,7 +477,8 @@ async function deleteTask(req, res) {
 
         const deletedTask = await taskModel.softDeleteTask(
             taskId,
-            projectId
+            projectId,
+            req.user.id
         );
 
         if (!deletedTask) {

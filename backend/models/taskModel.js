@@ -271,20 +271,72 @@ async function updateTaskDetails(taskId, projectId, title, description, priority
             return result.rows[0] || null;
 }
 
-// Soft-delete a task while preserving its security history
-async function softDeleteTask(taskId, projectId) {
-    const result = await pool.query(
-        `UPDATE tasks
-         SET deleted_at = NOW(),
-             updated_at = NOW()
-         WHERE id = $1
-           AND project_id = $2
-           AND deleted_at IS NULL
-         RETURNING id, project_id, title, deleted_at`,
-        [taskId, projectId]
-    );
+// Soft-delete a task and record who deleted it in one transaction
+async function softDeleteTask(taskId, projectId, actorId) {
+    const client = await pool.connect();
 
-    return result.rows[0] || null;
+    try {
+        await client.query("BEGIN");
+
+        // Lock the task so concurrent requests cannot delete it twice
+        const taskResult = await client.query(
+            `SELECT id, project_id, title, status
+             FROM tasks
+             WHERE id = $1
+               AND project_id = $2
+               AND deleted_at IS NULL
+             FOR UPDATE`,
+            [taskId, projectId]
+        );
+
+        const task = taskResult.rows[0];
+
+        if (!task) {
+            await client.query("ROLLBACK");
+            return null;
+        }
+
+        // Keep the task record but mark it as deleted
+        const deletedResult = await client.query(
+            `UPDATE tasks
+             SET deleted_at = NOW(),
+                 updated_at = NOW()
+             WHERE id = $1
+               AND project_id = $2
+               AND deleted_at IS NULL
+             RETURNING id, project_id, title, deleted_at`,
+            [taskId, projectId]
+        );
+
+        const deletedTask = deletedResult.rows[0];
+
+        // Store the deletion event for future security investigations
+        await client.query(
+            `INSERT INTO task_audit_logs
+                (task_id, actor_id, action, old_value, new_value)
+             VALUES ($1, $2, 'TASK_DELETED', $3::jsonb, $4::jsonb)`,
+            [
+                taskId,
+                actorId,
+                JSON.stringify({
+                    status: task.status,
+                    deleted_at: null
+                }),
+                JSON.stringify({
+                    deleted_at: deletedTask.deleted_at
+                })
+            ]
+        );
+
+        await client.query("COMMIT");
+
+        return deletedTask;
+    } catch (error) {
+        await client.query("ROLLBACK");
+        throw error;
+    } finally {
+        client.release();
+    }
 }
 
 module.exports = {

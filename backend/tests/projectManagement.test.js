@@ -55,7 +55,14 @@ test("Project creator can edit their project", async () => {
         });
 
     expect(response.status).toBe(200);
-    expect(projectModel.updateProjectDetails).toHaveBeenCalled();
+    
+// Verify the correct project details and actor ID are passed
+    expect(projectModel.updateProjectDetails).toHaveBeenCalledWith(
+        "1",
+        "Updated Project",
+        "Updated description",
+        2
+    );
 });
 
 // A developer cannot edit a project
@@ -74,6 +81,7 @@ test("Developer cannot edit a project", async () => {
         });
 
     expect(response.status).toBe(403);
+    // Developers must not be allowed to modify project details
     expect(projectModel.updateProjectDetails).not.toHaveBeenCalled();
 });
 
@@ -101,7 +109,7 @@ test("Project creator can delete their project", async () => {
         .set("Authorization", `Bearer ${createToken(2)}`);
 
     expect(response.status).toBe(200);
-    expect(projectModel.softDeleteProject).toHaveBeenCalledWith("1");
+    expect(projectModel.softDeleteProject).toHaveBeenCalledWith("1", 2);
 });
 
 // A different project manager cannot delete another creator's project
