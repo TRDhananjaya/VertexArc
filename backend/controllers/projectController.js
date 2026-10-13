@@ -1,11 +1,22 @@
 // Handles project requests and validates user permissions.
-const projectModel  = require("../models/projectModel");
-const userModel     = require("../models/userModel");
+const projectModel = require("../models/projectModel");
+const userModel = require("../models/userModel");
 
 // Check whether an ID fits PostgreSQL's positive INTEGER range
 function isValidId(id) {
     return /^[1-9]\d*$/.test(String(id)) &&
         Number(id) <= 2147483647;
+}
+
+// Check whether the user can manage this project
+function canManageProject(user, project) {
+    return (
+        user.role === "ADMIN" ||
+        (
+            user.role === "PROJECT_MANAGER" &&
+            Number(project.created_by) === Number(user.id)
+        )
+    );
 }
 
 // POST /api/projects — create a new project
@@ -89,7 +100,8 @@ async function getMembers(req, res) {
                 message: "Project not found"
             });
         }
-        // Admins can view any project; other users must belong to this project.
+
+        // Admins can view any project; other users must be members
         if (req.user.role !== "ADMIN") {
             const isMember = await projectModel.isProjectMember(
                 projectId,
@@ -137,11 +149,9 @@ async function addMember(req, res) {
             });
         }
 
-        // Admins can manage any project; managers can manage only projects they created.
-        if (
-            req.user.role !== "ADMIN" &&
-            project.created_by !== req.user.id
-        ) {
+        // Only admins or the Project Manager who created the project
+        // can add new members.
+        if (!canManageProject(req.user, project)) {
             return res.status(403).json({
                 message: "You cannot manage this project"
             });
@@ -171,6 +181,13 @@ async function addMember(req, res) {
             userId
         );
 
+        // The project might have been deleted after our initial lookup
+        if (!member) {
+            return res.status(404).json({
+                message: "Project not found or has been deleted"
+            });
+        }
+
         return res.status(201).json({
             message: "Member added successfully",
             member
@@ -191,9 +208,130 @@ async function addMember(req, res) {
     }
 }
 
+// PATCH /api/projects/:projectId — edit project details
+async function updateProject(req, res) {
+    try {
+        const { projectId } = req.params;
+        const { name, description = "" } = req.body ?? {};
+
+        if (!isValidId(projectId)) {
+            return res.status(400).json({
+                message: "Invalid project ID"
+            });
+        }
+
+        if (
+            typeof name !== "string" ||
+            name.trim().length === 0 ||
+            name.trim().length > 150
+        ) {
+            return res.status(400).json({
+                message: "Project name must be between 1 and 150 characters"
+            });
+        }
+
+        if (
+            typeof description !== "string" ||
+            description.length > 5000
+        ) {
+            return res.status(400).json({
+                message: "Description must not exceed 5000 characters"
+            });
+        }
+
+        const project = await projectModel.findProjectById(projectId);
+
+        if (!project) {
+            return res.status(404).json({
+                message: "Project not found"
+            });
+        }
+
+        if (!canManageProject(req.user, project)) {
+            return res.status(403).json({
+                message: "You cannot edit this project"
+            });
+        }
+
+        const updatedProject = await projectModel.updateProjectDetails(
+            projectId,
+            name.trim(),
+            description.trim()
+        );
+
+        if (!updatedProject) {
+            return res.status(404).json({
+                message: "Project not found"
+            });
+        }
+
+        return res.status(200).json({
+            message: "Project updated successfully",
+            project: updatedProject
+        });
+    } catch (error) {
+        console.error("Update project error:", error.message);
+
+        return res.status(500).json({
+            message: "Internal server error"
+        });
+    }
+}
+
+// DELETE /api/projects/:projectId — soft-delete a project
+async function deleteProject(req, res) {
+    try {
+        const { projectId } = req.params;
+
+        if (!isValidId(projectId)) {
+            return res.status(400).json({
+                message: "Invalid project ID"
+            });
+        }
+
+        const project = await projectModel.findProjectById(projectId);
+
+        if (!project) {
+            return res.status(404).json({
+                message: "Project not found"
+            });
+        }
+
+        if (!canManageProject(req.user, project)) {
+            return res.status(403).json({
+                message: "You cannot delete this project"
+            });
+        }
+
+        // Mark the project as deleted instead of removing its records
+        const deletedProject = await projectModel.softDeleteProject(
+            projectId
+        );
+
+        if (!deletedProject) {
+            return res.status(404).json({
+                message: "Project not found"
+            });
+        }
+
+        return res.status(200).json({
+            message: "Project deleted successfully",
+            project: deletedProject
+        });
+    } catch (error) {
+        console.error("Delete project error:", error.message);
+
+        return res.status(500).json({
+            message: "Internal server error"
+        });
+    }
+}
+
 module.exports = {
     createProject,
     getProjects,
     getMembers,
-    addMember
+    addMember,
+    updateProject,
+    deleteProject
 };

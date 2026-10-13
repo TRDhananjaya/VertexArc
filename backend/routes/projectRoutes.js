@@ -18,6 +18,20 @@ router.post(
     projectController.createProject          // Create a new project
 );
 
+// Edit project details
+router.patch(
+    "/:projectId",
+    requireRole("ADMIN", "PROJECT_MANAGER"),
+    projectController.updateProject
+);
+
+// Soft-delete a project and preserve its related records
+router.delete(
+    "/:projectId",
+    requireRole("ADMIN", "PROJECT_MANAGER"),
+    projectController.deleteProject
+);
+
 router.get(
     "/:projectId/members",
     projectController.getMembers             // List members of a project
@@ -27,6 +41,18 @@ router.post(
     "/:projectId/members",
     requireRole("ADMIN", "PROJECT_MANAGER"),
     projectController.addMember              // Add a user to a project
+);
+
+router.patch(
+    "/:projectId",
+    requireRole("ADMIN", "PROJECT_MANAGER"),
+    projectController.updateProject
+);
+
+router.delete(
+    "/:projectId",
+    requireRole("ADMIN", "PROJECT_MANAGER"),
+    projectController.deleteProject
 );
 
 // Handle tasks belonging to a project
