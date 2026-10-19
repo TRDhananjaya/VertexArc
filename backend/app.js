@@ -7,6 +7,7 @@ const pool    = require("./db");
 
 const authRoutes    = require("./routes/authRoutes");
 const projectRoutes = require("./routes/projectRoutes");
+const adminAuditRoutes = require("./routes/adminAuditRoutes");
 
 const { authenticateToken, requireRole } = require("./middleware/authMiddleware");
 
@@ -21,6 +22,9 @@ app.use("/api/auth", authRoutes);
 
 // Project routes — authentication is enforced inside the router
 app.use("/api/projects", projectRoutes);
+
+// Administrative access to project and task audit history
+app.use("/api/admin/audit-logs", adminAuditRoutes);
 
 // Health check
 app.get("/", (req, res) => {
