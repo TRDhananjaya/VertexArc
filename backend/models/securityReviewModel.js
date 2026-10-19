@@ -26,7 +26,9 @@ async function updateSecurityReview(taskId, projectId, checks, reviewerId) {
         const taskResult = await client.query(
             `SELECT id, status, is_security_sensitive
              FROM tasks
-             WHERE id = $1 AND project_id = $2
+             WHERE id = $1
+             AND project_id = $2
+             AND deleted_at IS NULL
              FOR UPDATE`,
             [taskId, projectId]
         );

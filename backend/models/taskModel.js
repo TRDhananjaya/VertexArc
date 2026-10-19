@@ -61,6 +61,7 @@ async function getTasksForProject(projectId) {
         `SELECT t.id, t.project_id, t.title, t.description,
                 t.status, t.priority, t.created_by,
                 t.assigned_to, t.created_at, t.updated_at,
+                t.is_security_sensitive,t.risk_level,
                 creator.name AS creator_name,
                 assignee.name AS assignee_name
          FROM tasks t
@@ -262,7 +263,9 @@ async function updateTaskDetails(taskId, projectId, title, description, priority
                      description = $2,
                      priority = $3,
                      updated_at = NOW()
-                 WHERE id = $4 AND project_id = $5
+                 WHERE id = $4
+                 AND project_id = $5
+                 AND deleted_at IS NULL
                  RETURNING id, project_id, title, description,
                            priority, status, assigned_to, updated_at`,
                 [title, description, priority, taskId, projectId]

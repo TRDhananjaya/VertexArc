@@ -86,7 +86,7 @@ async function createTask(req, res) {
             req.user.role !== "ADMIN" &&
             (
                 req.user.role !== "PROJECT_MANAGER" ||
-                project.created_by !== req.user.id
+                Number(project.created_by) !== Number(req.user.id)
             )
         ) {
             return res.status(403).json({
@@ -191,7 +191,7 @@ async function assignTask(req, res) {
             req.user.role !== "ADMIN" &&
             (
                 req.user.role !== "PROJECT_MANAGER" ||
-                project.created_by !== req.user.id
+                Number(project.created_by) !== Number(req.user.id)
             )
         ) {
             return res.status(403).json({

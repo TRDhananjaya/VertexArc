@@ -3,15 +3,24 @@ const express = require("express");
 // Configure security-related HTTP response headers
 const helmet = require("helmet");
 
-const pool    = require("./db");
+// CORS is needed so the React frontend can call the backend API
+const cors = require("cors");
 
-const authRoutes    = require("./routes/authRoutes");
+const pool = require("./db");
+
+const authRoutes = require("./routes/authRoutes");
 const projectRoutes = require("./routes/projectRoutes");
 const adminAuditRoutes = require("./routes/adminAuditRoutes");
 
 const { authenticateToken, requireRole } = require("./middleware/authMiddleware");
 
 const app = express();
+
+// Allow the local React frontend to call our backend API
+app.use(cors({
+    origin: "http://localhost:5173"
+}));
+
 // Apply security headers to all API responses
 app.use(helmet());
 

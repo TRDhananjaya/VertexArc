@@ -49,12 +49,6 @@ router.patch(
     projectController.updateProject
 );
 
-router.delete(
-    "/:projectId",
-    requireRole("ADMIN", "PROJECT_MANAGER"),
-    projectController.deleteProject
-);
-
 // Handle tasks belonging to a project
 router.use("/:projectId/tasks", taskRoutes);
 
