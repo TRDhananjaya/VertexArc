@@ -1,45 +1,49 @@
 import { useState } from "react";
 import Login from "./pages/Login";
+import Dashboard from "./pages/Dashboard";
+import ProjectDetails from "./pages/ProjectDetails";
 
 function App() {
-  const [session, setSession] = useState(null);
+  const [token, setToken] = useState(null);
+  const [user, setUser] = useState(null);
+  const [selectedProject, setSelectedProject] = useState(null);
 
   function handleLogin(data) {
-    // Temporary in-memory session for our first integration test
-    setSession(data);
+    if (!data.token || typeof data.token !== "string") {
+      throw new Error("Login response did not contain a valid token");
+    }
+
+    setToken(data.token);
+    setUser(data.user || null);
   }
 
   function handleLogout() {
-    setSession(null);
+    setToken(null);
+    setSelectedProject(null);
+    setUser(null);
   }
 
-  if (!session) {
+  if (!token) {
     return <Login onLogin={handleLogin} />;
   }
 
+  if (selectedProject) {
+    return (
+      <ProjectDetails
+        project={selectedProject}
+        token={token}
+        onBack={() => setSelectedProject(null)}
+      />
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-slate-950 p-8 text-white">
-      <div className="mx-auto max-w-4xl rounded-2xl border border-slate-800 bg-slate-900 p-8">
-        <h1 className="text-3xl font-bold">
-          Welcome to VertexArc!
-        </h1>
-
-        <p className="mt-3 text-slate-400">
-          Your login request was successful.
-        </p>
-
-        <div className="mt-6 rounded-lg border border-emerald-500/30 bg-emerald-500/10 p-4 text-emerald-400">
-          Authentication successful
-        </div>
-
-        <button
-          onClick={handleLogout}
-          className="mt-6 rounded-lg border border-slate-700 px-4 py-2 text-sm hover:bg-slate-800"
-        >
-          Log out
-        </button>
-      </div>
-    </div>
+    <Dashboard
+      token={token}
+      user={user}
+      onLogout={handleLogout}
+      onSelectProject={setSelectedProject}
+    />
   );
 }
 
