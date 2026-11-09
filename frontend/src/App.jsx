@@ -32,6 +32,7 @@ function App() {
       <ProjectDetails
         project={selectedProject}
         token={token}
+        user={user}
         onBack={() => setSelectedProject(null)}
       />
     );

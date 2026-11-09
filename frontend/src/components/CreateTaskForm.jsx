@@ -26,9 +26,10 @@ function CreateTaskForm({ projectId, token, onCreated, onCancel }) {
         title: title.trim(),
         description: description.trim(),
         priority,
-        is_security_sensitive: securitySensitive,
-        risk_level: securitySensitive ? riskLevel : "LOW"
+        isSecuritySensitive: securitySensitive,
+        riskLevel: securitySensitive ? riskLevel : null
       });
+
 
       onCreated();
     } catch (err) {

@@ -2,12 +2,18 @@ import { useEffect, useState } from "react";
 import { getProjectTasks } from "../api";
 import CreateTaskForm from "../components/CreateTaskForm";
 
-function ProjectDetails({ project, token, onBack }) {
+function ProjectDetails({ project, token, user, onBack }) {
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
+  const canCreateTask =
+    user?.role === "ADMIN" ||
+    (
+      user?.role === "PROJECT_MANAGER" &&
+      Number(project.created_by) === Number(user.id)
+    );
 
   useEffect(() => {
     let active = true;
