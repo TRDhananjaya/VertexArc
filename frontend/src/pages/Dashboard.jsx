@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { getProjects } from "../api";
 import CreateProjectForm from "../components/CreateProjectForm";
 
-function Dashboard({ token, user, onLogout, onSelectProject }) {
+function Dashboard({ token, user, onLogout, onSelectProject, onOpenUserManagement }) {
     const [projects, setProjects] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
@@ -54,12 +54,27 @@ function Dashboard({ token, user, onLogout, onSelectProject }) {
                         VertexArc
                     </h1>
 
-                    <button
-                        onClick={onLogout}
-                        className="rounded-lg border border-slate-700 px-4 py-2 text-sm transition hover:bg-slate-800"
-                    >
-                        Log out
-                    </button>
+
+                    <div className="flex items-center gap-3">
+                        {user?.role === "ADMIN" && (
+                            <button
+                                type="button"
+                                onClick={onOpenUserManagement}
+                                className="rounded-lg border border-emerald-500/50 px-4 py-2 text-sm text-emerald-400 transition hover:bg-emerald-500/10"
+                            >
+                                User Management
+                            </button>
+                        )}
+
+                        <button
+                            type="button"
+                            onClick={onLogout}
+                            className="rounded-lg border border-slate-700 px-4 py-2 text-sm transition hover:bg-slate-800"
+                        >
+                            Log out
+                        </button>
+                    </div>
+
                 </div>
             </header>
 

@@ -43,12 +43,6 @@ router.post(
     projectController.addMember              // Add a user to a project
 );
 
-router.patch(
-    "/:projectId",
-    requireRole("ADMIN", "PROJECT_MANAGER"),
-    projectController.updateProject
-);
-
 // Handle tasks belonging to a project
 router.use("/:projectId/tasks", taskRoutes);
 

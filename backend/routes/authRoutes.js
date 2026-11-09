@@ -1,11 +1,13 @@
-// Auth routes — mounted at /api/auth in app.js.
-const express        = require("express");
+const express = require("express");
 const authController = require("../controllers/authController");
-const {loginLimiter, registerLimiter} = require("../middleware/rateLimitMiddleware");
+const { loginLimiter } = require("../middleware/rateLimitMiddleware");
 
 const router = express.Router();
 
-router.post("/register", registerLimiter, authController.register); // Create a new user account
-router.post("/login", loginLimiter, authController.login);    // Authenticate and return a JWT
+// Public login is allowed for existing accounts.
+router.post("/login", loginLimiter, authController.login);
+
+// Public registration is intentionally disabled.
+// Admins create accounts through POST /api/users.
 
 module.exports = router;

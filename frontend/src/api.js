@@ -111,3 +111,96 @@ export async function createTask(projectId, token, taskData) {
 
   return data;
 }
+
+export async function getUsers(token) {
+  const response = await fetch(`${API_BASE_URL}/api/users`, {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+
+  if (!response.ok) {
+    if (response.status === 401) {
+      throw new Error("Your session has expired. Please log in again.");
+    }
+
+    if (response.status === 403) {
+      throw new Error("You do not have permission to view users.");
+    }
+
+    throw new Error("Failed to load users");
+  }
+
+  return response.json();
+}
+
+export async function createUser(token, userData) {
+  const response = await fetch(`${API_BASE_URL}/api/users`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`
+    },
+    body: JSON.stringify(userData)
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(
+      data.message || data.error || "Failed to create user"
+    );
+  }
+
+  return data;
+}
+
+export async function getProjectMembers(projectId, token) {
+  const response = await fetch(
+    `${API_BASE_URL}/api/projects/${projectId}/members`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    }
+  );
+
+  if (response.status === 401) {
+    throw new Error("Session expired. Please log in again.");
+  }
+
+  if (response.status === 403) {
+    throw new Error("You cannot view this project's members.");
+  }
+
+  if (!response.ok) {
+    throw new Error("Failed to load project members");
+  }
+
+  return response.json();
+}
+
+
+export async function addProjectMember(projectId, token, userId) {
+  const response = await fetch(
+    `${API_BASE_URL}/api/projects/${projectId}/members`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({ userId })
+    }
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(
+      data.message || "Failed to add project member"
+    );
+  }
+
+  return data;
+}

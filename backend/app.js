@@ -6,13 +6,10 @@ const helmet = require("helmet");
 // CORS is needed so the React frontend can call the backend API
 const cors = require("cors");
 
-const pool = require("./db");
-
 const authRoutes = require("./routes/authRoutes");
 const projectRoutes = require("./routes/projectRoutes");
 const adminAuditRoutes = require("./routes/adminAuditRoutes");
-
-const { authenticateToken, requireRole } = require("./middleware/authMiddleware");
+const userRoutes = require("./routes/userRoutes");
 
 const app = express();
 
@@ -35,26 +32,12 @@ app.use("/api/projects", projectRoutes);
 // Administrative access to project and task audit history
 app.use("/api/admin/audit-logs", adminAuditRoutes);
 
+app.use("/api/users", userRoutes);
+
 // Health check
 app.get("/", (req, res) => {
     res.json({ message: "VertexArc API is running" });
 });
 
-// Admin-only — returns all users (password_hash excluded)
-app.get("/api/users", authenticateToken, requireRole("ADMIN"), async (req, res) => {
-    try {
-        const result = await pool.query(`
-            SELECT id, name, email, role, is_active,
-                   created_at, updated_at
-            FROM users
-            ORDER BY id
-        `);
-
-        res.json({ users: result.rows });
-    } catch (error) {
-        console.error("Failed to retrieve users:", error.message);
-        res.status(500).json({ message: "Failed to retrieve users" });
-    }
-});
 
 module.exports = app;
