@@ -2,7 +2,13 @@ import { useEffect, useState } from "react";
 import { getProjects } from "../api";
 import CreateProjectForm from "../components/CreateProjectForm";
 
-function Dashboard({ token, user, onLogout, onSelectProject, onOpenUserManagement }) {
+function Dashboard({
+    token,
+    user,
+    onLogout,
+    onSelectProject,
+    onOpenUserManagement
+}) {
     const [projects, setProjects] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
@@ -17,20 +23,26 @@ function Dashboard({ token, user, onLogout, onSelectProject, onOpenUserManagemen
         let active = true;
 
         async function loadProjects() {
+            setLoading(true);
+            setError("");
+
             try {
                 const data = await getProjects(token);
 
                 if (!active) return;
 
-                // Supports either an array or a { projects: [...] } response
-                const projectList = Array.isArray(data)
-                    ? data
-                    : data.projects;
+                if (!Array.isArray(data?.projects)) {
+                    throw new Error(
+                        "Invalid projects response from server"
+                    );
+                }
 
-                setProjects(Array.isArray(projectList) ? projectList : []);
+                setProjects(data.projects);
+
             } catch (err) {
                 if (active) {
                     setError(err.message);
+                    setProjects([]);
                 }
             } finally {
                 if (active) {
@@ -44,23 +56,26 @@ function Dashboard({ token, user, onLogout, onSelectProject, onOpenUserManagemen
         return () => {
             active = false;
         };
+
     }, [token, refreshKey]);
 
     return (
         <div className="min-h-screen bg-slate-950 text-white">
+
             <header className="border-b border-slate-800 bg-slate-900">
                 <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
+
                     <h1 className="text-2xl font-bold text-emerald-400">
                         VertexArc
                     </h1>
 
-
                     <div className="flex items-center gap-3">
+
                         {user?.role === "ADMIN" && (
                             <button
                                 type="button"
                                 onClick={onOpenUserManagement}
-                                className="rounded-lg border border-emerald-500/50 px-4 py-2 text-sm text-emerald-400 transition hover:bg-emerald-500/10"
+                                className="rounded-lg border border-emerald-500/50 px-4 py-2 text-sm text-emerald-400 hover:bg-emerald-500/10"
                             >
                                 User Management
                             </button>
@@ -69,16 +84,17 @@ function Dashboard({ token, user, onLogout, onSelectProject, onOpenUserManagemen
                         <button
                             type="button"
                             onClick={onLogout}
-                            className="rounded-lg border border-slate-700 px-4 py-2 text-sm transition hover:bg-slate-800"
+                            className="rounded-lg border border-slate-700 px-4 py-2 text-sm hover:bg-slate-800"
                         >
                             Log out
                         </button>
-                    </div>
 
+                    </div>
                 </div>
             </header>
 
             <main className="mx-auto max-w-6xl px-6 py-10">
+
                 <div className="mb-8">
                     <h2 className="text-3xl font-bold">
                         Dashboard
@@ -89,8 +105,8 @@ function Dashboard({ token, user, onLogout, onSelectProject, onOpenUserManagemen
                     </p>
                 </div>
 
-
                 <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+
                     <h3 className="text-xl font-semibold">
                         Your Projects
                     </h3>
@@ -104,6 +120,7 @@ function Dashboard({ token, user, onLogout, onSelectProject, onOpenUserManagemen
                             + New Project
                         </button>
                     )}
+
                 </div>
 
                 {showCreateForm && canCreateProject && (
@@ -140,8 +157,8 @@ function Dashboard({ token, user, onLogout, onSelectProject, onOpenUserManagemen
 
                 {!loading && !error && projects.length > 0 && (
                     <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-                        {projects.map((project) => (
 
+                        {projects.map((project) => (
                             <button
                                 key={project.id}
                                 type="button"
@@ -153,7 +170,8 @@ function Dashboard({ token, user, onLogout, onSelectProject, onOpenUserManagemen
                                 </h4>
 
                                 <p className="mt-3 line-clamp-3 text-sm text-slate-400">
-                                    {project.description || "No description provided."}
+                                    {project.description ||
+                                        "No description provided."}
                                 </p>
 
                                 <div className="mt-5 border-t border-slate-800 pt-4">
@@ -161,10 +179,13 @@ function Dashboard({ token, user, onLogout, onSelectProject, onOpenUserManagemen
                                         Project ID: {project.id}
                                     </span>
                                 </div>
+
                             </button>
                         ))}
+
                     </div>
                 )}
+
             </main>
         </div>
     );

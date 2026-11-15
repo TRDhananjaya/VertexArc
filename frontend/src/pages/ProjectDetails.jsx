@@ -1,23 +1,32 @@
 import { useEffect, useState } from "react";
-import { getProjectTasks } from "../api";
+import { getProjectTasks, deleteProject } from "../api";
 import CreateTaskForm from "../components/CreateTaskForm";
+import EditProjectForm from "../components/EditProjectForm";
+import ConfirmDialog from "../components/ConfirmDialog";
 import ProjectMembers from "../components/ProjectMembers";
 
-function ProjectDetails({ project, token, user, onBack }) {
+function ProjectDetails({ project: initialProject, token, user, onBack }) {
+  const [project, setProject] = useState(initialProject);
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [showCreateForm, setShowCreateForm] = useState(false);
+  const [showEditForm, setShowEditForm] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [deleteError, setDeleteError] = useState("");
   const [refreshKey, setRefreshKey] = useState(0);
 
-  // Admins can create tasks in any project.
-  // Project Managers can create tasks in projects they created.
-  const canCreateTask =
+  // Can this user manage (edit/delete) this project?
+  const canManageProject =
     user?.role === "ADMIN" ||
     (user?.role === "PROJECT_MANAGER" &&
       project.created_by != null &&
       user.id != null &&
       String(project.created_by) === String(user.id));
+
+  // Can this user create tasks in this project?
+  const canCreateTask = canManageProject;
 
   // Load tasks whenever the project changes or a task is created.
   useEffect(() => {
@@ -59,6 +68,26 @@ function ProjectDetails({ project, token, user, onBack }) {
     };
   }, [project.id, token, refreshKey]);
 
+  // Handle project deletion
+  async function handleDeleteProject() {
+    setDeleteLoading(true);
+    setDeleteError("");
+
+    try {
+      await deleteProject(project.id, token);
+      onBack(); // Return to dashboard — the deleted project will no longer appear
+    } catch (err) {
+      setDeleteError(err.message);
+      setDeleteLoading(false);
+    }
+  }
+
+  // Handle successful project edit
+  function handleProjectUpdated(updatedProject) {
+    setProject(updatedProject);
+    setShowEditForm(false);
+  }
+
   // Task status colors
   const statusStyles = {
     TODO: "bg-slate-700 text-slate-200",
@@ -97,14 +126,71 @@ function ProjectDetails({ project, token, user, onBack }) {
 
         {/* Project information */}
         <div className="mb-10">
-          <h2 className="text-3xl font-bold">
-            {project.name}
-          </h2>
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div>
+              <h2 className="text-3xl font-bold">
+                {project.name}
+              </h2>
 
-          <p className="mt-3 text-slate-400">
-            {project.description || "No description provided."}
-          </p>
+              <p className="mt-3 text-slate-400">
+                {project.description || "No description provided."}
+              </p>
+            </div>
+
+            {/* Edit / Delete buttons — only for authorized users */}
+            {canManageProject && !showEditForm && (
+              <div className="flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => setShowEditForm(true)}
+                  className="rounded-lg border border-slate-700 px-4 py-2 text-sm text-slate-300 hover:bg-slate-800"
+                >
+                  Edit Project
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setShowDeleteConfirm(true)}
+                  className="rounded-lg border border-red-500/50 px-4 py-2 text-sm text-red-400 hover:bg-red-500/10"
+                >
+                  Delete Project
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Delete error message */}
+          {deleteError && (
+            <div
+              role="alert"
+              className="mt-4 rounded-lg border border-red-500/30 bg-red-500/10 p-4 text-red-400"
+            >
+              {deleteError}
+            </div>
+          )}
         </div>
+
+        {/* Edit Project form */}
+        {showEditForm && canManageProject && (
+          <EditProjectForm
+            project={project}
+            token={token}
+            onUpdated={handleProjectUpdated}
+            onCancel={() => setShowEditForm(false)}
+          />
+        )}
+
+        {/* Delete confirmation dialog */}
+        {showDeleteConfirm && (
+          <ConfirmDialog
+            title="Delete Project"
+            message={`Are you sure you want to delete "${project.name}"? This action will archive the project and all its associated data. This cannot be undone.`}
+            confirmLabel="Delete Project"
+            onConfirm={handleDeleteProject}
+            onCancel={() => setShowDeleteConfirm(false)}
+            loading={deleteLoading}
+          />
+        )}
 
         {/* Project Members */}
         <ProjectMembers

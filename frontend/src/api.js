@@ -64,7 +64,7 @@ export async function getProjectTasks(projectId, token) {
   return response.json();
 }
 
-// Create a new project (only for admins)
+// Create a new project (Admin and Project Manager)
 export async function createProject(token, name, description) {
   const response = await fetch(`${API_BASE_URL}/api/projects`, {
     method: "POST",
@@ -200,6 +200,51 @@ export async function addProjectMember(projectId, token, userId) {
     throw new Error(
       data.message || "Failed to add project member"
     );
+  }
+
+  return data;
+}
+
+
+// Update project details
+export async function updateProject(projectId, token, projectData) {
+  const response = await fetch(
+    `${API_BASE_URL}/api/projects/${projectId}`,
+    {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify(projectData)
+    }
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Failed to update project");
+  }
+
+  return data;
+}
+
+// Soft-delete a project
+export async function deleteProject(projectId, token) {
+  const response = await fetch(
+    `${API_BASE_URL}/api/projects/${projectId}`,
+    {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    }
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Failed to delete project");
   }
 
   return data;
