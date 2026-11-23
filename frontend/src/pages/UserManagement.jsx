@@ -3,7 +3,7 @@ import { getUsers } from "../api";
 import CreateUserForm from "../components/CreateUserForm";
 import Navbar from "../components/Navbar";
 
-function UserManagement({ token, user, onLogout, onBack, onGoDashboard, onOpenAuditLogs, theme, onToggleTheme }) {
+function UserManagement({ token, user, onBack, onGoDashboard, onToggleSidebar }) {
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
@@ -53,12 +53,9 @@ function UserManagement({ token, user, onLogout, onBack, onGoDashboard, onOpenAu
         <div className="min-h-screen bg-transparent text-gray-900 dark:text-white">
             <Navbar
                 user={user}
-                onLogout={onLogout}
                 onGoDashboard={onGoDashboard}
-                onOpenAuditLogs={onOpenAuditLogs}
                 subtitle="Administration / User Management"
-                theme={theme}
-                onToggleTheme={onToggleTheme}
+                onToggleSidebar={onToggleSidebar}
             />
 
             <main className="mx-auto max-w-6xl px-6 py-10">

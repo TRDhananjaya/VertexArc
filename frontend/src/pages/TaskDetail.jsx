@@ -13,12 +13,8 @@ function TaskDetail({
   memberMap = {},
   onBack,
   onTaskUpdated,
-  onLogout,
   onGoDashboard,
-  onOpenUserManagement,
-  onOpenAuditLogs,
-  theme,
-  onToggleTheme
+  onToggleSidebar
 }) {
   const [task, setTask] = useState(initialTask);
   const [comments, setComments] = useState([]);
@@ -155,13 +151,9 @@ function TaskDetail({
       {/* Top Header */}
       <Navbar
         user={user}
-        onLogout={onLogout}
         onGoDashboard={onGoDashboard}
-        onOpenUserManagement={onOpenUserManagement}
-        onOpenAuditLogs={onOpenAuditLogs}
         subtitle={`Project: ${project.name} | Task #${task.id}`}
-        theme={theme}
-        onToggleTheme={onToggleTheme}
+        onToggleSidebar={onToggleSidebar}
       />
 
       <main className="mx-auto max-w-5xl px-6 py-8">

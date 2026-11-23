@@ -13,12 +13,8 @@ function ProjectDetails({
   token,
   user,
   onBack,
-  onLogout,
   onGoDashboard,
-  onOpenUserManagement,
-  onOpenAuditLogs,
-  theme,
-  onToggleTheme
+  onToggleSidebar
 }) {
   const [project, setProject] = useState(initialProject);
   const [selectedTask, setSelectedTask] = useState(null);
@@ -239,12 +235,8 @@ function ProjectDetails({
         user={user}
         members={members}
         memberMap={memberMap}
-        onLogout={onLogout}
         onGoDashboard={onGoDashboard}
-        onOpenUserManagement={onOpenUserManagement}
-        onOpenAuditLogs={onOpenAuditLogs}
-        theme={theme}
-        onToggleTheme={onToggleTheme}
+        onToggleSidebar={onToggleSidebar}
         onBack={() => setSelectedTask(null)}
         onTaskUpdated={(updatedTask) => {
           setSelectedTask(updatedTask);
@@ -259,13 +251,9 @@ function ProjectDetails({
       {/* Unified Navbar */}
       <Navbar
         user={user}
-        onLogout={onLogout}
         onGoDashboard={onGoDashboard}
-        onOpenUserManagement={onOpenUserManagement}
-        onOpenAuditLogs={onOpenAuditLogs}
         subtitle={`Project: ${project.name}`}
-        theme={theme}
-        onToggleTheme={onToggleTheme}
+        onToggleSidebar={onToggleSidebar}
       />
 
       <main className="mx-auto max-w-6xl px-6 py-10">

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { getAdminProjectAuditLogs, getAdminTaskAuditLogs } from "../api";
 import Navbar from "../components/Navbar";
 
-function AdminAuditLogs({ token, user, onLogout, onBack, onGoDashboard, onOpenUserManagement, theme, onToggleTheme }) {
+function AdminAuditLogs({ token, user, onBack, onGoDashboard, onToggleSidebar }) {
   const [activeTab, setActiveTab] = useState("projects"); // "projects" | "tasks"
   const [projectLogs, setProjectLogs] = useState([]);
   const [taskLogs, setTaskLogs] = useState([]);
@@ -81,12 +81,9 @@ function AdminAuditLogs({ token, user, onLogout, onBack, onGoDashboard, onOpenUs
       {/* Header */}
       <Navbar
         user={user}
-        onLogout={onLogout}
         onGoDashboard={onGoDashboard}
-        onOpenUserManagement={onOpenUserManagement}
         subtitle="Administration / System Audit Trail"
-        theme={theme}
-        onToggleTheme={onToggleTheme}
+        onToggleSidebar={onToggleSidebar}
       />
 
       <main className="mx-auto max-w-6xl px-6 py-10">

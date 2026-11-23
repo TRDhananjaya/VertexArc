@@ -6,12 +6,8 @@ import Navbar from "../components/Navbar";
 function Dashboard({
     token,
     user,
-    onLogout,
     onSelectProject,
-    onOpenUserManagement,
-    onOpenAuditLogs,
-    theme,
-    onToggleTheme
+    onToggleSidebar
 }) {
     const [projects, setProjects] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -68,11 +64,7 @@ function Dashboard({
 
             <Navbar
                 user={user}
-                onLogout={onLogout}
-                onOpenUserManagement={onOpenUserManagement}
-                onOpenAuditLogs={onOpenAuditLogs}
-                theme={theme}
-                onToggleTheme={onToggleTheme}
+                onToggleSidebar={onToggleSidebar}
             />
 
             <main className="mx-auto max-w-6xl px-6 py-10">

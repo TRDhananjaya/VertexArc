@@ -5,12 +5,14 @@ import Dashboard from "./pages/Dashboard";
 import ProjectDetails from "./pages/ProjectDetails";
 import UserManagement from "./pages/UserManagement";
 import AdminAuditLogs from "./pages/AdminAuditLogs";
+import FloatingSidebar from "./components/FloatingSidebar";
 import { setSessionExpiredHandler } from "./api";
 
 // Keys used to persist session in localStorage
 const SESSION_TOKEN_KEY = "vertexarc_token";
 const SESSION_USER_KEY  = "vertexarc_user";
 const THEME_KEY         = "vertexarc_theme"; // "dark" | "light"
+const SIDEBAR_EXPANDED_KEY = "vertexarc_sidebar_expanded";
 
 function readPersistedSession() {
   try {
@@ -27,6 +29,11 @@ function getInitialTheme() {
   if (saved === "light" || saved === "dark") return saved;
   // Default to dark mode (matches the existing design)
   return "dark";
+}
+
+function getInitialSidebarExpanded() {
+  const saved = localStorage.getItem(SIDEBAR_EXPANDED_KEY);
+  return saved === "true";
 }
 
 function applyTheme(theme) {
@@ -52,6 +59,9 @@ function App() {
   // Theme: "dark" | "light"
   const [theme, setTheme] = useState(getInitialTheme);
 
+  // Sidebar expanded / collapsed state
+  const [sidebarExpanded, setSidebarExpanded] = useState(getInitialSidebarExpanded);
+
   // Apply theme on mount and whenever it changes
   useEffect(() => {
     applyTheme(theme);
@@ -59,6 +69,14 @@ function App() {
 
   function toggleTheme() {
     setTheme((prev) => (prev === "dark" ? "light" : "dark"));
+  }
+
+  function toggleSidebarExpanded() {
+    setSidebarExpanded((prev) => {
+      const next = !prev;
+      localStorage.setItem(SIDEBAR_EXPANDED_KEY, String(next));
+      return next;
+    });
   }
 
   useEffect(() => {
@@ -148,72 +166,77 @@ function App() {
     );
   }
 
-  // 3. User Management (Admin only)
-  if (showUserManagement && user?.role === "ADMIN") {
-    return (
-      <UserManagement
-        token={token}
-        user={user}
-        onLogout={handleLogout}
-        onBack={handleGoDashboard}
-        onGoDashboard={handleGoDashboard}
-        onOpenAuditLogs={handleOpenAuditLogs}
-        theme={theme}
-        onToggleTheme={toggleTheme}
-      />
-    );
-  }
+  // Determine active view for dock indicator
+  const activeView = showUserManagement
+    ? "users"
+    : showAuditLogs
+    ? "audit"
+    : selectedProject
+    ? "project"
+    : "dashboard";
 
-  // 4. System Audit Logs (Admin only)
-  if (showAuditLogs && user?.role === "ADMIN") {
-    return (
-      <AdminAuditLogs
-        token={token}
-        user={user}
-        onLogout={handleLogout}
-        onBack={handleGoDashboard}
-        onGoDashboard={handleGoDashboard}
-        onOpenUserManagement={handleOpenUserManagement}
-        theme={theme}
-        onToggleTheme={toggleTheme}
-      />
-    );
-  }
-
-  // 5. Project Details
-  if (selectedProject) {
-    return (
-      <ProjectDetails
-        project={selectedProject}
-        token={token}
-        user={user}
-        onLogout={handleLogout}
-        onBack={handleGoDashboard}
-        onGoDashboard={handleGoDashboard}
-        onOpenUserManagement={handleOpenUserManagement}
-        onOpenAuditLogs={handleOpenAuditLogs}
-        theme={theme}
-        onToggleTheme={toggleTheme}
-      />
-    );
-  }
-
-  // 6. Dashboard
   return (
-    <Dashboard
-      token={token}
-      user={user}
-      onLogout={handleLogout}
-      onSelectProject={(project) => {
-        setSelectedProject(project);
-        setShowUserManagement(false);
-        setShowAuditLogs(false);
-      }}
-      onOpenUserManagement={handleOpenUserManagement}
-      onOpenAuditLogs={handleOpenAuditLogs}
-      theme={theme}
-      onToggleTheme={toggleTheme}
-    />
+    <div className="min-h-screen text-gray-900 dark:text-white">
+      {/* Floating Capsule Sidebar Dock & Expandable Panel */}
+      <FloatingSidebar
+        user={user}
+        activeView={activeView}
+        projectName={selectedProject?.name}
+        onGoDashboard={handleGoDashboard}
+        onOpenUserManagement={handleOpenUserManagement}
+        onOpenAuditLogs={handleOpenAuditLogs}
+        onLogout={handleLogout}
+        theme={theme}
+        onToggleTheme={toggleTheme}
+        isExpanded={sidebarExpanded}
+        onToggleExpand={toggleSidebarExpanded}
+      />
+
+      {/* Main Content Area (Offset smoothly by left dock on desktop, padded for bottom bar on mobile) */}
+      <div
+        className={`w-full transition-[padding] duration-300 ease-in-out pb-20 md:pb-0 ${
+          sidebarExpanded ? "md:pl-80" : "md:pl-24"
+        }`}
+      >
+        {showUserManagement && user?.role === "ADMIN" ? (
+          <UserManagement
+            token={token}
+            user={user}
+            onBack={handleGoDashboard}
+            onGoDashboard={handleGoDashboard}
+            onToggleSidebar={toggleSidebarExpanded}
+          />
+        ) : showAuditLogs && user?.role === "ADMIN" ? (
+          <AdminAuditLogs
+            token={token}
+            user={user}
+            onBack={handleGoDashboard}
+            onGoDashboard={handleGoDashboard}
+            onToggleSidebar={toggleSidebarExpanded}
+          />
+        ) : selectedProject ? (
+          <ProjectDetails
+            project={selectedProject}
+            token={token}
+            user={user}
+            onBack={handleGoDashboard}
+            onGoDashboard={handleGoDashboard}
+            onToggleSidebar={toggleSidebarExpanded}
+          />
+        ) : (
+          <Dashboard
+            token={token}
+            user={user}
+            onSelectProject={(project) => {
+              setSelectedProject(project);
+              setShowUserManagement(false);
+              setShowAuditLogs(false);
+            }}
+            onToggleSidebar={toggleSidebarExpanded}
+          />
+        )}
+      </div>
+    </div>
   );
 }
 
