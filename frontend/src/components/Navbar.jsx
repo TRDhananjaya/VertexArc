@@ -19,15 +19,15 @@ function Navbar({
   };
 
   return (
-    <header className="border-b border-gray-200/80 dark:border-[#1c1d30] bg-white/75 dark:bg-[#0c0d16]/75 backdrop-blur-md sticky top-0 z-30 transition-colors">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-3">
+    <header className="md:hidden border-b border-gray-200/80 dark:border-[#1c1d30] bg-white/75 dark:bg-[#0c0d16]/75 backdrop-blur-md sticky top-0 z-30 transition-colors">
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3">
         {/* Left: Mobile Toggle & Contextual Breadcrumb */}
         <div className="flex items-center gap-3">
           {onToggleSidebar && (
             <button
               type="button"
               onClick={onToggleSidebar}
-              className="md:hidden flex h-8 w-8 items-center justify-center rounded-xl border border-gray-200 dark:border-[#1c1d30] text-gray-600 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-[#131422] transition"
+              className="flex h-8 w-8 items-center justify-center rounded-xl border border-gray-200 dark:border-[#1c1d30] text-gray-600 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-[#131422] transition"
               title="Toggle Navigation Menu"
             >
               <SidebarIcon className="w-4 h-4" />

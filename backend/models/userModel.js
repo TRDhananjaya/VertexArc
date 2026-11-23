@@ -54,9 +54,50 @@ async function createUserWithRole({
   return result.rows[0];
 }
 
+async function updateUser(id, { name, email, role, isActive }) {
+  const fields = [];
+  const values = [];
+  let paramIndex = 1;
+
+  if (name !== undefined) {
+    fields.push(`name = $${paramIndex++}`);
+    values.push(name);
+  }
+  if (email !== undefined) {
+    fields.push(`email = $${paramIndex++}`);
+    values.push(email);
+  }
+  if (role !== undefined) {
+    fields.push(`role = $${paramIndex++}`);
+    values.push(role);
+  }
+  if (isActive !== undefined) {
+    fields.push(`is_active = $${paramIndex++}`);
+    values.push(isActive);
+  }
+
+  if (fields.length === 0) {
+    return findUserById(id);
+  }
+
+  fields.push(`updated_at = NOW()`);
+  values.push(id);
+
+  const query = `
+    UPDATE users
+    SET ${fields.join(", ")}
+    WHERE id = $${paramIndex}
+    RETURNING id, name, email, role, is_active, created_at, updated_at
+  `;
+
+  const result = await pool.query(query, values);
+  return result.rows[0] || null;
+}
+
 module.exports = { 
     findUserByEmail, 
     findUserById, 
     createUser,
-    createUserWithRole,    
- };
+    createUserWithRole,
+    updateUser
+};

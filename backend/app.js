@@ -10,6 +10,7 @@ const authRoutes = require("./routes/authRoutes");
 const projectRoutes = require("./routes/projectRoutes");
 const adminAuditRoutes = require("./routes/adminAuditRoutes");
 const userRoutes = require("./routes/userRoutes");
+const notificationRoutes = require("./routes/notificationRoutes");
 
 const app = express();
 
@@ -34,6 +35,9 @@ app.use("/api/projects", projectRoutes);
 app.use("/api/admin/audit-logs", adminAuditRoutes);
 
 app.use("/api/users", userRoutes);
+
+// In-app notifications
+app.use("/api/notifications", notificationRoutes);
 
 // Health check
 app.get("/", (req, res) => {

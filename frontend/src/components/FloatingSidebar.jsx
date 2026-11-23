@@ -10,7 +10,9 @@ import {
   LayersIcon,
   SidebarIcon,
   ShieldCheckIcon,
-  ChevronLeftIcon
+  ChevronLeftIcon,
+  BellIcon,
+  SettingsIcon
 } from "./Icons";
 import { VertexArcEmblem } from "./VertexArcLogo";
 
@@ -29,7 +31,10 @@ function FloatingSidebar({
   theme,
   onToggleTheme,
   isExpanded,
-  onToggleExpand
+  onToggleExpand,
+  unreadNotificationCount = 0,
+  onOpenNotifications,
+  onOpenProfile
 }) {
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
@@ -74,7 +79,7 @@ function FloatingSidebar({
               </div>
 
               <div className="flex items-center gap-1.5">
-                {/* Theme Mode Toggle Pill (Matches reference image top right) */}
+                {/* Theme Mode Toggle Pill */}
                 {onToggleTheme && (
                   <button
                     type="button"
@@ -167,7 +172,7 @@ function FloatingSidebar({
                     <span>Projects & Backlogs</span>
                   </button>
 
-                  {/* Nested Active Project (Matches reference image's indented sub-menu) */}
+                  {/* Nested Active Project (Directly under Projects & Backlogs) */}
                   {activeView === "project" && (
                     <div className="ml-4 pl-3 border-l-2 border-[#3A0CA3]/40 dark:border-[#3A0CA3]/60 my-1 space-y-1">
                       <div className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-[#3A0CA3]/10 text-xs font-semibold text-[#3A0CA3] dark:text-[#c4b5fd]">
@@ -175,6 +180,33 @@ function FloatingSidebar({
                         <span className="truncate">{projectName || "Active Project"}</span>
                       </div>
                     </div>
+                  )}
+
+                  {/* Notifications Navigation Tab (Equal sibling to Projects & Backlogs) */}
+                  {onOpenNotifications && (
+                    <button
+                      type="button"
+                      onClick={onOpenNotifications}
+                      className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs transition ${
+                        activeView === "notifications" ? activePillClass : inactiveBtnClass
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <BellIcon className="w-4 h-4 shrink-0" />
+                        <span>Notifications</span>
+                      </div>
+                      {unreadNotificationCount > 0 && (
+                        <span
+                          className={`flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-[10px] font-bold shadow-xs ${
+                            activeView === "notifications"
+                              ? "bg-white text-[#3A0CA3]"
+                              : "bg-[#3A0CA3] text-white"
+                          }`}
+                        >
+                          {unreadNotificationCount > 9 ? "9+" : unreadNotificationCount}
+                        </span>
+                      )}
+                    </button>
                   )}
                 </div>
               </div>
@@ -265,6 +297,30 @@ function FloatingSidebar({
                 </button>
               )}
 
+              {/* Notifications in collapsed mode */}
+              {onOpenNotifications && (
+                <button
+                  type="button"
+                  onClick={onOpenNotifications}
+                  className={`group relative flex h-10 w-10 items-center justify-center rounded-2xl transition ${
+                    activeView === "notifications" ? activePillClass : inactiveBtnClass
+                  }`}
+                  title="Notifications"
+                >
+                  <BellIcon className="w-4 h-4" />
+                  {unreadNotificationCount > 0 && (
+                    <span className="absolute top-1.5 right-1.5 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-red-500 text-[8px] font-bold text-white shadow-xs">
+                      {unreadNotificationCount > 9 ? "9+" : unreadNotificationCount}
+                    </span>
+                  )}
+                  <div className="absolute left-full ml-3 hidden items-center group-hover:flex pointer-events-none z-50">
+                    <div className="rounded-lg bg-gray-900 px-2.5 py-1 text-xs font-semibold text-white shadow-xl dark:bg-white dark:text-gray-950 whitespace-nowrap">
+                      Notifications {unreadNotificationCount > 0 ? `(${unreadNotificationCount})` : ""}
+                    </div>
+                  </div>
+                </button>
+              )}
+
               {/* Admin: Audit Logs */}
               {user?.role === "ADMIN" && onOpenAuditLogs && (
                 <button
@@ -331,36 +387,54 @@ function FloatingSidebar({
         {/* ── BOTTOM PROFILE & LOGOUT ── */}
         <div className="w-full border-t border-gray-100 dark:border-[#1c1d30] pt-4">
           {isExpanded ? (
-            /* EXPANDED PROFILE CARD */
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2.5 overflow-hidden">
-                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 font-bold text-xs border border-indigo-200 dark:border-indigo-500/30">
-                  {user?.name?.charAt(0)?.toUpperCase() || "U"}
+            /* EXPANDED PROFILE CARD & SIGN OUT AT BOTTOM */
+            <div className="space-y-3">
+              {/* User Identity Info */}
+              <div className="flex items-center justify-between gap-2 px-1">
+                <div className="flex items-center gap-3 overflow-hidden min-w-0 flex-1">
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 font-bold text-xs border border-indigo-200 dark:border-indigo-500/30">
+                    {user?.name?.charAt(0)?.toUpperCase() || "U"}
+                  </div>
+                  <div className="truncate min-w-0 flex-1">
+                    <p className="text-xs font-semibold text-gray-900 dark:text-white truncate">
+                      {user?.name || "User"}
+                    </p>
+                    <span className="inline-block rounded-full bg-purple-100 dark:bg-purple-500/15 text-[10px] font-semibold text-purple-700 dark:text-purple-300 px-2 py-0.5 mt-0.5">
+                      {user?.role?.replaceAll("_", " ")}
+                    </span>
+                  </div>
                 </div>
-                <div className="truncate">
-                  <p className="text-xs font-semibold text-gray-900 dark:text-white truncate">
-                    {user?.name || "User"}
-                  </p>
-                  <span className="inline-block rounded-full bg-purple-100 dark:bg-purple-500/15 text-[10px] font-semibold text-purple-700 dark:text-purple-300 px-1.5 py-0.2">
-                    {user?.role?.replaceAll("_", " ")}
-                  </span>
-                </div>
+
+                {onOpenProfile && (
+                  <button
+                    type="button"
+                    onClick={onOpenProfile}
+                    title="Account Settings & Password"
+                    className="shrink-0 p-1.5 rounded-lg text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-[#131422] transition"
+                  >
+                    <SettingsIcon className="w-4 h-4" />
+                  </button>
+                )}
               </div>
 
+              {/* Clean Separator Line */}
+              <div className="w-full border-t border-gray-100 dark:border-[#1c1d30]" />
+
+              {/* Dedicated Sign Out Button at the Very Bottom */}
               {onLogout && (
                 <button
                   type="button"
                   onClick={() => setShowLogoutConfirm(true)}
-                  title="Sign Out"
-                  className="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-500/10 transition"
+                  className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-xs font-medium text-red-600 dark:text-red-400 bg-red-500/5 hover:bg-red-500/10 border border-red-500/15 hover:border-red-500/30 transition shadow-xs"
                 >
-                  <LogOutIcon className="w-4 h-4" />
+                  <LogOutIcon className="w-4 h-4 shrink-0" />
+                  <span>Sign Out</span>
                 </button>
               )}
             </div>
           ) : (
             /* COLLAPSED PROFILE ICONS */
-            <div className="flex flex-col items-center gap-2 w-full">
+            <div className="flex flex-col items-center gap-2.5 w-full">
               {user && (
                 <div className="group relative flex h-9 w-9 items-center justify-center rounded-full bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 font-bold text-xs border border-indigo-200 dark:border-indigo-500/30 cursor-default">
                   {user.name?.charAt(0)?.toUpperCase() || "U"}
@@ -371,6 +445,26 @@ function FloatingSidebar({
                   </div>
                 </div>
               )}
+
+              {/* Account Settings in collapsed mode */}
+              {onOpenProfile && (
+                <button
+                  type="button"
+                  onClick={onOpenProfile}
+                  className={`group relative flex h-9 w-9 items-center justify-center rounded-2xl text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-[#131422] transition`}
+                  title="Account Settings & Password"
+                >
+                  <SettingsIcon className="w-4 h-4" />
+                  <div className="absolute left-full ml-3 hidden items-center group-hover:flex pointer-events-none z-50">
+                    <div className="rounded-lg bg-gray-900 px-2.5 py-1 text-xs font-semibold text-white shadow-xl whitespace-nowrap">
+                      Account Settings
+                    </div>
+                  </div>
+                </button>
+              )}
+
+              {/* Clean Separator Line in Collapsed View */}
+              <div className="w-5 h-px bg-gray-200 dark:bg-[#1c1d30]" />
 
               {onLogout && (
                 <button
@@ -416,6 +510,24 @@ function FloatingSidebar({
         >
           <FolderIcon className="w-4 h-4" />
         </button>
+
+        {onOpenNotifications && (
+          <button
+            type="button"
+            onClick={onOpenNotifications}
+            className={`relative flex h-10 w-10 items-center justify-center rounded-xl transition ${
+              activeView === "notifications" ? activePillClass : inactiveBtnClass
+            }`}
+            title="Notifications"
+          >
+            <BellIcon className="w-4 h-4" />
+            {unreadNotificationCount > 0 && (
+              <span className="absolute top-1.5 right-1.5 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-red-500 text-[8px] font-bold text-white shadow-xs">
+                {unreadNotificationCount > 9 ? "9+" : unreadNotificationCount}
+              </span>
+            )}
+          </button>
+        )}
 
         {user?.role === "ADMIN" && onOpenAuditLogs && (
           <button

@@ -525,3 +525,139 @@ export async function getAdminTaskAuditLogs(token) {
 
   return data;
 }
+
+// ── Admin User Update ──
+export async function updateUser(token, userId, updates) {
+  const response = await authFetch(`${API_BASE_URL}/api/users/${userId}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`
+    },
+    body: JSON.stringify(updates)
+  });
+
+  const data = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    if (response.status === 401) {
+      throw new Error("Session expired. Please log in again.");
+    }
+    if (response.status === 403) {
+      throw new Error("You do not have permission to modify users.");
+    }
+    throw new Error(data.message || "Failed to update user");
+  }
+
+  return data;
+}
+
+// ── Profile Management ──
+export async function getProfile(token) {
+  const response = await authFetch(`${API_BASE_URL}/api/auth/profile`, {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.message || "Failed to load profile");
+  }
+  return data;
+}
+
+export async function updateProfile(token, updates) {
+  const response = await authFetch(`${API_BASE_URL}/api/auth/profile`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`
+    },
+    body: JSON.stringify(updates)
+  });
+
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.message || "Failed to update profile");
+  }
+  return data;
+}
+
+// ── Notifications ──
+export async function getNotifications(token) {
+  const response = await authFetch(`${API_BASE_URL}/api/notifications`, {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.message || "Failed to load notifications");
+  }
+  return data;
+}
+
+export async function markNotificationRead(token, id) {
+  const response = await authFetch(`${API_BASE_URL}/api/notifications/${id}/read`, {
+    method: "PATCH",
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.message || "Failed to update notification");
+  }
+  return data;
+}
+
+export async function markAllNotificationsRead(token) {
+  const response = await authFetch(`${API_BASE_URL}/api/notifications/mark-all-read`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.message || "Failed to mark notifications as read");
+  }
+  return data;
+}
+
+// ── Password Reset Flow ──
+export async function requestPasswordReset(email) {
+  const response = await fetch(`${API_BASE_URL}/api/auth/forgot-password`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ email })
+  });
+
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(data.message || `Server responded with ${response.status}: Failed to request password reset`);
+  }
+  return data;
+}
+
+export async function resetPassword(token, newPassword) {
+  const response = await fetch(`${API_BASE_URL}/api/auth/reset-password`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ token, newPassword })
+  });
+
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(data.message || `Server responded with ${response.status}: Failed to reset password`);
+  }
+  return data;
+}

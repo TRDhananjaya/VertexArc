@@ -1,14 +1,17 @@
 import { useEffect, useState } from "react";
-import { getUsers } from "../api";
+import { getUsers, updateUser } from "../api";
 import CreateUserForm from "../components/CreateUserForm";
+import EditUserModal from "../components/EditUserModal";
 import Navbar from "../components/Navbar";
 
-function UserManagement({ token, user, onBack, onGoDashboard, onToggleSidebar }) {
+function UserManagement({ token, user, onBack, onGoDashboard, onToggleSidebar, showToast }) {
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [showCreateForm, setShowCreateForm] = useState(false);
     const [refreshKey, setRefreshKey] = useState(0);
+    const [userToEdit, setUserToEdit] = useState(null);
+    const [actionLoadingId, setActionLoadingId] = useState(null);
 
     useEffect(() => {
         let active = true;
@@ -48,6 +51,36 @@ function UserManagement({ token, user, onBack, onGoDashboard, onToggleSidebar })
             active = false;
         };
     }, [token, refreshKey]);
+
+    async function handleToggleStatus(account) {
+        if (account.id === user?.id) {
+            if (showToast) {
+                showToast("Action Blocked", "You cannot deactivate your own account.", "error");
+            }
+            return;
+        }
+
+        const nextStatus = !account.is_active;
+        setActionLoadingId(account.id);
+        try {
+            await updateUser(token, account.id, { is_active: nextStatus });
+            setRefreshKey((k) => k + 1);
+            if (showToast) {
+                showToast(
+                    "Status Updated",
+                    `User "${account.name}" is now ${nextStatus ? "Active" : "Inactive"}.`
+                );
+            }
+        } catch (err) {
+            if (showToast) {
+                showToast("Update Failed", err.message, "error");
+            } else {
+                setError(err.message);
+            }
+        } finally {
+            setActionLoadingId(null);
+        }
+    }
 
     return (
         <div className="min-h-screen bg-transparent text-gray-900 dark:text-white">
@@ -96,6 +129,9 @@ function UserManagement({ token, user, onBack, onGoDashboard, onToggleSidebar })
                         onCreated={() => {
                             setShowCreateForm(false);
                             setRefreshKey((current) => current + 1);
+                            if (showToast) {
+                                showToast("User Created", "New team member account created successfully!");
+                            }
                         }}
                         onCancel={() => setShowCreateForm(false)}
                     />
@@ -183,10 +219,59 @@ function UserManagement({ token, user, onBack, onGoDashboard, onToggleSidebar })
                                     >
                                         {account.is_active ? "Active" : "Inactive"}
                                     </span>
+
+                                    {/* Edit Button */}
+                                    <button
+                                        type="button"
+                                        onClick={() => setUserToEdit(account)}
+                                        className="rounded-lg border border-gray-200 dark:border-[#272844] bg-gray-50 dark:bg-[#131422] px-2.5 py-1 text-xs font-medium text-gray-700 dark:text-slate-200 hover:bg-gray-100 dark:hover:bg-[#1c1d30] transition"
+                                    >
+                                        Edit
+                                    </button>
+
+                                    {/* Quick Toggle Status Button */}
+                                    {account.id !== user?.id && (
+                                        <button
+                                            type="button"
+                                            disabled={actionLoadingId === account.id}
+                                            onClick={() => handleToggleStatus(account)}
+                                            className={`rounded-lg px-2.5 py-1 text-xs font-medium transition ${
+                                                account.is_active
+                                                    ? "border border-red-500/20 text-red-600 dark:text-red-400 hover:bg-red-500/10"
+                                                    : "border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/10"
+                                            } disabled:opacity-50`}
+                                        >
+                                            {actionLoadingId === account.id
+                                                ? "Updating..."
+                                                : account.is_active
+                                                ? "Deactivate"
+                                                : "Activate"}
+                                        </button>
+                                    )}
                                 </div>
                             </div>
                         ))}
                     </div>
+                )}
+
+                {/* Edit User Modal */}
+                {userToEdit && (
+                    <EditUserModal
+                        userToEdit={userToEdit}
+                        currentUser={user}
+                        token={token}
+                        onUpdated={(updated) => {
+                            setUserToEdit(null);
+                            setRefreshKey((k) => k + 1);
+                            if (showToast) {
+                                showToast(
+                                    "User Updated",
+                                    `User "${updated.name}" updated successfully!`
+                                );
+                            }
+                        }}
+                        onClose={() => setUserToEdit(null)}
+                    />
                 )}
             </main>
         </div>

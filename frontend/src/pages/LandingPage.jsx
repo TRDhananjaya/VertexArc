@@ -8,7 +8,8 @@ import {
   MessageSquareIcon,
   GitPullRequestIcon,
   KeyIcon,
-  SearchIcon
+  UsersIcon,
+  SidebarIcon
 } from "../components/Icons";
 import { VertexArcLogo, VertexArcEmblem } from "../components/VertexArcLogo";
 
@@ -254,152 +255,167 @@ function LandingPage({ onGetStarted, theme, onToggleTheme }) {
               </div>
             </div>
 
-            {/* Mock Dashboard Layout */}
-            <div className="grid grid-cols-1 md:grid-cols-5 min-h-[420px]">
-              {/* Mock Sidebar */}
-              <div className="border-r border-gray-100 dark:border-[#1c1d30]/80 bg-gray-50/50 dark:bg-[#050505]/50 p-4 space-y-5 hidden md:block">
-                <div className="flex items-center gap-2 px-2">
-                  <VertexArcEmblem className="h-4 w-auto" />
-                  <span className="text-xs font-bold text-gray-800 dark:text-white font-sans">Vertex<span className="bg-gradient-to-r from-[#3A0CA3] via-[#6d28d9] to-[#7C3AED] bg-clip-text text-transparent">Arc</span></span>
+            {/* Authentic VertexArc Application Preview */}
+            <div className="flex min-h-[460px] bg-[#f8f7fd]/60 dark:bg-[#050505]/60 p-4 sm:p-6 gap-5">
+              {/* Floating Sidebar Dock Preview */}
+              <div className="w-14 shrink-0 hidden sm:flex flex-col items-center justify-between py-3.5 rounded-2xl border border-gray-200/90 dark:border-[#1c1d30] bg-white/90 dark:bg-[#0c0d16]/90 backdrop-blur-md shadow-lg shadow-black/5">
+                <div className="flex flex-col items-center gap-3">
+                  <div className="flex h-7 w-7 items-center justify-center rounded-lg text-gray-400 dark:text-slate-500">
+                    <SidebarIcon className="w-3.5 h-3.5" />
+                  </div>
+                  <VertexArcEmblem className="h-5 w-auto" />
                 </div>
 
-                {/* Mock Search */}
-                <div className="relative">
-                  <SearchIcon className="absolute left-2.5 top-2.5 w-3.5 h-3.5 text-gray-400" />
-                  <input
-                    type="text"
-                    disabled
-                    placeholder="Search tasks..."
-                    className="w-full rounded-lg border border-gray-200 dark:border-[#1c1d30] bg-white dark:bg-[#0c0d16] pl-8 pr-3 py-1.5 text-xs text-gray-500"
-                  />
+                <div className="flex flex-col items-center gap-2">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-r from-[#3A0CA3] to-[#4c1d95] text-white shadow-md shadow-[#3A0CA3]/35">
+                    <FolderIcon className="w-3.5 h-3.5" />
+                  </div>
+                  <div className="flex h-8 w-8 items-center justify-center rounded-xl text-gray-400 dark:text-slate-500">
+                    <FileTextIcon className="w-3.5 h-3.5" />
+                  </div>
+                  <div className="flex h-8 w-8 items-center justify-center rounded-xl text-gray-400 dark:text-slate-500">
+                    <UsersIcon className="w-3.5 h-3.5" />
+                  </div>
+                  <div className="w-4 h-px bg-gray-200 dark:bg-[#1c1d30] my-1" />
+                  <div className="flex h-7 w-7 items-center justify-center rounded-lg text-gray-400 dark:text-slate-500">
+                    <MoonIcon className="w-3.5 h-3.5" />
+                  </div>
                 </div>
 
-                <div className="space-y-1 text-xs">
-                  <div className="rounded-lg bg-[#3A0CA3]/10 dark:bg-[#3A0CA3]/20 px-3 py-2 font-semibold text-[#3A0CA3] dark:text-[#c4b5fd] shadow-xs border border-[#3A0CA3]/25">
-                    Dashboard
-                  </div>
-                  <div className="flex items-center justify-between px-3 py-2 text-gray-500 dark:text-slate-400 hover:text-gray-900">
-                    <span>Projects</span>
-                    <span className="rounded bg-gray-200/70 dark:bg-[#131422] px-1.5 py-0.5 text-[10px]">3</span>
-                  </div>
-                  <div className="flex items-center justify-between px-3 py-2 text-gray-500 dark:text-slate-400 hover:text-gray-900">
-                    <span>Tasks</span>
-                    <span className="rounded bg-gray-200/70 dark:bg-[#131422] px-1.5 py-0.5 text-[10px]">8</span>
-                  </div>
-                  <div className="px-3 py-2 text-gray-500 dark:text-slate-400 hover:text-gray-900">
-                    Security Gates
-                  </div>
-                  <div className="px-3 py-2 text-gray-500 dark:text-slate-400 hover:text-gray-900">
-                    Audit Trail
-                  </div>
+                <div className="flex h-7 w-7 items-center justify-center rounded-full bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 font-bold text-[10px] border border-indigo-200 dark:border-indigo-500/30">
+                  SA
                 </div>
               </div>
 
-              {/* Mock Main Area */}
-              <div className="md:col-span-4 p-6 space-y-6">
+              {/* Main Workspace Preview */}
+              <div className="flex-1 space-y-6">
                 {/* Header row */}
-                <div className="flex flex-wrap items-center justify-between gap-4">
+                <div className="flex flex-wrap items-center justify-between gap-4 border-b border-gray-200/70 dark:border-[#1c1d30] pb-4">
                   <div>
-                    <h3 className="text-xl font-bold text-gray-900 dark:text-white">Dashboard</h3>
-                    <p className="text-xs text-gray-400 dark:text-slate-500">Live Workspace Overview</p>
+                    <h2 className="text-xl font-bold tracking-tight text-gray-900 dark:text-white">Projects</h2>
+                    <p className="mt-0.5 text-xs text-gray-500 dark:text-slate-400">Workspaces and active backlogs for your development teams</p>
                   </div>
 
-                  <div className="flex items-center gap-2">
-                    <span className="rounded-lg border border-gray-200 dark:border-[#1c1d30] bg-gray-50 dark:bg-[#050505] px-3 py-1 text-xs text-gray-600 dark:text-slate-300">
-                      Mar 01 - Apr 01, 2026
-                    </span>
-                    <button
-                      type="button"
-                      onClick={onGetStarted}
-                      className="rounded-lg bg-gradient-to-r from-[#3A0CA3] to-[#4c1d95] hover:from-[#4313b8] hover:to-[#5b21b6] text-white px-3 py-1 text-xs font-semibold transition shadow-sm shadow-[#3A0CA3]/30"
-                    >
-                      + Add Task
-                    </button>
+                  <button
+                    type="button"
+                    onClick={onGetStarted}
+                    className="inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-[#3A0CA3] to-[#4c1d95] hover:from-[#4313b8] hover:to-[#5b21b6] text-white px-3.5 py-1.5 text-xs font-semibold transition shadow-md shadow-[#3A0CA3]/25 hover:scale-[1.02]"
+                  >
+                    <span>+</span>
+                    <span>New Project</span>
+                  </button>
+                </div>
+
+                {/* 3 Authentic Project Cards Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {/* Project 1 */}
+                  <div className="rounded-2xl border border-gray-200/90 dark:border-[#1c1d30] bg-white dark:bg-[#0c0d16] p-5 shadow-xs transition hover:border-[#3A0CA3]/50">
+                    <div className="flex items-center justify-between">
+                      <span className="font-mono text-[10px] text-gray-400 dark:text-slate-500">ID #1</span>
+                      <span className="rounded-full bg-red-500/10 px-2 py-0.5 text-[10px] font-semibold text-red-500 dark:text-red-400 border border-red-500/20">
+                        Gate Active
+                      </span>
+                    </div>
+
+                    <h3 className="mt-3 text-sm font-semibold text-gray-900 dark:text-white">
+                      Core Authentication Service
+                    </h3>
+
+                    <p className="mt-1.5 text-xs text-gray-500 dark:text-slate-400 line-clamp-2 leading-relaxed">
+                      Zero-trust JWT authentication, refresh token rotation, and RBAC policy enforcement.
+                    </p>
+
+                    <div className="mt-4 pt-3 border-t border-gray-100 dark:border-[#1c1d30] flex items-center justify-between text-[11px] text-gray-400 dark:text-slate-500">
+                      <span>4 Tasks • 1 In Review</span>
+                      <span className="font-medium text-[#3A0CA3] dark:text-[#a78bfa]">Open →</span>
+                    </div>
+                  </div>
+
+                  {/* Project 2 */}
+                  <div className="rounded-2xl border border-gray-200/90 dark:border-[#1c1d30] bg-white dark:bg-[#0c0d16] p-5 shadow-xs transition hover:border-[#3A0CA3]/50">
+                    <div className="flex items-center justify-between">
+                      <span className="font-mono text-[10px] text-gray-400 dark:text-slate-500">ID #2</span>
+                      <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                        Pipeline Clear
+                      </span>
+                    </div>
+
+                    <h3 className="mt-3 text-sm font-semibold text-gray-900 dark:text-white">
+                      Cloud Infrastructure & API
+                    </h3>
+
+                    <p className="mt-1.5 text-xs text-gray-500 dark:text-slate-400 line-clamp-2 leading-relaxed">
+                      PostgreSQL connection pooling, Docker container pipelines, and health endpoints.
+                    </p>
+
+                    <div className="mt-4 pt-3 border-t border-gray-100 dark:border-[#1c1d30] flex items-center justify-between text-[11px] text-gray-400 dark:text-slate-500">
+                      <span>6 Tasks • 3 Done</span>
+                      <span className="font-medium text-[#3A0CA3] dark:text-[#a78bfa]">Open →</span>
+                    </div>
+                  </div>
+
+                  {/* Project 3 */}
+                  <div className="rounded-2xl border border-gray-200/90 dark:border-[#1c1d30] bg-white dark:bg-[#0c0d16] p-5 shadow-xs transition hover:border-[#3A0CA3]/50">
+                    <div className="flex items-center justify-between">
+                      <span className="font-mono text-[10px] text-gray-400 dark:text-slate-500">ID #3</span>
+                      <span className="rounded-full bg-blue-500/10 px-2 py-0.5 text-[10px] font-semibold text-blue-600 dark:text-blue-400 border border-blue-500/20">
+                        Active Backlog
+                      </span>
+                    </div>
+
+                    <h3 className="mt-3 text-sm font-semibold text-gray-900 dark:text-white">
+                      Frontend Platform & UI
+                    </h3>
+
+                    <p className="mt-1.5 text-xs text-gray-500 dark:text-slate-400 line-clamp-2 leading-relaxed">
+                      React 19 Vite application with Obsidian Glow design system and role gating.
+                    </p>
+
+                    <div className="mt-4 pt-3 border-t border-gray-100 dark:border-[#1c1d30] flex items-center justify-between text-[11px] text-gray-400 dark:text-slate-500">
+                      <span>5 Tasks • 2 In Progress</span>
+                      <span className="font-medium text-[#3A0CA3] dark:text-[#a78bfa]">Open →</span>
+                    </div>
                   </div>
                 </div>
 
-                {/* 5 Stats Cards Grid (matching reference image cards) */}
-                <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-                  <div className="rounded-xl border border-gray-100 dark:border-[#1c1d30] bg-gray-50/50 dark:bg-[#050505]/50 p-3.5">
-                    <span className="text-[11px] font-medium text-gray-500 dark:text-slate-400">Active Projects</span>
-                    <div className="mt-1 flex items-baseline gap-2">
-                      <span className="text-xl font-bold text-gray-900 dark:text-white">3</span>
-                      <span className="text-[10px] font-medium text-blue-600 dark:text-blue-400">+4%</span>
-                    </div>
-                  </div>
-
-                  <div className="rounded-xl border border-gray-100 dark:border-[#1c1d30] bg-gray-50/50 dark:bg-[#050505]/50 p-3.5">
-                    <span className="text-[11px] font-medium text-gray-500 dark:text-slate-400">Tasks Completed</span>
-                    <div className="mt-1 flex items-baseline gap-2">
-                      <span className="text-xl font-bold text-gray-900 dark:text-white">2</span>
-                      <span className="text-[10px] font-medium text-emerald-600 dark:text-emerald-400">+14%</span>
-                    </div>
-                  </div>
-
-                  <div className="rounded-xl border border-gray-100 dark:border-[#1c1d30] bg-gray-50/50 dark:bg-[#050505]/50 p-3.5">
-                    <span className="text-[11px] font-medium text-gray-500 dark:text-slate-400">In Review</span>
-                    <div className="mt-1 flex items-baseline gap-2">
-                      <span className="text-xl font-bold text-gray-900 dark:text-white">2</span>
-                      <span className="text-[10px] font-medium text-amber-600 dark:text-amber-400">Pending</span>
-                    </div>
-                  </div>
-
-                  <div className="rounded-xl border border-gray-100 dark:border-[#1c1d30] bg-gray-50/50 dark:bg-[#050505]/50 p-3.5">
-                    <span className="text-[11px] font-medium text-gray-500 dark:text-slate-400">Security Gate</span>
-                    <div className="mt-1 flex items-baseline gap-2">
-                      <span className="text-xl font-bold text-emerald-600 dark:text-emerald-400">3/3</span>
-                      <span className="text-[10px] font-medium text-emerald-600">100%</span>
-                    </div>
-                  </div>
-
-                  <div className="rounded-xl border border-gray-100 dark:border-[#1c1d30] bg-gray-50/50 dark:bg-[#050505]/50 p-3.5 col-span-2 sm:col-span-1">
-                    <span className="text-[11px] font-medium text-gray-500 dark:text-slate-400">Audit Events</span>
-                    <div className="mt-1 flex items-baseline gap-2">
-                      <span className="text-xl font-bold text-gray-900 dark:text-white">18</span>
-                      <span className="text-[10px] font-medium text-purple-600 dark:text-purple-400">Logged</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Sample Live Task Items */}
-                <div className="space-y-2.5 pt-2">
-                  <div className="flex items-center justify-between rounded-xl border border-gray-100 dark:border-[#1c1d30]/80 bg-white dark:bg-[#0c0d16] p-3.5 shadow-xs">
-                    <div className="flex items-center gap-3">
-                      <span className="h-2 w-2 rounded-full bg-blue-500" />
-                      <div>
-                        <p className="text-xs font-semibold text-gray-900 dark:text-white">Implement OAuth2 / JWT Session Invalidation</p>
-                        <p className="text-[11px] text-gray-400">Security Sensitive • Assigned to dev1</p>
-                      </div>
-                    </div>
-                    <span className="rounded-full bg-blue-500/10 px-2.5 py-0.5 text-[10px] font-semibold text-blue-600 dark:text-blue-400">
-                      IN PROGRESS
+                {/* Recent Task Pipeline Stream */}
+                <div className="rounded-2xl border border-gray-200/90 dark:border-[#1c1d30] bg-white dark:bg-[#0c0d16] p-4 shadow-xs">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-[11px] font-semibold uppercase tracking-wider text-gray-400 dark:text-slate-500">
+                      Active Development Backlog
+                    </span>
+                    <span className="text-[11px] text-gray-400 dark:text-slate-500">
+                      3-Point Security Gate Enforced
                     </span>
                   </div>
 
-                  <div className="flex items-center justify-between rounded-xl border border-gray-100 dark:border-[#1c1d30]/80 bg-white dark:bg-[#0c0d16] p-3.5 shadow-xs">
-                    <div className="flex items-center gap-3">
-                      <span className="h-2 w-2 rounded-full bg-amber-500" />
-                      <div>
-                        <p className="text-xs font-semibold text-gray-900 dark:text-white">Role-Based Access Control Endpoint Verification</p>
-                        <p className="text-[11px] text-gray-400">Security Review Gate Active • Assigned to dev2</p>
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between rounded-xl border border-gray-100 dark:border-[#1c1d30] bg-gray-50/70 dark:bg-[#050505] p-3 text-xs">
+                      <div className="flex items-center gap-2.5">
+                        <span className="h-2 w-2 rounded-full bg-blue-500" />
+                        <span className="font-medium text-gray-900 dark:text-white">Implement OAuth2 / JWT Session Invalidation</span>
+                        <span className="rounded bg-red-500/10 px-1.5 py-0.5 text-[10px] font-semibold text-red-500">Security Sensitive</span>
                       </div>
+                      <span className="rounded-full bg-blue-500/10 px-2.5 py-0.5 text-[10px] font-semibold text-blue-500">IN PROGRESS</span>
                     </div>
-                    <span className="rounded-full bg-amber-500/10 px-2.5 py-0.5 text-[10px] font-semibold text-amber-600 dark:text-amber-400">
-                      IN REVIEW
-                    </span>
-                  </div>
 
-                  <div className="flex items-center justify-between rounded-xl border border-gray-100 dark:border-[#1c1d30]/80 bg-white dark:bg-[#0c0d16] p-3.5 shadow-xs">
-                    <div className="flex items-center gap-3">
-                      <span className="h-2 w-2 rounded-full bg-emerald-500" />
-                      <div>
-                        <p className="text-xs font-semibold text-gray-900 dark:text-white">PostgreSQL Connection Pooling & Migration Setup</p>
-                        <p className="text-[11px] text-gray-400">Completed & Verified • Signed off by pm1</p>
+                    <div className="flex items-center justify-between rounded-xl border border-gray-100 dark:border-[#1c1d30] bg-gray-50/70 dark:bg-[#050505] p-3 text-xs">
+                      <div className="flex items-center gap-2.5">
+                        <span className="h-2 w-2 rounded-full bg-amber-500" />
+                        <span className="font-medium text-gray-900 dark:text-white">Role-Based Access Control Endpoint Verification</span>
+                        <span className="rounded bg-amber-500/10 px-1.5 py-0.5 text-[10px] font-semibold text-amber-500">Gate Active</span>
                       </div>
+                      <span className="rounded-full bg-amber-500/10 px-2.5 py-0.5 text-[10px] font-semibold text-amber-500">IN REVIEW</span>
                     </div>
-                    <span className="rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">
-                      DONE
-                    </span>
+
+                    <div className="flex items-center justify-between rounded-xl border border-gray-100 dark:border-[#1c1d30] bg-gray-50/70 dark:bg-[#050505] p-3 text-xs">
+                      <div className="flex items-center gap-2.5">
+                        <span className="h-2 w-2 rounded-full bg-emerald-500" />
+                        <span className="font-medium text-gray-900 dark:text-white">PostgreSQL Connection Pooling & Health Checks</span>
+                        <span className="rounded bg-emerald-500/10 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-500">Verified</span>
+                      </div>
+                      <span className="rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-[10px] font-semibold text-emerald-500">DONE</span>
+                    </div>
                   </div>
                 </div>
               </div>

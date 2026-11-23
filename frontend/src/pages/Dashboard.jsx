@@ -7,7 +7,8 @@ function Dashboard({
     token,
     user,
     onSelectProject,
-    onToggleSidebar
+    onToggleSidebar,
+    showToast
 }) {
     const [projects, setProjects] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -95,9 +96,15 @@ function Dashboard({
                 {showCreateForm && canCreateProject && (
                     <CreateProjectForm
                         token={token}
-                        onCreated={() => {
+                        onCreated={(newProject) => {
                             setShowCreateForm(false);
                             setRefreshKey((current) => current + 1);
+                            if (showToast) {
+                                showToast(
+                                    "Project Created",
+                                    `Project "${newProject?.name || "New Workspace"}" created successfully!`
+                                );
+                            }
                         }}
                         onCancel={() => setShowCreateForm(false)}
                     />

@@ -14,7 +14,8 @@ function ProjectDetails({
   user,
   onBack,
   onGoDashboard,
-  onToggleSidebar
+  onToggleSidebar,
+  showToast
 }) {
   const [project, setProject] = useState(initialProject);
   const [selectedTask, setSelectedTask] = useState(null);
@@ -392,9 +393,15 @@ function ProjectDetails({
           <CreateTaskForm
             projectId={project.id}
             token={token}
-            onCreated={() => {
+            onCreated={(createdTask) => {
               setShowCreateForm(false);
               setRefreshKey((current) => current + 1);
+              if (showToast) {
+                showToast(
+                  "Task Created",
+                  `Task "${createdTask?.title || "New Task"}" created successfully!`
+                );
+              }
             }}
             onCancel={() => setShowCreateForm(false)}
           />

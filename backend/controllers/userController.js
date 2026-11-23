@@ -108,7 +108,112 @@ async function createUser(req, res) {
   }
 }
 
+// PATCH/PUT /api/users/:id - Admin only
+async function updateUser(req, res) {
+  try {
+    const targetId = parseInt(req.params.id, 10);
+    if (!Number.isInteger(targetId) || targetId <= 0) {
+      return res.status(400).json({ message: "Invalid user ID" });
+    }
+
+    const targetUser = await userModel.findUserById(targetId);
+    if (!targetUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const { name, email, role, isActive, is_active } = req.body ?? {};
+
+    // Validate name if provided
+    if (name !== undefined) {
+      if (typeof name !== "string" || !name.trim() || name.trim().length > 100) {
+        return res.status(400).json({
+          message: "Name must be between 1 and 100 characters"
+        });
+      }
+    }
+
+    // Validate email if provided
+    if (email !== undefined) {
+      if (
+        typeof email !== "string" ||
+        email.trim().length > 255 ||
+        !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())
+      ) {
+        return res.status(400).json({
+          message: "Please provide a valid email address"
+        });
+      }
+
+      const normalizedEmail = email.trim().toLowerCase();
+      const existingUser = await userModel.findUserByEmail(normalizedEmail);
+      if (existingUser && existingUser.id !== targetId) {
+        return res.status(409).json({
+          message: "Email is already registered"
+        });
+      }
+    }
+
+    // Validate role if provided
+    const allowedRoles = ["ADMIN", "PROJECT_MANAGER", "DEVELOPER"];
+    if (role !== undefined) {
+      if (!allowedRoles.includes(role)) {
+        return res.status(400).json({
+          message: "Role must be ADMIN, PROJECT_MANAGER, or DEVELOPER"
+        });
+      }
+
+      // Security check: An admin cannot demote their own account
+      if (targetId === req.user.id && role !== "ADMIN") {
+        return res.status(400).json({
+          message: "You cannot demote your own administrator account"
+        });
+      }
+    }
+
+    // Validate active status if provided
+    const activeStatus = isActive !== undefined ? isActive : is_active;
+    if (activeStatus !== undefined) {
+      if (typeof activeStatus !== "boolean") {
+        return res.status(400).json({
+          message: "Active status must be a boolean"
+        });
+      }
+
+      // Security check: An admin cannot deactivate their own account
+      if (targetId === req.user.id && activeStatus === false) {
+        return res.status(400).json({
+          message: "You cannot deactivate your own account"
+        });
+      }
+    }
+
+    const updated = await userModel.updateUser(targetId, {
+      name: name !== undefined ? name.trim() : undefined,
+      email: email !== undefined ? email.trim().toLowerCase() : undefined,
+      role,
+      isActive: activeStatus
+    });
+
+    return res.json({
+      message: "User updated successfully",
+      user: updated
+    });
+  } catch (error) {
+    if (error.code === "23505") {
+      return res.status(409).json({
+        message: "Email is already registered"
+      });
+    }
+
+    console.error("User update failed:", error.message);
+    return res.status(500).json({
+      message: "Failed to update user"
+    });
+  }
+}
+
 module.exports = {
   listUsers,
-  createUser
+  createUser,
+  updateUser
 };

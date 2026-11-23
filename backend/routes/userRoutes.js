@@ -19,4 +19,8 @@ router.get("/", userController.listUsers);
 // Create Developer or Project Manager
 router.post("/", userController.createUser);
 
+// Update user details, role, or active status
+router.patch("/:id", userController.updateUser);
+router.put("/:id", userController.updateUser);
+
 module.exports = router;

@@ -1,6 +1,7 @@
-const taskModel     = require("../models/taskModel");
-const projectModel  = require("../models/projectModel");
-const userModel     = require("../models/userModel");
+const taskModel         = require("../models/taskModel");
+const projectModel      = require("../models/projectModel");
+const userModel         = require("../models/userModel");
+const notificationModel = require("../models/notificationModel");
 
 // Check whether an ID fits PostgreSQL's positive INTEGER range
 function isValidId(id) {
@@ -231,6 +232,16 @@ async function assignTask(req, res) {
             projectId,
             userId
         );
+
+        if (userId && Number(userId) !== req.user.id) {
+            notificationModel.createNotification({
+                userId,
+                title: "Task Assigned",
+                message: `You were assigned to task #${taskId}: "${updatedTask.title}"`,
+                link: `/projects/${projectId}`,
+                type: "TASK_ASSIGNED"
+            }).catch(() => {});
+        }
 
         return res.status(200).json({
             message: "Task assigned successfully",

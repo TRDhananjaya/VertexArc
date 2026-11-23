@@ -6,7 +6,15 @@ import ProjectDetails from "./pages/ProjectDetails";
 import UserManagement from "./pages/UserManagement";
 import AdminAuditLogs from "./pages/AdminAuditLogs";
 import FloatingSidebar from "./components/FloatingSidebar";
-import { setSessionExpiredHandler } from "./api";
+import Toast from "./components/Toast";
+import ProfileModal from "./components/ProfileModal";
+import NotificationsPage from "./pages/NotificationsPage";
+import {
+  setSessionExpiredHandler,
+  getNotifications,
+  markNotificationRead,
+  markAllNotificationsRead
+} from "./api";
 
 // Keys used to persist session in localStorage
 const SESSION_TOKEN_KEY = "vertexarc_token";
@@ -33,7 +41,8 @@ function getInitialTheme() {
 
 function getInitialSidebarExpanded() {
   const saved = localStorage.getItem(SIDEBAR_EXPANDED_KEY);
-  return saved === "true";
+  if (saved === "false") return false;
+  return true; // Default to expanded
 }
 
 function applyTheme(theme) {
@@ -53,6 +62,7 @@ function App() {
   const [selectedProject, setSelectedProject]       = useState(null);
   const [showUserManagement, setShowUserManagement] = useState(false);
   const [showAuditLogs, setShowAuditLogs]           = useState(false);
+  const [showNotificationsView, setShowNotificationsView] = useState(false);
   const [sessionMessage, setSessionMessage]         = useState("");
   const [showLogin, setShowLogin]                   = useState(false);
 
@@ -61,6 +71,72 @@ function App() {
 
   // Sidebar expanded / collapsed state
   const [sidebarExpanded, setSidebarExpanded] = useState(getInitialSidebarExpanded);
+
+  // Global popup notification toast
+  const [toast, setToast] = useState(null);
+
+  function showToast(title, message, type = "success") {
+    setToast({ id: Date.now(), title, message, type });
+  }
+
+  // User Profile & Notification states
+  const [showProfileModal, setShowProfileModal] = useState(false);
+  const [notifications, setNotifications] = useState([]);
+  const [unreadNotificationsCount, setUnreadNotificationsCount] = useState(0);
+
+  // Poll notifications periodically when user is logged in
+  useEffect(() => {
+    if (!token) return;
+    let active = true;
+
+    async function fetchUserNotifications() {
+      try {
+        const data = await getNotifications(token);
+        if (!active) return;
+        setNotifications(data.notifications || []);
+        setUnreadNotificationsCount(data.unreadCount || 0);
+      } catch {
+        // Silently catch background errors
+      }
+    }
+
+    fetchUserNotifications();
+    const timer = setInterval(fetchUserNotifications, 30000);
+    return () => {
+      active = false;
+      clearInterval(timer);
+    };
+  }, [token]);
+
+  async function handleMarkNotificationRead(id) {
+    try {
+      await markNotificationRead(token, id);
+      setNotifications((prev) =>
+        prev.map((n) => (n.id === id ? { ...n, is_read: true } : n))
+      );
+      setUnreadNotificationsCount((c) => Math.max(0, c - 1));
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  async function handleMarkAllNotificationsRead() {
+    try {
+      await markAllNotificationsRead(token);
+      setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
+      setUnreadNotificationsCount(0);
+      showToast("Notifications", "All notifications marked as read.");
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  function handleProfileUpdated(updatedUser) {
+    setUser(updatedUser);
+    localStorage.setItem(SESSION_USER_KEY, JSON.stringify(updatedUser));
+    setShowProfileModal(false);
+    showToast("Profile Updated", "Your account settings have been saved successfully.");
+  }
 
   // Apply theme on mount and whenever it changes
   useEffect(() => {
@@ -89,6 +165,7 @@ function App() {
       setSelectedProject(null);
       setShowUserManagement(false);
       setShowAuditLogs(false);
+      setShowNotificationsView(false);
       setSessionMessage("Your session has expired. Please sign in again.");
       setShowLogin(true);
     });
@@ -108,6 +185,7 @@ function App() {
     setSelectedProject(null);
     setShowUserManagement(false);
     setShowAuditLogs(false);
+    setShowNotificationsView(false);
     setSessionMessage("");
     setShowLogin(false);
   }
@@ -120,6 +198,7 @@ function App() {
     setSelectedProject(null);
     setShowUserManagement(false);
     setShowAuditLogs(false);
+    setShowNotificationsView(false);
     setSessionMessage("");
     setShowLogin(false);
   }
@@ -128,18 +207,28 @@ function App() {
     setSelectedProject(null);
     setShowUserManagement(false);
     setShowAuditLogs(false);
+    setShowNotificationsView(false);
   }
 
   function handleOpenUserManagement() {
     setSelectedProject(null);
     setShowUserManagement(true);
     setShowAuditLogs(false);
+    setShowNotificationsView(false);
   }
 
   function handleOpenAuditLogs() {
     setSelectedProject(null);
     setShowUserManagement(false);
     setShowAuditLogs(true);
+    setShowNotificationsView(false);
+  }
+
+  function handleOpenNotifications() {
+    setSelectedProject(null);
+    setShowUserManagement(false);
+    setShowAuditLogs(false);
+    setShowNotificationsView(true);
   }
 
   // 1. Landing page — shown to unauthenticated users who haven't clicked "Sign In"
@@ -167,7 +256,9 @@ function App() {
   }
 
   // Determine active view for dock indicator
-  const activeView = showUserManagement
+  const activeView = showNotificationsView
+    ? "notifications"
+    : showUserManagement
     ? "users"
     : showAuditLogs
     ? "audit"
@@ -190,6 +281,9 @@ function App() {
         onToggleTheme={toggleTheme}
         isExpanded={sidebarExpanded}
         onToggleExpand={toggleSidebarExpanded}
+        unreadNotificationCount={unreadNotificationsCount}
+        onOpenNotifications={handleOpenNotifications}
+        onOpenProfile={() => setShowProfileModal(true)}
       />
 
       {/* Main Content Area (Offset smoothly by left dock on desktop, padded for bottom bar on mobile) */}
@@ -198,13 +292,30 @@ function App() {
           sidebarExpanded ? "md:pl-80" : "md:pl-24"
         }`}
       >
-        {showUserManagement && user?.role === "ADMIN" ? (
+        {showNotificationsView ? (
+          <NotificationsPage
+            user={user}
+            notifications={notifications}
+            unreadCount={unreadNotificationsCount}
+            onMarkRead={handleMarkNotificationRead}
+            onMarkAllRead={handleMarkAllNotificationsRead}
+            onGoDashboard={handleGoDashboard}
+            onSelectProject={(project) => {
+              setSelectedProject(project);
+              setShowNotificationsView(false);
+              setShowUserManagement(false);
+              setShowAuditLogs(false);
+            }}
+            onToggleSidebar={toggleSidebarExpanded}
+          />
+        ) : showUserManagement && user?.role === "ADMIN" ? (
           <UserManagement
             token={token}
             user={user}
             onBack={handleGoDashboard}
             onGoDashboard={handleGoDashboard}
             onToggleSidebar={toggleSidebarExpanded}
+            showToast={showToast}
           />
         ) : showAuditLogs && user?.role === "ADMIN" ? (
           <AdminAuditLogs
@@ -222,6 +333,7 @@ function App() {
             onBack={handleGoDashboard}
             onGoDashboard={handleGoDashboard}
             onToggleSidebar={toggleSidebarExpanded}
+            showToast={showToast}
           />
         ) : (
           <Dashboard
@@ -229,13 +341,28 @@ function App() {
             user={user}
             onSelectProject={(project) => {
               setSelectedProject(project);
+              setShowNotificationsView(false);
               setShowUserManagement(false);
               setShowAuditLogs(false);
             }}
             onToggleSidebar={toggleSidebarExpanded}
+            showToast={showToast}
           />
         )}
       </div>
+
+      {/* Global Success & Error Toast Popup */}
+      <Toast toast={toast} onClose={() => setToast(null)} />
+
+      {/* User Account Settings / Profile Modal */}
+      {showProfileModal && (
+        <ProfileModal
+          user={user}
+          token={token}
+          onProfileUpdated={handleProfileUpdated}
+          onClose={() => setShowProfileModal(false)}
+        />
+      )}
     </div>
   );
 }

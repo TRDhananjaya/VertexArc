@@ -26,10 +26,10 @@ function CreateProjectForm({ token, onCreated, onCancel }) {
     setLoading(true);
 
     try {
-      await createProject(token, trimmedName, description.trim());
+      const data = await createProject(token, trimmedName, description.trim());
 
-      // Tell the dashboard to refresh its project list
-      onCreated();
+      // Tell the dashboard to refresh its project list and show success toast
+      onCreated(data?.project || { name: trimmedName });
     } catch (err) {
       setError(err.message);
     } finally {

@@ -22,7 +22,7 @@ function CreateTaskForm({ projectId, token, onCreated, onCancel }) {
     setLoading(true);
 
     try {
-      await createTask(projectId, token, {
+      const data = await createTask(projectId, token, {
         title: title.trim(),
         description: description.trim(),
         priority,
@@ -30,8 +30,7 @@ function CreateTaskForm({ projectId, token, onCreated, onCancel }) {
         riskLevel: securitySensitive ? riskLevel : null
       });
 
-
-      onCreated();
+      onCreated(data?.task || { title: title.trim() });
     } catch (err) {
       setError(err.message);
     } finally {

@@ -1,6 +1,8 @@
 // Handles user registration and login.
 const bcrypt    = require("bcrypt");
 const jwt       = require("jsonwebtoken");
+const crypto    = require("crypto");
+const pool      = require("../db");
 const userModel = require("../models/userModel");
 
 // POST /api/auth/register — validate input, hash password, create user
@@ -126,4 +128,214 @@ async function login(req, res) {
     }
 }
 
-module.exports = { register, login };
+// GET /api/auth/profile — authenticated user profile
+async function getProfile(req, res) {
+    try {
+        if (!req.user) {
+            return res.status(401).json({ message: "Not authenticated" });
+        }
+        return res.json({ user: req.user });
+    } catch (error) {
+        console.error("Failed to retrieve profile:", error.message);
+        return res.status(500).json({ message: "Failed to retrieve profile" });
+    }
+}
+
+// PATCH /api/auth/profile — update own name or change password
+async function updateProfile(req, res) {
+    try {
+        const { name, currentPassword, newPassword } = req.body ?? {};
+
+        const fields = [];
+        const values = [];
+        let paramIndex = 1;
+
+        if (name !== undefined) {
+            if (typeof name !== "string" || !name.trim() || name.trim().length > 100) {
+                return res.status(400).json({
+                    message: "Name must be between 1 and 100 characters"
+                });
+            }
+            fields.push(`name = $${paramIndex++}`);
+            values.push(name.trim());
+        }
+
+        if (newPassword !== undefined) {
+            if (typeof currentPassword !== "string" || !currentPassword) {
+                return res.status(400).json({
+                    message: "Current password is required to change password"
+                });
+            }
+
+            if (
+                typeof newPassword !== "string" ||
+                newPassword.length < 8 ||
+                Buffer.byteLength(newPassword, "utf8") > 72
+            ) {
+                return res.status(400).json({
+                    message: "New password must be at least 8 characters and no more than 72 UTF-8 bytes"
+                });
+            }
+
+            // Fetch password hash to verify current password
+            const fullUser = await pool.query(
+                "SELECT password_hash FROM users WHERE id = $1",
+                [req.user.id]
+            );
+
+            if (!fullUser.rows[0]) {
+                return res.status(404).json({ message: "User not found" });
+            }
+
+            const currentValid = await bcrypt.compare(
+                currentPassword,
+                fullUser.rows[0].password_hash
+            );
+
+            if (!currentValid) {
+                return res.status(400).json({
+                    message: "Current password is incorrect"
+                });
+            }
+
+            const newHash = await bcrypt.hash(newPassword, 12);
+            fields.push(`password_hash = $${paramIndex++}`);
+            values.push(newHash);
+        }
+
+        if (fields.length === 0) {
+            return res.status(400).json({
+                message: "No profile updates provided"
+            });
+        }
+
+        fields.push("updated_at = NOW()");
+        values.push(req.user.id);
+
+        const updateResult = await pool.query(
+            `UPDATE users
+             SET ${fields.join(", ")}
+             WHERE id = $${paramIndex}
+             RETURNING id, name, email, role, is_active, created_at, updated_at`,
+            values
+        );
+
+        return res.json({
+            message: "Profile updated successfully",
+            user: updateResult.rows[0]
+        });
+    } catch (error) {
+        console.error("Profile update failed:", error.message);
+        return res.status(500).json({ message: "Failed to update profile" });
+    }
+}
+
+// POST /api/auth/forgot-password — generate secure password reset token
+async function forgotPassword(req, res) {
+    try {
+        const { email } = req.body ?? {};
+
+        if (typeof email !== "string" || !email.trim()) {
+            return res.status(400).json({ message: "Email is required" });
+        }
+
+        const normalizedEmail = email.trim().toLowerCase();
+        const user = await userModel.findUserByEmail(normalizedEmail);
+
+        // Security: always return generic message to prevent email enumeration
+        if (!user || !user.is_active) {
+            return res.json({
+                message: "If an account with that email exists, reset instructions have been generated."
+            });
+        }
+
+        // Generate 32-byte cryptographic token
+        const resetToken = crypto.randomBytes(32).toString("hex");
+        const tokenHash  = crypto.createHash("sha256").update(resetToken).digest("hex");
+        const expiresAt  = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
+
+        await pool.query(
+            `INSERT INTO password_resets (user_id, token_hash, expires_at, used)
+             VALUES ($1, $2, $3, false)`,
+            [user.id, tokenHash, expiresAt]
+        );
+
+        return res.json({
+            message: "If an account with that email exists, reset instructions have been generated.",
+            resetToken // Included for development/demo testing
+        });
+    } catch (error) {
+        console.error("Forgot password request failed:", error.message);
+        return res.status(500).json({ message: "Failed to process request" });
+    }
+}
+
+// POST /api/auth/reset-password — verify token and apply new password
+async function resetPassword(req, res) {
+    try {
+        const { token, newPassword } = req.body ?? {};
+
+        if (typeof token !== "string" || !token.trim()) {
+            return res.status(400).json({ message: "Reset token is required" });
+        }
+
+        if (
+            typeof newPassword !== "string" ||
+            newPassword.length < 8 ||
+            Buffer.byteLength(newPassword, "utf8") > 72
+        ) {
+            return res.status(400).json({
+                message: "Password must be at least 8 characters and no more than 72 UTF-8 bytes"
+            });
+        }
+
+        const tokenHash = crypto.createHash("sha256").update(token.trim()).digest("hex");
+
+        const resetQuery = await pool.query(
+            `SELECT id, user_id, expires_at, used
+             FROM password_resets
+             WHERE token_hash = $1
+               AND used = false
+               AND expires_at > NOW()
+             ORDER BY id DESC
+             LIMIT 1`,
+            [tokenHash]
+        );
+
+        const resetRecord = resetQuery.rows[0];
+        if (!resetRecord) {
+            return res.status(400).json({
+                message: "Password reset link is invalid or has expired."
+            });
+        }
+
+        const newHash = await bcrypt.hash(newPassword, 12);
+
+        // Update password and invalidate the token
+        await pool.query(
+            "UPDATE users SET password_hash = $1, updated_at = NOW() WHERE id = $2",
+            [newHash, resetRecord.user_id]
+        );
+
+        await pool.query(
+            "UPDATE password_resets SET used = true WHERE id = $1",
+            [resetRecord.id]
+        );
+
+        return res.json({
+            message: "Password has been reset successfully. You can now log in with your new password."
+        });
+    } catch (error) {
+        console.error("Password reset failed:", error.message);
+        return res.status(500).json({ message: "Password reset failed" });
+    }
+}
+
+module.exports = {
+    register,
+    login,
+    getProfile,
+    updateProfile,
+    forgotPassword,
+    resetPassword
+};
