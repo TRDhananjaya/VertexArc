@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { getAdminProjectAuditLogs, getAdminTaskAuditLogs } from "../api";
 import Navbar from "../components/Navbar";
 
-function AdminAuditLogs({ token, user, onLogout, onBack, onGoDashboard, onOpenUserManagement }) {
+function AdminAuditLogs({ token, user, onLogout, onBack, onGoDashboard, onOpenUserManagement, theme, onToggleTheme }) {
   const [activeTab, setActiveTab] = useState("projects"); // "projects" | "tasks"
   const [projectLogs, setProjectLogs] = useState([]);
   const [taskLogs, setTaskLogs] = useState([]);
@@ -61,7 +61,7 @@ function AdminAuditLogs({ token, user, onLogout, onBack, onGoDashboard, onOpenUs
       case "TASK_ASSIGNED":
         return <span className="rounded bg-emerald-500/15 px-2 py-0.5 text-xs font-semibold text-emerald-400">Assigned</span>;
       default:
-        return <span className="rounded bg-slate-800 px-2 py-0.5 text-xs font-semibold text-slate-300">{action}</span>;
+        return <span className="rounded bg-gray-100 dark:bg-slate-800 px-2 py-0.5 text-xs font-semibold text-gray-600 dark:text-slate-300">{action}</span>;
     }
   }
 
@@ -77,7 +77,7 @@ function AdminAuditLogs({ token, user, onLogout, onBack, onGoDashboard, onOpenUs
   });
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white">
+    <div className="min-h-screen bg-gray-50 dark:bg-slate-950 text-gray-900 dark:text-white">
       {/* Header */}
       <Navbar
         user={user}
@@ -85,6 +85,8 @@ function AdminAuditLogs({ token, user, onLogout, onBack, onGoDashboard, onOpenUs
         onGoDashboard={onGoDashboard}
         onOpenUserManagement={onOpenUserManagement}
         subtitle="Administration / System Audit Trail"
+        theme={theme}
+        onToggleTheme={onToggleTheme}
       />
 
       <main className="mx-auto max-w-6xl px-6 py-10">
@@ -100,21 +102,21 @@ function AdminAuditLogs({ token, user, onLogout, onBack, onGoDashboard, onOpenUs
         {/* Page title */}
         <div className="mb-8">
           <h2 className="text-3xl font-bold">System Audit Logs</h2>
-          <p className="mt-2 text-slate-400">
+          <p className="mt-2 text-gray-500 dark:text-slate-400">
             Immutable, centralized audit history of all critical project and task operations.
           </p>
         </div>
 
         {/* Tabs & Search controls */}
         <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-          <div className="flex gap-2 rounded-xl bg-slate-900 p-1 border border-slate-800">
+          <div className="flex gap-2 rounded-xl bg-slate-900 p-1 border border-gray-200 dark:border-slate-800">
             <button
               type="button"
               onClick={() => setActiveTab("projects")}
               className={`rounded-lg px-4 py-2 text-sm font-semibold transition ${
                 activeTab === "projects"
                   ? "bg-purple-600 text-white"
-                  : "text-slate-400 hover:text-white"
+                  : "text-gray-500 dark:text-slate-400 hover:text-white"
               }`}
             >
               Project Audit Logs ({projectLogs.length})
@@ -125,7 +127,7 @@ function AdminAuditLogs({ token, user, onLogout, onBack, onGoDashboard, onOpenUs
               className={`rounded-lg px-4 py-2 text-sm font-semibold transition ${
                 activeTab === "tasks"
                   ? "bg-purple-600 text-white"
-                  : "text-slate-400 hover:text-white"
+                  : "text-gray-500 dark:text-slate-400 hover:text-white"
               }`}
             >
               Task Audit Logs ({taskLogs.length})
@@ -138,12 +140,12 @@ function AdminAuditLogs({ token, user, onLogout, onBack, onGoDashboard, onOpenUs
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search by action, name, actor…"
-            className="w-full max-w-xs rounded-xl border border-slate-700 bg-slate-900 px-4 py-2 text-sm text-white outline-none focus:border-purple-500"
+            className="w-full max-w-xs rounded-xl border border-gray-200 dark:border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-2 text-sm text-white outline-none focus:border-purple-500"
           />
         </div>
 
         {/* Feedback states */}
-        {loading && <p className="text-slate-400">Loading audit records…</p>}
+        {loading && <p className="text-gray-500 dark:text-slate-400">Loading audit records…</p>}
         {error && (
           <div role="alert" className="mb-6 rounded-lg border border-red-500/30 bg-red-500/10 p-4 text-red-400">
             {error}
@@ -151,16 +153,16 @@ function AdminAuditLogs({ token, user, onLogout, onBack, onGoDashboard, onOpenUs
         )}
 
         {!loading && !error && filteredLogs.length === 0 && (
-          <div className="rounded-xl border border-slate-800 bg-slate-900 p-8 text-center text-slate-400">
+          <div className="rounded-xl border border-gray-200 dark:border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-8 text-center text-gray-500 dark:text-slate-400">
             No audit records found {searchQuery ? "matching your search query" : ""}.
           </div>
         )}
 
         {/* Audit Log Table */}
         {!loading && !error && filteredLogs.length > 0 && (
-          <div className="overflow-x-auto rounded-xl border border-slate-800 bg-slate-900 shadow-xl">
-            <table className="w-full text-left text-sm text-slate-300">
-              <thead className="border-b border-slate-800 bg-slate-950/60 text-xs uppercase tracking-wider text-slate-400">
+          <div className="overflow-x-auto rounded-xl border border-gray-200 dark:border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xl">
+            <table className="w-full text-left text-sm text-gray-600 dark:text-slate-300">
+              <thead className="border-b border-gray-200 dark:border-slate-800 bg-slate-950/60 text-xs uppercase tracking-wider text-gray-500 dark:text-slate-400">
                 <tr>
                   <th className="px-5 py-4">Timestamp</th>
                   <th className="px-5 py-4">Action</th>
@@ -171,8 +173,8 @@ function AdminAuditLogs({ token, user, onLogout, onBack, onGoDashboard, onOpenUs
               </thead>
               <tbody className="divide-y divide-slate-800/60 font-normal">
                 {filteredLogs.map((log) => (
-                  <tr key={log.id} className="transition hover:bg-slate-800/40">
-                    <td className="whitespace-nowrap px-5 py-4 text-xs text-slate-400">
+                  <tr key={log.id} className="transition hover:bg-gray-100 dark:hover:bg-gray-100 dark:bg-slate-800/40">
+                    <td className="whitespace-nowrap px-5 py-4 text-xs text-gray-500 dark:text-slate-400">
                       {log.created_at ? new Date(log.created_at).toLocaleString() : "—"}
                     </td>
 
@@ -184,34 +186,34 @@ function AdminAuditLogs({ token, user, onLogout, onBack, onGoDashboard, onOpenUs
                       {activeTab === "projects" ? (
                         <div>
                           <span>{log.project_name || `Project #${log.project_id}`}</span>
-                          <span className="block text-xs text-slate-500 font-mono">ID: {log.project_id}</span>
+                          <span className="block text-xs text-gray-500 dark:text-slate-500 font-mono">ID: {log.project_id}</span>
                         </div>
                       ) : (
                         <div>
                           <span>{log.task_title || `Task #${log.task_id}`}</span>
-                          <span className="block text-xs text-slate-500 font-mono">ID: {log.task_id}</span>
+                          <span className="block text-xs text-gray-500 dark:text-slate-500 font-mono">ID: {log.task_id}</span>
                         </div>
                       )}
                     </td>
 
                     <td className="px-5 py-4 text-xs">
-                      <span className="font-semibold text-slate-200">
+                      <span className="font-semibold text-gray-800 dark:text-slate-200">
                         {log.actor_name || `User #${log.actor_id}`}
                       </span>
                       {log.actor_email && (
-                        <span className="block text-slate-500">{log.actor_email}</span>
+                        <span className="block text-gray-500 dark:text-slate-500">{log.actor_email}</span>
                       )}
                     </td>
 
-                    <td className="px-5 py-4 text-xs font-mono text-slate-400 max-w-xs break-words">
+                    <td className="px-5 py-4 text-xs font-mono text-gray-500 dark:text-slate-400 max-w-xs break-words">
                       {log.old_value && (
                         <div className="truncate" title={JSON.stringify(log.old_value)}>
-                          <span className="text-slate-500">Old:</span> {JSON.stringify(log.old_value)}
+                          <span className="text-gray-500 dark:text-slate-500">Old:</span> {JSON.stringify(log.old_value)}
                         </div>
                       )}
                       {log.new_value && (
-                        <div className="truncate text-slate-300" title={JSON.stringify(log.new_value)}>
-                          <span className="text-slate-500">New:</span> {JSON.stringify(log.new_value)}
+                        <div className="truncate text-gray-600 dark:text-slate-300" title={JSON.stringify(log.new_value)}>
+                          <span className="text-gray-500 dark:text-slate-500">New:</span> {JSON.stringify(log.new_value)}
                         </div>
                       )}
                       {!log.old_value && !log.new_value && <span className="text-slate-600">—</span>}

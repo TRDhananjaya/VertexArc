@@ -40,8 +40,8 @@ function CreateTaskForm({ projectId, token, onCreated, onCancel }) {
   }
 
   return (
-    <div className="mb-8 rounded-xl border border-slate-700 bg-slate-900 p-6">
-      <h3 className="mb-5 text-xl font-semibold">
+    <div className="mb-8 rounded-xl border border-gray-200 dark:border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-900 p-6">
+      <h3 className="mb-5 text-xl font-semibold text-gray-900 dark:text-white">
         Create New Task
       </h3>
 
@@ -49,7 +49,7 @@ function CreateTaskForm({ projectId, token, onCreated, onCancel }) {
         <div>
           <label
             htmlFor="task-title"
-            className="mb-2 block text-sm text-slate-300"
+            className="mb-2 block text-sm text-gray-600 dark:text-slate-300"
           >
             Task Title
           </label>
@@ -61,14 +61,14 @@ function CreateTaskForm({ projectId, token, onCreated, onCancel }) {
             value={title}
             onChange={(event) => setTitle(event.target.value)}
             placeholder="Enter task title"
-            className="w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-3 text-white outline-none focus:border-emerald-500"
+            className="w-full rounded-lg border border-gray-300 dark:border-slate-700 bg-gray-100 dark:bg-slate-800 px-4 py-3 text-gray-900 dark:text-white outline-none focus:border-emerald-500"
           />
         </div>
 
         <div>
           <label
             htmlFor="task-description"
-            className="mb-2 block text-sm text-slate-300"
+            className="mb-2 block text-sm text-gray-600 dark:text-slate-300"
           >
             Description
           </label>
@@ -79,14 +79,14 @@ function CreateTaskForm({ projectId, token, onCreated, onCancel }) {
             value={description}
             onChange={(event) => setDescription(event.target.value)}
             placeholder="Describe the task"
-            className="w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-3 text-white outline-none focus:border-emerald-500"
+            className="w-full rounded-lg border border-gray-300 dark:border-slate-700 bg-gray-100 dark:bg-slate-800 px-4 py-3 text-gray-900 dark:text-white outline-none focus:border-emerald-500"
           />
         </div>
 
         <div>
           <label
             htmlFor="task-priority"
-            className="mb-2 block text-sm text-slate-300"
+            className="mb-2 block text-sm text-gray-600 dark:text-slate-300"
           >
             Priority
           </label>
@@ -95,7 +95,7 @@ function CreateTaskForm({ projectId, token, onCreated, onCancel }) {
             id="task-priority"
             value={priority}
             onChange={(event) => setPriority(event.target.value)}
-            className="w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-3 text-white"
+            className="w-full rounded-lg border border-gray-300 dark:border-slate-700 bg-gray-100 dark:bg-slate-800 px-4 py-3 text-gray-900 dark:text-white"
           >
             <option value="LOW">Low</option>
             <option value="MEDIUM">Medium</option>
@@ -103,7 +103,7 @@ function CreateTaskForm({ projectId, token, onCreated, onCancel }) {
           </select>
         </div>
 
-        <label className="flex items-center gap-3 text-sm text-slate-300">
+        <label className="flex items-center gap-3 text-sm text-gray-600 dark:text-slate-300">
           <input
             type="checkbox"
             checked={securitySensitive}
@@ -120,7 +120,7 @@ function CreateTaskForm({ projectId, token, onCreated, onCancel }) {
           <div>
             <label
               htmlFor="task-risk"
-              className="mb-2 block text-sm text-slate-300"
+              className="mb-2 block text-sm text-gray-600 dark:text-slate-300"
             >
               Security Risk Level
             </label>
@@ -129,7 +129,7 @@ function CreateTaskForm({ projectId, token, onCreated, onCancel }) {
               id="task-risk"
               value={riskLevel}
               onChange={(event) => setRiskLevel(event.target.value)}
-              className="w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-3 text-white"
+              className="w-full rounded-lg border border-gray-300 dark:border-slate-700 bg-gray-100 dark:bg-slate-800 px-4 py-3 text-gray-900 dark:text-white"
             >
               <option value="LOW">Low</option>
               <option value="MEDIUM">Medium</option>
@@ -157,7 +157,7 @@ function CreateTaskForm({ projectId, token, onCreated, onCancel }) {
             type="button"
             onClick={onCancel}
             disabled={loading}
-            className="rounded-lg border border-slate-700 px-5 py-2.5 text-slate-300 hover:bg-slate-800"
+            className="rounded-lg border border-gray-300 dark:border-slate-700 px-5 py-2.5 text-gray-600 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-gray-100 dark:bg-slate-800"
           >
             Cancel
           </button>

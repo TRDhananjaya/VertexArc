@@ -32,8 +32,8 @@ function CreateUserForm({ token, onCreated, onCancel }) {
     }
 
     return (
-        <div className="mb-8 rounded-xl border border-slate-700 bg-slate-900 p-6">
-            <h3 className="mb-5 text-xl font-semibold">
+        <div className="mb-8 rounded-xl border border-gray-200 dark:border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-900 p-6">
+            <h3 className="mb-5 text-xl font-semibold text-gray-900 dark:text-white">
                 Create New User
             </h3>
 
@@ -41,7 +41,7 @@ function CreateUserForm({ token, onCreated, onCancel }) {
                 <div>
                     <label
                         htmlFor="user-name"
-                        className="mb-2 block text-sm text-slate-300"
+                        className="mb-2 block text-sm text-gray-600 dark:text-slate-300"
                     >
                         Full Name
                     </label>
@@ -54,14 +54,14 @@ function CreateUserForm({ token, onCreated, onCancel }) {
                         autoComplete="name"
                         value={name}
                         onChange={(event) => setName(event.target.value)}
-                        className="w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-3 text-white outline-none focus:border-emerald-500"
+                        className="w-full rounded-lg border border-gray-300 dark:border-slate-700 bg-gray-100 dark:bg-slate-800 px-4 py-3 text-gray-900 dark:text-white outline-none focus:border-emerald-500"
                     />
                 </div>
 
                 <div>
                     <label
                         htmlFor="user-email"
-                        className="mb-2 block text-sm text-slate-300"
+                        className="mb-2 block text-sm text-gray-600 dark:text-slate-300"
                     >
                         Email
                     </label>
@@ -74,14 +74,14 @@ function CreateUserForm({ token, onCreated, onCancel }) {
                         autoComplete="off"
                         value={email}
                         onChange={(event) => setEmail(event.target.value)}
-                        className="w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-3 text-white outline-none focus:border-emerald-500"
+                        className="w-full rounded-lg border border-gray-300 dark:border-slate-700 bg-gray-100 dark:bg-slate-800 px-4 py-3 text-gray-900 dark:text-white outline-none focus:border-emerald-500"
                     />
                 </div>
 
                 <div>
                     <label
                         htmlFor="user-password"
-                        className="mb-2 block text-sm text-slate-300"
+                        className="mb-2 block text-sm text-gray-600 dark:text-slate-300"
                     >
                         Initial Password
                     </label>
@@ -94,10 +94,10 @@ function CreateUserForm({ token, onCreated, onCancel }) {
                         autoComplete="new-password"
                         value={password}
                         onChange={(event) => setPassword(event.target.value)}
-                        className="w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-3 text-white outline-none focus:border-emerald-500"
+                        className="w-full rounded-lg border border-gray-300 dark:border-slate-700 bg-gray-100 dark:bg-slate-800 px-4 py-3 text-gray-900 dark:text-white outline-none focus:border-emerald-500"
                     />
 
-                    <p className="mt-2 text-xs text-slate-500">
+                    <p className="mt-2 text-xs text-gray-500 dark:text-slate-500">
                         At least 8 characters. Maximum 72 UTF-8 bytes.
                     </p>
                 </div>
@@ -105,7 +105,7 @@ function CreateUserForm({ token, onCreated, onCancel }) {
                 <div>
                     <label
                         htmlFor="user-role"
-                        className="mb-2 block text-sm text-slate-300"
+                        className="mb-2 block text-sm text-gray-600 dark:text-slate-300"
                     >
                         Role
                     </label>
@@ -114,7 +114,7 @@ function CreateUserForm({ token, onCreated, onCancel }) {
                         id="user-role"
                         value={role}
                         onChange={(event) => setRole(event.target.value)}
-                        className="w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-3 text-white"
+                        className="w-full rounded-lg border border-gray-300 dark:border-slate-700 bg-gray-100 dark:bg-slate-800 px-4 py-3 text-gray-900 dark:text-white"
                     >
                         <option value="DEVELOPER">Developer</option>
                         <option value="PROJECT_MANAGER">Project Manager</option>
@@ -140,7 +140,7 @@ function CreateUserForm({ token, onCreated, onCancel }) {
                         type="button"
                         onClick={onCancel}
                         disabled={loading}
-                        className="rounded-lg border border-slate-700 px-5 py-2.5 text-slate-300 hover:bg-slate-800"
+                        className="rounded-lg border border-gray-300 dark:border-slate-700 px-5 py-2.5 text-gray-600 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-gray-100 dark:bg-slate-800"
                     >
                         Cancel
                     </button>

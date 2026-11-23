@@ -16,7 +16,9 @@ function TaskDetail({
   onLogout,
   onGoDashboard,
   onOpenUserManagement,
-  onOpenAuditLogs
+  onOpenAuditLogs,
+  theme,
+  onToggleTheme
 }) {
   const [task, setTask] = useState(initialTask);
   const [comments, setComments] = useState([]);
@@ -46,17 +48,17 @@ function TaskDetail({
 
   // Status colors
   const statusStyles = {
-    TODO: "bg-slate-700 text-slate-200",
-    IN_PROGRESS: "bg-blue-500/15 text-blue-400",
-    IN_REVIEW: "bg-amber-500/15 text-amber-400",
-    DONE: "bg-emerald-500/15 text-emerald-400"
+    TODO: "bg-gray-200 dark:bg-slate-700 text-gray-800 dark:text-slate-200",
+    IN_PROGRESS: "bg-blue-500/15 text-blue-600 dark:text-blue-400",
+    IN_REVIEW: "bg-amber-500/15 text-amber-600 dark:text-amber-400",
+    DONE: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400"
   };
 
   // Priority colors
   const priorityStyles = {
-    LOW: "text-slate-400",
-    MEDIUM: "text-amber-400",
-    HIGH: "text-red-400"
+    LOW: "text-gray-500 dark:text-slate-400",
+    MEDIUM: "text-amber-600 dark:text-amber-400",
+    HIGH: "text-red-600 dark:text-red-400"
   };
 
   // Load comments on mount
@@ -149,7 +151,7 @@ function TaskDetail({
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white">
+    <div className="min-h-screen bg-gray-50 dark:bg-slate-950 text-gray-900 dark:text-white">
       {/* Top Header */}
       <Navbar
         user={user}
@@ -158,6 +160,8 @@ function TaskDetail({
         onOpenUserManagement={onOpenUserManagement}
         onOpenAuditLogs={onOpenAuditLogs}
         subtitle={`Project: ${project.name} | Task #${task.id}`}
+        theme={theme}
+        onToggleTheme={onToggleTheme}
       />
 
       <main className="mx-auto max-w-5xl px-6 py-8">
@@ -165,17 +169,17 @@ function TaskDetail({
         <button
           type="button"
           onClick={onBack}
-          className="mb-6 flex items-center gap-2 text-sm text-emerald-400 transition hover:text-emerald-300"
+          className="mb-6 flex items-center gap-2 text-sm text-emerald-600 dark:text-emerald-400 transition hover:text-emerald-500 dark:hover:text-emerald-300"
         >
           ← Back to Project Tasks
         </button>
 
         {/* Task Details Card */}
-        <div className="rounded-2xl border border-slate-800 bg-slate-900 p-8 shadow-xl">
+        <div className="rounded-2xl border border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-8 shadow-sm dark:shadow-xl">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div className="space-y-2">
               <div className="flex flex-wrap items-center gap-3">
-                <span className="text-xs font-mono uppercase tracking-wider text-slate-500">
+                <span className="text-xs font-mono uppercase tracking-wider text-gray-400 dark:text-slate-500">
                   Task #{task.id}
                 </span>
 
@@ -187,18 +191,18 @@ function TaskDetail({
                   {task.status?.replaceAll("_", " ")}
                 </span>
 
-                <span className={`text-xs font-medium ${priorityStyles[task.priority] || "text-slate-400"}`}>
+                <span className={`text-xs font-medium ${priorityStyles[task.priority] || "text-gray-500 dark:text-slate-400"}`}>
                   Priority: {task.priority}
                 </span>
 
                 {task.is_security_sensitive && (
-                  <span className="rounded-md bg-red-500/10 px-2.5 py-1 text-xs font-semibold text-red-400">
+                  <span className="rounded-md bg-red-500/10 px-2.5 py-1 text-xs font-semibold text-red-500 dark:text-red-400">
                     Security Sensitive {task.risk_level ? `(${task.risk_level})` : ""}
                   </span>
                 )}
               </div>
 
-              <h2 className="text-2xl font-bold text-white">{task.title}</h2>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{task.title}</h2>
             </div>
 
             {/* Quick Assign / Reassign */}
@@ -212,7 +216,7 @@ function TaskDetail({
                       onChange={(e) => {
                         if (e.target.value) handleAssignUser(e.target.value);
                       }}
-                      className="rounded-lg border border-slate-700 bg-slate-800 px-3 py-1.5 text-xs text-white"
+                      className="rounded-lg border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-1.5 text-xs text-gray-900 dark:text-white"
                     >
                       <option value="" disabled>
                         Choose member…
@@ -226,7 +230,7 @@ function TaskDetail({
                     <button
                       type="button"
                       onClick={() => setShowAssignDropdown(false)}
-                      className="text-xs text-slate-400 hover:text-slate-200"
+                      className="text-xs text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-200 transition"
                     >
                       Cancel
                     </button>
@@ -235,20 +239,20 @@ function TaskDetail({
                   <button
                     type="button"
                     onClick={() => setShowAssignDropdown(true)}
-                    className="rounded-lg border border-slate-700 px-3 py-1.5 text-xs font-medium text-slate-300 hover:bg-slate-800"
+                    className="rounded-lg border border-gray-300 dark:border-slate-700 px-3 py-1.5 text-xs font-medium text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800 transition"
                   >
                     {task.assigned_to ? "Reassign Member" : "+ Assign Member"}
                   </button>
                 )}
-                {assignError && <p className="mt-1 text-xs text-red-400">{assignError}</p>}
+                {assignError && <p className="mt-1 text-xs text-red-500 dark:text-red-400">{assignError}</p>}
               </div>
             )}
           </div>
 
           {/* Assignee banner */}
-          <div className="mt-4 flex items-center gap-2 text-sm text-slate-400">
+          <div className="mt-4 flex items-center gap-2 text-sm text-gray-500 dark:text-slate-400">
             <span>Assignee:</span>
-            <span className="font-medium text-slate-200">
+            <span className="font-medium text-gray-800 dark:text-slate-200">
               {task.assigned_to
                 ? memberMap[task.assigned_to] || `User #${task.assigned_to}`
                 : "Unassigned"}
@@ -256,18 +260,18 @@ function TaskDetail({
           </div>
 
           {/* Description */}
-          <div className="mt-6 border-t border-slate-800 pt-6">
-            <h3 className="text-sm font-semibold uppercase tracking-wider text-slate-400">
+          <div className="mt-6 border-t border-gray-200 dark:border-slate-800 pt-6">
+            <h3 className="text-sm font-semibold uppercase tracking-wider text-gray-500 dark:text-slate-400">
               Description
             </h3>
-            <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-slate-300">
+            <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-gray-700 dark:text-slate-300">
               {task.description || "No description provided."}
             </p>
           </div>
 
           {/* Workflow Status Actions */}
-          <div className="mt-6 flex flex-wrap items-center gap-3 border-t border-slate-800 pt-6">
-            <span className="text-xs uppercase tracking-wider text-slate-500">Workflow Action:</span>
+          <div className="mt-6 flex flex-wrap items-center gap-3 border-t border-gray-200 dark:border-slate-800 pt-6">
+            <span className="text-xs uppercase tracking-wider text-gray-400 dark:text-slate-500">Workflow Action:</span>
 
             {/* Developer Actions */}
             {isAssignee && task.status === "TODO" && (
@@ -275,7 +279,7 @@ function TaskDetail({
                 type="button"
                 disabled={statusLoading}
                 onClick={() => handleStatusTransition("IN_PROGRESS")}
-                className="rounded-lg bg-blue-500 px-4 py-2 text-xs font-semibold text-white hover:bg-blue-400 disabled:opacity-60"
+                className="rounded-lg bg-blue-500 px-4 py-2 text-xs font-semibold text-white hover:bg-blue-400 disabled:opacity-60 transition"
               >
                 {statusLoading ? "Updating..." : "Start Work"}
               </button>
@@ -286,9 +290,9 @@ function TaskDetail({
                 type="button"
                 disabled={statusLoading}
                 onClick={() => handleStatusTransition("IN_REVIEW")}
-                className="rounded-lg bg-amber-500 px-4 py-2 text-xs font-semibold text-slate-950 hover:bg-amber-400 disabled:opacity-60"
+                className="rounded-lg bg-amber-500 px-4 py-2 text-xs font-semibold text-slate-950 hover:bg-amber-400 disabled:opacity-60 transition"
               >
-                {statusLoading ? "Updating..." : "Submit for Review"}
+                {statusLoading ? "Submit for Review" : "Submit for Review"}
               </button>
             )}
 
@@ -299,7 +303,7 @@ function TaskDetail({
                   type="button"
                   disabled={statusLoading}
                   onClick={() => handleStatusTransition("DONE")}
-                  className="rounded-lg bg-emerald-500 px-4 py-2 text-xs font-semibold text-slate-950 hover:bg-emerald-400 disabled:opacity-60"
+                  className="rounded-lg bg-emerald-500 px-4 py-2 text-xs font-semibold text-slate-950 hover:bg-emerald-400 disabled:opacity-60 transition"
                 >
                   {statusLoading ? "Updating..." : "Approve (Done)"}
                 </button>
@@ -308,7 +312,7 @@ function TaskDetail({
                   type="button"
                   disabled={statusLoading}
                   onClick={() => handleStatusTransition("IN_PROGRESS")}
-                  className="rounded-lg border border-amber-500/50 px-4 py-2 text-xs font-semibold text-amber-400 hover:bg-amber-500/10 disabled:opacity-60"
+                  className="rounded-lg border border-amber-500/50 px-4 py-2 text-xs font-semibold text-amber-500 dark:text-amber-400 hover:bg-amber-500/10 disabled:opacity-60 transition"
                 >
                   {statusLoading ? "Updating..." : "Request Changes"}
                 </button>
@@ -316,12 +320,12 @@ function TaskDetail({
             )}
 
             {!isAssignee && !isReviewer && (
-              <span className="text-xs text-slate-500 italic">No available actions for your role.</span>
+              <span className="text-xs text-gray-400 dark:text-slate-500 italic">No available actions for your role.</span>
             )}
           </div>
 
           {statusError && (
-            <p role="alert" className="mt-3 text-xs text-red-400">
+            <p role="alert" className="mt-3 text-xs text-red-500 dark:text-red-400">
               {statusError}
             </p>
           )}
@@ -343,20 +347,20 @@ function TaskDetail({
         )}
 
         {/* Discussions / Comments Section */}
-        <section className="mt-10 rounded-2xl border border-slate-800 bg-slate-900 p-8 shadow-xl">
-          <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+        <section className="mt-10 rounded-2xl border border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-8 shadow-sm dark:shadow-xl">
+          <div className="flex items-center justify-between border-b border-gray-200 dark:border-slate-800 pb-4">
             <div className="flex items-center gap-3">
-              <h3 className="text-xl font-bold text-white">Discussions</h3>
-              <span className="rounded-full bg-slate-800 px-2.5 py-0.5 text-xs font-medium text-slate-400">
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white">Discussions</h3>
+              <span className="rounded-full bg-gray-100 dark:bg-slate-800 px-2.5 py-0.5 text-xs font-medium text-gray-600 dark:text-slate-400">
                 {comments.length}
               </span>
             </div>
-            <span className="text-xs text-slate-500">Project members only</span>
+            <span className="text-xs text-gray-400 dark:text-slate-500">Project members only</span>
           </div>
 
           {/* Comment submission form */}
           <form onSubmit={handleAddComment} className="mt-6">
-            <label htmlFor="task-comment" className="mb-2 block text-xs font-medium text-slate-300">
+            <label htmlFor="task-comment" className="mb-2 block text-xs font-medium text-gray-600 dark:text-slate-300">
               Add to discussion
             </label>
 
@@ -367,11 +371,11 @@ function TaskDetail({
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
               placeholder="Ask a question, share progress, or leave feedback…"
-              className="w-full resize-y rounded-xl border border-slate-700 bg-slate-950 p-4 text-sm text-white outline-none transition focus:border-emerald-500"
+              className="w-full resize-y rounded-xl border border-gray-300 dark:border-slate-700 bg-gray-50 dark:bg-slate-950 p-4 text-sm text-gray-900 dark:text-white outline-none transition focus:border-emerald-500"
             />
 
             <div className="mt-2 flex items-center justify-between">
-              <span className="text-xs text-slate-500">{newComment.length} / 2000 characters</span>
+              <span className="text-xs text-gray-400 dark:text-slate-500">{newComment.length} / 2000 characters</span>
 
               <button
                 type="submit"
@@ -383,7 +387,7 @@ function TaskDetail({
             </div>
 
             {postError && (
-              <p role="alert" className="mt-2 text-xs text-red-400">
+              <p role="alert" className="mt-2 text-xs text-red-500 dark:text-red-400">
                 {postError}
               </p>
             )}
@@ -392,17 +396,17 @@ function TaskDetail({
           {/* Comments List */}
           <div className="mt-8 space-y-4">
             {commentsLoading && (
-              <p className="text-sm text-slate-400">Loading discussions…</p>
+              <p className="text-sm text-gray-500 dark:text-slate-400">Loading discussions…</p>
             )}
 
             {commentsError && (
-              <p role="alert" className="text-sm text-red-400">
+              <p role="alert" className="text-sm text-red-500 dark:text-red-400">
                 {commentsError}
               </p>
             )}
 
             {!commentsLoading && !commentsError && comments.length === 0 && (
-              <div className="rounded-xl border border-dashed border-slate-800 p-8 text-center text-sm text-slate-500">
+              <div className="rounded-xl border border-dashed border-gray-300 dark:border-slate-800 p-8 text-center text-sm text-gray-400 dark:text-slate-500">
                 No comments yet. Start the conversation above!
               </div>
             )}
@@ -412,23 +416,23 @@ function TaskDetail({
                 {comments.map((c) => (
                   <div
                     key={c.id}
-                    className="rounded-xl border border-slate-800/80 bg-slate-950 p-5 transition hover:border-slate-700"
+                    className="rounded-xl border border-gray-200 dark:border-slate-800/80 bg-gray-50 dark:bg-slate-950 p-5 transition hover:border-gray-300 dark:hover:border-slate-700"
                   >
                     <div className="flex items-center justify-between text-xs">
                       <div className="flex items-center gap-2">
-                        <span className="font-semibold text-emerald-400">{c.author_name}</span>
+                        <span className="font-semibold text-emerald-600 dark:text-emerald-400">{c.author_name}</span>
                         {c.user_id === user?.id && (
-                          <span className="rounded bg-emerald-500/10 px-1.5 py-0.5 text-[10px] font-medium text-emerald-400">
+                          <span className="rounded bg-emerald-500/10 px-1.5 py-0.5 text-[10px] font-medium text-emerald-600 dark:text-emerald-400">
                             You
                           </span>
                         )}
                       </div>
-                      <span className="text-slate-500">
+                      <span className="text-gray-400 dark:text-slate-500">
                         {c.created_at ? new Date(c.created_at).toLocaleString() : ""}
                       </span>
                     </div>
 
-                    <p className="mt-3 whitespace-pre-wrap text-sm leading-relaxed text-slate-200">
+                    <p className="mt-3 whitespace-pre-wrap text-sm leading-relaxed text-gray-700 dark:text-slate-200">
                       {c.content}
                     </p>
                   </div>

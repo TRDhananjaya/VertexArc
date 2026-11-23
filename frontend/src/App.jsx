@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import Login from "./pages/Login";
+import LandingPage from "./pages/LandingPage";
 import Dashboard from "./pages/Dashboard";
 import ProjectDetails from "./pages/ProjectDetails";
 import UserManagement from "./pages/UserManagement";
@@ -9,6 +10,7 @@ import { setSessionExpiredHandler } from "./api";
 // Keys used to persist session in localStorage
 const SESSION_TOKEN_KEY = "vertexarc_token";
 const SESSION_USER_KEY  = "vertexarc_user";
+const THEME_KEY         = "vertexarc_theme"; // "dark" | "light"
 
 function readPersistedSession() {
   try {
@@ -20,6 +22,22 @@ function readPersistedSession() {
   }
 }
 
+function getInitialTheme() {
+  const saved = localStorage.getItem(THEME_KEY);
+  if (saved === "light" || saved === "dark") return saved;
+  // Default to dark mode (matches the existing design)
+  return "dark";
+}
+
+function applyTheme(theme) {
+  if (theme === "dark") {
+    document.documentElement.classList.add("dark");
+  } else {
+    document.documentElement.classList.remove("dark");
+  }
+  localStorage.setItem(THEME_KEY, theme);
+}
+
 function App() {
   // Initialise state from localStorage so a page refresh keeps the user logged in
   const persisted = readPersistedSession();
@@ -29,6 +47,19 @@ function App() {
   const [showUserManagement, setShowUserManagement] = useState(false);
   const [showAuditLogs, setShowAuditLogs]           = useState(false);
   const [sessionMessage, setSessionMessage]         = useState("");
+  const [showLogin, setShowLogin]                   = useState(false);
+
+  // Theme: "dark" | "light"
+  const [theme, setTheme] = useState(getInitialTheme);
+
+  // Apply theme on mount and whenever it changes
+  useEffect(() => {
+    applyTheme(theme);
+  }, [theme]);
+
+  function toggleTheme() {
+    setTheme((prev) => (prev === "dark" ? "light" : "dark"));
+  }
 
   useEffect(() => {
     // Register global listener for HTTP 401 Unauthorized responses
@@ -41,6 +72,7 @@ function App() {
       setShowUserManagement(false);
       setShowAuditLogs(false);
       setSessionMessage("Your session has expired. Please sign in again.");
+      setShowLogin(true);
     });
   }, []);
 
@@ -59,6 +91,7 @@ function App() {
     setShowUserManagement(false);
     setShowAuditLogs(false);
     setSessionMessage("");
+    setShowLogin(false);
   }
 
   function handleLogout() {
@@ -70,6 +103,7 @@ function App() {
     setShowUserManagement(false);
     setShowAuditLogs(false);
     setSessionMessage("");
+    setShowLogin(false);
   }
 
   function handleGoDashboard() {
@@ -90,12 +124,31 @@ function App() {
     setShowAuditLogs(true);
   }
 
-  // 1. Show login page if user is not authenticated
-  if (!token) {
-    return <Login onLogin={handleLogin} sessionMessage={sessionMessage} />;
+  // 1. Landing page — shown to unauthenticated users who haven't clicked "Sign In"
+  if (!token && !showLogin) {
+    return (
+      <LandingPage
+        onGetStarted={() => setShowLogin(true)}
+        theme={theme}
+        onToggleTheme={toggleTheme}
+      />
+    );
   }
 
-  // 2. Show User Management page for Admin only
+  // 2. Login page
+  if (!token) {
+    return (
+      <Login
+        onLogin={handleLogin}
+        sessionMessage={sessionMessage}
+        onBack={() => setShowLogin(false)}
+        theme={theme}
+        onToggleTheme={toggleTheme}
+      />
+    );
+  }
+
+  // 3. User Management (Admin only)
   if (showUserManagement && user?.role === "ADMIN") {
     return (
       <UserManagement
@@ -105,11 +158,13 @@ function App() {
         onBack={handleGoDashboard}
         onGoDashboard={handleGoDashboard}
         onOpenAuditLogs={handleOpenAuditLogs}
+        theme={theme}
+        onToggleTheme={toggleTheme}
       />
     );
   }
 
-  // 3. Show System Audit Logs for Admin only
+  // 4. System Audit Logs (Admin only)
   if (showAuditLogs && user?.role === "ADMIN") {
     return (
       <AdminAuditLogs
@@ -119,11 +174,13 @@ function App() {
         onBack={handleGoDashboard}
         onGoDashboard={handleGoDashboard}
         onOpenUserManagement={handleOpenUserManagement}
+        theme={theme}
+        onToggleTheme={toggleTheme}
       />
     );
   }
 
-  // 4. Show selected project details
+  // 5. Project Details
   if (selectedProject) {
     return (
       <ProjectDetails
@@ -135,11 +192,13 @@ function App() {
         onGoDashboard={handleGoDashboard}
         onOpenUserManagement={handleOpenUserManagement}
         onOpenAuditLogs={handleOpenAuditLogs}
+        theme={theme}
+        onToggleTheme={toggleTheme}
       />
     );
   }
 
-  // 5. Show dashboard by default
+  // 6. Dashboard
   return (
     <Dashboard
       token={token}
@@ -152,6 +211,8 @@ function App() {
       }}
       onOpenUserManagement={handleOpenUserManagement}
       onOpenAuditLogs={handleOpenAuditLogs}
+      theme={theme}
+      onToggleTheme={toggleTheme}
     />
   );
 }

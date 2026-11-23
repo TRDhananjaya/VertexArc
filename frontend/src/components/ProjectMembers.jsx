@@ -60,9 +60,9 @@ function ProjectMembers({ projectId, token, user, project }) {
     }, [projectId, token, refreshKey]);
 
     return (
-        <section className="mb-8 rounded-xl border border-slate-800 bg-slate-900 p-6">
+        <section className="mb-8 rounded-xl border border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6">
             <div className="mb-5 flex flex-wrap items-center justify-between gap-4">
-                <h3 className="text-xl font-semibold text-white">
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
                     Project Members
                 </h3>
 
@@ -91,7 +91,7 @@ function ProjectMembers({ projectId, token, user, project }) {
             )}
 
             {loading && (
-                <p className="text-sm text-slate-400">
+                <p className="text-sm text-gray-500 dark:text-slate-400">
                     Loading project members...
                 </p>
             )}
@@ -103,7 +103,7 @@ function ProjectMembers({ projectId, token, user, project }) {
             )}
 
             {!loading && !error && members.length === 0 && (
-                <p className="text-sm text-slate-400">
+                <p className="text-sm text-gray-500 dark:text-slate-400">
                     No members found.
                 </p>
             )}
@@ -113,14 +113,14 @@ function ProjectMembers({ projectId, token, user, project }) {
                     {members.map((member) => (
                         <div
                             key={member.id}
-                            className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-slate-800 bg-slate-950 p-4"
+                            className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-gray-200 dark:border-slate-800 bg-gray-50 dark:bg-slate-950 p-4"
                         >
                             <div>
-                                <p className="font-medium text-white">
+                                <p className="font-medium text-gray-900 dark:text-white">
                                     {member.name}
                                 </p>
 
-                                <p className="text-sm text-slate-400">
+                                <p className="text-sm text-gray-500 dark:text-slate-400">
                                     {member.email}
                                 </p>
                             </div>

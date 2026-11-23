@@ -92,21 +92,21 @@ function AddProjectMemberForm({
     return (
         <form
             onSubmit={handleSubmit}
-            className="mb-5 rounded-lg border border-slate-700 bg-slate-950 p-5"
+            className="mb-5 rounded-lg border border-gray-200 dark:border-gray-300 dark:border-slate-700 bg-gray-50 dark:bg-slate-950 p-5"
         >
-            <h4 className="mb-4 text-lg font-semibold text-white">
+            <h4 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
                 Add Project Member
             </h4>
 
             {loading ? (
-                <p className="text-sm text-slate-400">
+                <p className="text-sm text-gray-500 dark:text-slate-400">
                     Loading available users...
                 </p>
             ) : (
                 <>
                     <label
                         htmlFor="project-member"
-                        className="mb-2 block text-sm text-slate-300"
+                        className="mb-2 block text-sm text-gray-600 dark:text-slate-300"
                     >
                         Select User
                     </label>
@@ -118,7 +118,7 @@ function AddProjectMemberForm({
                             setSelectedUserId(event.target.value)
                         }
                         disabled={saving || availableUsers.length === 0}
-                        className="w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-3 text-white"
+                        className="w-full rounded-lg border border-gray-300 dark:border-slate-700 bg-gray-100 dark:bg-slate-800 px-4 py-3 text-gray-900 dark:text-white"
                     >
                         <option value="">Choose a user</option>
 
@@ -130,7 +130,7 @@ function AddProjectMemberForm({
                     </select>
 
                     {availableUsers.length === 0 && !error && (
-                        <p className="mt-3 text-sm text-slate-400">
+                        <p className="mt-3 text-sm text-gray-500 dark:text-slate-400">
                             No available users to add.
                         </p>
                     )}
@@ -160,7 +160,7 @@ function AddProjectMemberForm({
                     type="button"
                     onClick={onCancel}
                     disabled={saving}
-                    className="rounded-lg border border-slate-700 px-4 py-2 text-slate-300 hover:bg-slate-800"
+                    className="rounded-lg border border-gray-300 dark:border-slate-700 px-4 py-2 text-gray-600 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-gray-100 dark:bg-slate-800"
                 >
                     Cancel
                 </button>

@@ -3,7 +3,7 @@ import { getUsers } from "../api";
 import CreateUserForm from "../components/CreateUserForm";
 import Navbar from "../components/Navbar";
 
-function UserManagement({ token, user, onLogout, onBack, onGoDashboard, onOpenAuditLogs }) {
+function UserManagement({ token, user, onLogout, onBack, onGoDashboard, onOpenAuditLogs, theme, onToggleTheme }) {
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
@@ -50,13 +50,15 @@ function UserManagement({ token, user, onLogout, onBack, onGoDashboard, onOpenAu
     }, [token, refreshKey]);
 
     return (
-        <div className="min-h-screen bg-slate-950 text-white">
+        <div className="min-h-screen bg-gray-50 dark:bg-slate-950 text-gray-900 dark:text-white">
             <Navbar
                 user={user}
                 onLogout={onLogout}
                 onGoDashboard={onGoDashboard}
                 onOpenAuditLogs={onOpenAuditLogs}
                 subtitle="Administration / User Management"
+                theme={theme}
+                onToggleTheme={onToggleTheme}
             />
 
             <main className="mx-auto max-w-6xl px-6 py-10">
@@ -70,11 +72,11 @@ function UserManagement({ token, user, onLogout, onBack, onGoDashboard, onOpenAu
 
                 <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
                     <div>
-                        <h2 className="text-3xl font-bold">
+                        <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
                             User Management
                         </h2>
 
-                        <p className="mt-2 text-slate-400">
+                        <p className="mt-2 text-gray-500 dark:text-slate-400">
                             Manage VertexArc team accounts.
                         </p>
                     </div>
@@ -107,14 +109,14 @@ function UserManagement({ token, user, onLogout, onBack, onGoDashboard, onOpenAu
                     </h3>
 
                     {!loading && !error && (
-                        <span className="text-sm text-slate-400">
+                        <span className="text-sm text-gray-500 dark:text-slate-400">
                             {users.length} user{users.length !== 1 ? "s" : ""}
                         </span>
                     )}
                 </div>
 
                 {loading && (
-                    <p className="text-slate-400">
+                    <p className="text-gray-500 dark:text-slate-400">
                         Loading users...
                     </p>
                 )}
@@ -139,7 +141,7 @@ function UserManagement({ token, user, onLogout, onBack, onGoDashboard, onOpenAu
                 )}
 
                 {!loading && !error && users.length === 0 && (
-                    <div className="rounded-xl border border-slate-800 bg-slate-900 p-8 text-center text-slate-400">
+                    <div className="rounded-xl border border-gray-200 dark:border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-8 text-center text-gray-500 dark:text-slate-400">
                         No users found.
                     </div>
                 )}
@@ -149,18 +151,18 @@ function UserManagement({ token, user, onLogout, onBack, onGoDashboard, onOpenAu
                         {users.map((account) => (
                             <div
                                 key={account.id}
-                                className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-slate-800 bg-slate-900 p-5"
+                                className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-gray-200 dark:border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5"
                             >
                                 <div>
                                     <h4 className="font-semibold">
                                         {account.name}
                                     </h4>
 
-                                    <p className="mt-1 text-sm text-slate-400">
+                                    <p className="mt-1 text-sm text-gray-500 dark:text-slate-400">
                                         {account.email}
                                     </p>
 
-                                    <p className="mt-1 text-xs text-slate-500">
+                                    <p className="mt-1 text-xs text-gray-500 dark:text-slate-500">
                                         User #{account.id}
                                     </p>
                                 </div>

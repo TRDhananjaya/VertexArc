@@ -9,7 +9,9 @@ function Dashboard({
     onLogout,
     onSelectProject,
     onOpenUserManagement,
-    onOpenAuditLogs
+    onOpenAuditLogs,
+    theme,
+    onToggleTheme
 }) {
     const [projects, setProjects] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -62,13 +64,15 @@ function Dashboard({
     }, [token, refreshKey]);
 
     return (
-        <div className="min-h-screen bg-slate-950 text-white">
+        <div className="min-h-screen bg-gray-50 dark:bg-slate-950 text-gray-900 dark:text-white">
 
             <Navbar
                 user={user}
                 onLogout={onLogout}
                 onOpenUserManagement={onOpenUserManagement}
                 onOpenAuditLogs={onOpenAuditLogs}
+                theme={theme}
+                onToggleTheme={onToggleTheme}
             />
 
             <main className="mx-auto max-w-6xl px-6 py-10">
@@ -78,7 +82,7 @@ function Dashboard({
                         Dashboard
                     </h2>
 
-                    <p className="mt-2 text-slate-400">
+                    <p className="mt-2 text-gray-500 dark:text-slate-400">
                         Your projects and development workspace
                     </p>
                 </div>
@@ -113,7 +117,7 @@ function Dashboard({
                 )}
 
                 {loading && (
-                    <p className="text-slate-400">
+                    <p className="text-gray-500 dark:text-slate-400">
                         Loading projects...
                     </p>
                 )}
@@ -128,7 +132,7 @@ function Dashboard({
                 )}
 
                 {!loading && !error && projects.length === 0 && (
-                    <div className="rounded-xl border border-slate-800 bg-slate-900 p-8 text-center text-slate-400">
+                    <div className="rounded-xl border border-gray-200 dark:border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-8 text-center text-gray-500 dark:text-slate-400">
                         No projects found.
                     </div>
                 )}
@@ -141,19 +145,19 @@ function Dashboard({
                                 key={project.id}
                                 type="button"
                                 onClick={() => onSelectProject(project)}
-                                className="w-full rounded-xl border border-slate-800 bg-slate-900 p-6 text-left transition hover:border-emerald-500/50 focus-visible:outline-2 focus-visible:outline-emerald-400"
+                                className="w-full rounded-xl border border-gray-200 dark:border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 text-left transition hover:border-emerald-500/50 focus-visible:outline-2 focus-visible:outline-emerald-400"
                             >
-                                <h4 className="text-lg font-semibold">
+                                <h4 className="text-lg font-semibold text-gray-900 dark:text-white">
                                     {project.name}
                                 </h4>
 
-                                <p className="mt-3 line-clamp-3 text-sm text-slate-400">
+                                <p className="mt-3 line-clamp-3 text-sm text-gray-500 dark:text-slate-400">
                                     {project.description ||
                                         "No description provided."}
                                 </p>
 
-                                <div className="mt-5 border-t border-slate-800 pt-4">
-                                    <span className="text-xs text-slate-500">
+                                <div className="mt-5 border-t border-gray-200 dark:border-slate-800 pt-4">
+                                    <span className="text-xs text-gray-500 dark:text-slate-500">
                                         Project ID: {project.id}
                                     </span>
                                 </div>

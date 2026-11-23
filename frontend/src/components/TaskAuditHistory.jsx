@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { getTaskAuditLogs } from "../api";
+import { FileTextIcon } from "./Icons";
 
 function TaskAuditHistory({ projectId, taskId, token }) {
   const [logs, setLogs] = useState([]);
@@ -49,7 +50,7 @@ function TaskAuditHistory({ projectId, taskId, token }) {
       case "TASK_DELETED":
         return <span className="rounded bg-red-500/15 px-2 py-0.5 text-xs font-semibold text-red-400">Soft Deleted</span>;
       default:
-        return <span className="rounded bg-slate-800 px-2 py-0.5 text-xs font-semibold text-slate-300">{action}</span>;
+        return <span className="rounded bg-gray-100 dark:bg-slate-800 px-2 py-0.5 text-xs font-semibold text-gray-600 dark:text-slate-300">{action}</span>;
     }
   }
 
@@ -59,15 +60,15 @@ function TaskAuditHistory({ projectId, taskId, token }) {
     // Check if it's a status transition
     if (oldVal?.status && newVal?.status) {
       return (
-        <span className="font-mono text-xs text-slate-300">
-          <span className="line-through text-slate-500">{oldVal.status}</span> → <strong className="text-white">{newVal.status}</strong>
+        <span className="font-mono text-xs text-gray-600 dark:text-slate-300">
+          <span className="line-through text-gray-500 dark:text-slate-500">{oldVal.status}</span> → <strong className="text-gray-900 dark:text-white">{newVal.status}</strong>
         </span>
       );
     }
 
     // Generic JSON stringify if objects
     return (
-      <div className="mt-1 font-mono text-[11px] text-slate-400">
+      <div className="mt-1 font-mono text-[11px] text-gray-500 dark:text-slate-400">
         {oldVal && <div>From: {JSON.stringify(oldVal)}</div>}
         {newVal && <div>To: {JSON.stringify(newVal)}</div>}
       </div>
@@ -75,29 +76,31 @@ function TaskAuditHistory({ projectId, taskId, token }) {
   }
 
   return (
-    <section className="mt-8 rounded-2xl border border-slate-800 bg-slate-900 p-6 shadow-xl">
+    <section className="mt-8 rounded-2xl border border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-xl">
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <span className="text-base">📜</span>
-          <h3 className="text-lg font-bold text-white">Task Audit Trail</h3>
+        <div className="flex items-center gap-2.5">
+          <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-500">
+            <FileTextIcon className="w-4 h-4" />
+          </span>
+          <h3 className="text-base font-bold text-gray-900 dark:text-white">Task Audit Trail</h3>
         </div>
 
         <button
           type="button"
           onClick={() => setIsExpanded((prev) => !prev)}
-          className="rounded-lg border border-slate-700 px-3 py-1 text-xs font-medium text-slate-300 hover:bg-slate-800"
+          className="rounded-lg border border-gray-300 dark:border-slate-700 px-3 py-1 text-xs font-medium text-gray-600 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800 transition"
         >
           {isExpanded ? "Hide Audit History" : "View Audit History"}
         </button>
       </div>
 
       {isExpanded && (
-        <div className="mt-6 border-t border-slate-800 pt-5">
-          {loading && <p className="text-xs text-slate-400">Loading audit history…</p>}
+        <div className="mt-6 border-t border-gray-200 dark:border-slate-800 pt-5">
+          {loading && <p className="text-xs text-gray-500 dark:text-slate-400">Loading audit history…</p>}
           {error && <p role="alert" className="text-xs text-red-400">{error}</p>}
 
           {!loading && !error && logs.length === 0 && (
-            <p className="text-xs text-slate-500">No recorded audit events for this task.</p>
+            <p className="text-xs text-gray-500 dark:text-slate-500">No recorded audit events for this task.</p>
           )}
 
           {!loading && !error && logs.length > 0 && (
@@ -105,23 +108,23 @@ function TaskAuditHistory({ projectId, taskId, token }) {
               {logs.map((log) => (
                 <div
                   key={log.id}
-                  className="rounded-lg border border-slate-800/80 bg-slate-950 p-3 text-xs"
+                  className="rounded-lg border border-gray-200 dark:border-slate-800/80 bg-gray-50 dark:bg-slate-950 p-3 text-xs"
                 >
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <div className="flex items-center gap-2">
                       {getActionBadge(log.action)}
-                      <span className="text-slate-400">
-                        by <strong className="text-slate-200">{log.actor_name || `User #${log.actor_id}`}</strong>
+                      <span className="text-gray-500 dark:text-slate-400">
+                        by <strong className="text-gray-800 dark:text-slate-200">{log.actor_name || `User #${log.actor_id}`}</strong>
                       </span>
                     </div>
 
-                    <span className="text-slate-500">
+                    <span className="text-gray-500 dark:text-slate-500">
                       {log.created_at ? new Date(log.created_at).toLocaleString() : ""}
                     </span>
                   </div>
 
                   {/* Changes detail */}
-                  <div className="mt-2 text-slate-300">
+                  <div className="mt-2 text-gray-600 dark:text-slate-300">
                     {formatChangeValues(log.old_value, log.new_value)}
                   </div>
                 </div>

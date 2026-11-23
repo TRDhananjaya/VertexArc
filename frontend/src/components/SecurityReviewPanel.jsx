@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { getSecurityReview, updateSecurityReview } from "../api";
+import { ShieldIcon, ShieldCheckIcon, AlertCircleIcon, LockIcon } from "./Icons";
 
 function SecurityReviewPanel({
   projectId,
@@ -90,16 +91,16 @@ function SecurityReviewPanel({
   }
 
   return (
-    <section className="mt-8 rounded-2xl border border-red-500/30 bg-slate-900/90 p-6 shadow-xl">
-      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 pb-4">
+    <section className="mt-8 rounded-2xl border border-red-300 dark:border-red-500/30 bg-white dark:bg-slate-900/90 p-6 shadow-xl">
+      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-gray-200 dark:border-slate-800 pb-4">
         <div>
           <div className="flex items-center gap-2">
-            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-red-500/20 text-xs font-bold text-red-400">
-              🛡️
+            <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-red-500/10 text-red-500">
+              <ShieldIcon className="w-4 h-4" />
             </span>
-            <h3 className="text-lg font-bold text-white">Security Review Gate</h3>
+            <h3 className="text-base font-bold text-gray-900 dark:text-white">Security Review Gate</h3>
           </div>
-          <p className="mt-1 text-xs text-slate-400">
+          <p className="mt-1 text-xs text-gray-500 dark:text-slate-400">
             Mandatory security verification required before moving this task to DONE.
           </p>
         </div>
@@ -107,36 +108,40 @@ function SecurityReviewPanel({
         {/* Gate Ready Status Badge */}
         <div>
           {allChecksPassed ? (
-            <span className="rounded-full bg-emerald-500/15 px-3 py-1 text-xs font-semibold text-emerald-400">
-              ✓ Gate Passed (Ready for Approval)
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/15 px-3 py-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+              <ShieldCheckIcon className="w-3.5 h-3.5" />
+              <span>Gate Passed (Ready for Approval)</span>
             </span>
           ) : (
-            <span className="rounded-full bg-amber-500/15 px-3 py-1 text-xs font-semibold text-amber-400">
-              ⚠️ Gate Incomplete (3 of 3 checks required)
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-500/15 px-3 py-1 text-xs font-semibold text-amber-600 dark:text-amber-400">
+              <AlertCircleIcon className="w-3.5 h-3.5" />
+              <span>Gate Incomplete (3 of 3 checks required)</span>
             </span>
           )}
         </div>
       </div>
 
       {loading ? (
-        <p className="mt-4 text-xs text-slate-400">Loading security checklist…</p>
+        <p className="mt-4 text-xs text-gray-500 dark:text-slate-400">Loading security checklist…</p>
       ) : (
         <form onSubmit={handleSaveReview} className="mt-5 space-y-4">
           {/* Status Context Banner */}
           {taskStatus !== "IN_REVIEW" && (
-            <div className="rounded-lg border border-slate-800 bg-slate-950 p-3 text-xs text-slate-400">
-              ℹ️ Status is currently <strong className="text-white">{taskStatus}</strong>. Security checklist updates are only permitted while the task is <strong className="text-amber-400">IN_REVIEW</strong>.
+            <div className="flex items-center gap-2 rounded-lg border border-gray-200 dark:border-slate-800 bg-gray-50 dark:bg-slate-950 p-3 text-xs text-gray-500 dark:text-slate-400">
+              <AlertCircleIcon className="w-4 h-4 shrink-0 text-amber-500" />
+              <span>Status is currently <strong className="text-gray-900 dark:text-white">{taskStatus}</strong>. Security checklist updates are only permitted while the task is <strong className="text-amber-600 dark:text-amber-400">IN_REVIEW</strong>.</span>
             </div>
           )}
 
           {!isReviewer && (
-            <div className="rounded-lg border border-slate-800 bg-slate-950 p-3 text-xs text-slate-400">
-              🔒 Read-only view. Only designated project reviewers (Admin or Project Manager) can check off security requirements.
+            <div className="flex items-center gap-2 rounded-lg border border-gray-200 dark:border-slate-800 bg-gray-50 dark:bg-slate-950 p-3 text-xs text-gray-500 dark:text-slate-400">
+              <LockIcon className="w-4 h-4 shrink-0 text-slate-400" />
+              <span>Read-only view. Only designated project reviewers (Admin or Project Manager) can check off security requirements.</span>
             </div>
           )}
 
           {/* Checklist Items */}
-          <div className="space-y-3 rounded-xl border border-slate-800 bg-slate-950 p-4">
+          <div className="space-y-3 rounded-xl border border-gray-200 dark:border-slate-800 bg-gray-50 dark:bg-slate-950 p-4">
             {/* Check 1 */}
             <label className={`flex items-start gap-3 text-sm ${canEdit ? "cursor-pointer" : "cursor-not-allowed opacity-80"}`}>
               <input
@@ -147,8 +152,8 @@ function SecurityReviewPanel({
                 className="mt-1 h-4 w-4 accent-emerald-500"
               />
               <div>
-                <span className="font-medium text-slate-200">1. Code Review Completed</span>
-                <p className="text-xs text-slate-400">
+                <span className="font-medium text-gray-800 dark:text-slate-200">1. Code Review Completed</span>
+                <p className="text-xs text-gray-500 dark:text-slate-400">
                   Source code has been reviewed by an authorized reviewer and meets security standards.
                 </p>
               </div>
@@ -164,8 +169,8 @@ function SecurityReviewPanel({
                 className="mt-1 h-4 w-4 accent-emerald-500"
               />
               <div>
-                <span className="font-medium text-slate-200">2. Security Tests Passed</span>
-                <p className="text-xs text-slate-400">
+                <span className="font-medium text-gray-800 dark:text-slate-200">2. Security Tests Passed</span>
+                <p className="text-xs text-gray-500 dark:text-slate-400">
                   Automated security regression tests and test suites have executed successfully.
                 </p>
               </div>
@@ -181,8 +186,8 @@ function SecurityReviewPanel({
                 className="mt-1 h-4 w-4 accent-emerald-500"
               />
               <div>
-                <span className="font-medium text-slate-200">3. No Unresolved Vulnerabilities</span>
-                <p className="text-xs text-slate-400">
+                <span className="font-medium text-gray-800 dark:text-slate-200">3. No Unresolved Vulnerabilities</span>
+                <p className="text-xs text-gray-500 dark:text-slate-400">
                   No high- or critical-severity vulnerabilities or security defects remain unmitigated.
                 </p>
               </div>
@@ -191,7 +196,7 @@ function SecurityReviewPanel({
 
           {/* Stamp / Attribution */}
           {reviewedBy && (
-            <div className="text-xs text-slate-400">
+            <div className="text-xs text-gray-500 dark:text-slate-400">
               Last signed off by:{" "}
               <span className="font-medium text-emerald-400">
                 {memberMap[reviewedBy] || `User #${reviewedBy}`}

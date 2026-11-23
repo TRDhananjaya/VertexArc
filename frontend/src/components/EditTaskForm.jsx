@@ -45,8 +45,8 @@ function EditTaskForm({ task, projectId, token, onUpdated, onCancel }) {
   }
 
   return (
-    <div className="mt-4 rounded-lg border border-slate-700 bg-slate-950 p-4">
-      <h4 className="mb-4 text-sm font-semibold text-white">
+    <div className="mt-4 rounded-lg border border-gray-200 dark:border-gray-300 dark:border-slate-700 bg-gray-50 dark:bg-slate-950 p-4">
+      <h4 className="mb-4 text-sm font-semibold text-gray-900 dark:text-white">
         Edit Task
       </h4>
 
@@ -55,7 +55,7 @@ function EditTaskForm({ task, projectId, token, onUpdated, onCancel }) {
         <div>
           <label
             htmlFor={`edit-task-title-${task.id}`}
-            className="mb-1 block text-xs text-slate-400"
+            className="mb-1 block text-xs text-gray-500 dark:text-slate-400"
           >
             Title
           </label>
@@ -67,7 +67,7 @@ function EditTaskForm({ task, projectId, token, onUpdated, onCancel }) {
             maxLength={150}
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-white outline-none focus:border-emerald-500"
+            className="w-full rounded-lg border border-gray-300 dark:border-slate-700 bg-gray-100 dark:bg-slate-800 px-3 py-2 text-sm text-gray-900 dark:text-white outline-none focus:border-emerald-500"
           />
         </div>
 
@@ -75,7 +75,7 @@ function EditTaskForm({ task, projectId, token, onUpdated, onCancel }) {
         <div>
           <label
             htmlFor={`edit-task-desc-${task.id}`}
-            className="mb-1 block text-xs text-slate-400"
+            className="mb-1 block text-xs text-gray-500 dark:text-slate-400"
           >
             Description
           </label>
@@ -86,7 +86,7 @@ function EditTaskForm({ task, projectId, token, onUpdated, onCancel }) {
             maxLength={5000}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            className="w-full resize-y rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-white outline-none focus:border-emerald-500"
+            className="w-full resize-y rounded-lg border border-gray-300 dark:border-slate-700 bg-gray-100 dark:bg-slate-800 px-3 py-2 text-sm text-gray-900 dark:text-white outline-none focus:border-emerald-500"
           />
         </div>
 
@@ -94,7 +94,7 @@ function EditTaskForm({ task, projectId, token, onUpdated, onCancel }) {
         <div>
           <label
             htmlFor={`edit-task-priority-${task.id}`}
-            className="mb-1 block text-xs text-slate-400"
+            className="mb-1 block text-xs text-gray-500 dark:text-slate-400"
           >
             Priority
           </label>
@@ -103,7 +103,7 @@ function EditTaskForm({ task, projectId, token, onUpdated, onCancel }) {
             id={`edit-task-priority-${task.id}`}
             value={priority}
             onChange={(e) => setPriority(e.target.value)}
-            className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-white"
+            className="w-full rounded-lg border border-gray-300 dark:border-slate-700 bg-gray-100 dark:bg-slate-800 px-3 py-2 text-sm text-gray-900 dark:text-white"
           >
             <option value="LOW">Low</option>
             <option value="MEDIUM">Medium</option>
@@ -130,7 +130,7 @@ function EditTaskForm({ task, projectId, token, onUpdated, onCancel }) {
             type="button"
             onClick={onCancel}
             disabled={loading}
-            className="rounded-lg border border-slate-700 px-4 py-2 text-xs text-slate-300 hover:bg-slate-800"
+            className="rounded-lg border border-gray-300 dark:border-slate-700 px-4 py-2 text-xs text-gray-600 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-gray-100 dark:bg-slate-800"
           >
             Cancel
           </button>
