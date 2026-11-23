@@ -82,6 +82,44 @@ async function getProjects(req, res) {
     }
 }
 
+// GET /api/projects/:projectId/eligible-users — candidate users to add as project members
+async function getEligibleUsers(req, res) {
+    try {
+        const { projectId } = req.params;
+
+        if (!isValidId(projectId)) {
+            return res.status(400).json({
+                message: "Invalid project ID"
+            });
+        }
+
+        const project = await projectModel.findProjectById(projectId);
+
+        if (!project) {
+            return res.status(404).json({
+                message: "Project not found"
+            });
+        }
+
+        // Only Admin or the Project Manager who created the project can manage members
+        if (!canManageProject(req.user, project)) {
+            return res.status(403).json({
+                message: "You cannot manage this project"
+            });
+        }
+
+        const users = await projectModel.getEligibleUsersForProject(projectId);
+
+        return res.status(200).json({ users });
+    } catch (error) {
+        console.error("Failed to retrieve eligible users:", error.message);
+
+        return res.status(500).json({
+            message: "Failed to retrieve eligible users"
+        });
+    }
+}
+
 // GET /api/projects/:projectId/members — view project members
 async function getMembers(req, res) {
     try {
@@ -333,6 +371,7 @@ module.exports = {
     createProject,
     getProjects,
     getMembers,
+    getEligibleUsers,
     addMember,
     updateProject,
     deleteProject

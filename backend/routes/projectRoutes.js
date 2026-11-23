@@ -37,6 +37,13 @@ router.get(
     projectController.getMembers             // List members of a project
 );
 
+// List active users eligible to be added to this project
+router.get(
+    "/:projectId/eligible-users",
+    requireRole("ADMIN", "PROJECT_MANAGER"),
+    projectController.getEligibleUsers
+);
+
 router.post(
     "/:projectId/members",
     requireRole("ADMIN", "PROJECT_MANAGER"),

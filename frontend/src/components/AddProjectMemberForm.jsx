@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getUsers, addProjectMember } from "../api";
+import { getEligibleUsers, addProjectMember } from "../api";
 
 function AddProjectMemberForm({
     projectId,
@@ -22,7 +22,7 @@ function AddProjectMemberForm({
                 setLoading(true);
                 setError("");
 
-                const data = await getUsers(token);
+                const data = await getEligibleUsers(projectId, token);
 
                 if (!active) return;
 
@@ -51,15 +51,15 @@ function AddProjectMemberForm({
         return () => {
             active = false;
         };
-    }, [token]);
+    }, [projectId, token]);
 
     const memberIds = new Set(
-        existingMembers.map((member) => Number(member.id))
+        (existingMembers || []).map((member) => Number(member.id))
     );
 
     const availableUsers = users.filter(
         (account) =>
-            account.is_active &&
+            account.is_active !== false &&
             !memberIds.has(Number(account.id))
     );
 

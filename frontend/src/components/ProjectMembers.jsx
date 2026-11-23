@@ -17,11 +17,8 @@ function ProjectMembers({ projectId, token, user, project }) {
             String(project.created_by) === String(user.id)
         );
 
-    // GET /api/users is currently Admin-only.
-    // We'll enable Project Managers after adding a
-    // restricted user-selection endpoint.
-    const canShowAddForm =
-        canManageMembers && user?.role === "ADMIN";
+    // Eligible users endpoint allows both Admins and Project Managers who created the project
+    const canShowAddForm = canManageMembers;
 
     useEffect(() => {
         let active = true;

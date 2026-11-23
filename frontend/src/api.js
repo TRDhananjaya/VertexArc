@@ -205,6 +205,29 @@ export async function addProjectMember(projectId, token, userId) {
   return data;
 }
 
+// Retrieve candidate users eligible to be added to this project (Admin / Project Manager owner)
+export async function getEligibleUsers(projectId, token) {
+  const response = await fetch(
+    `${API_BASE_URL}/api/projects/${projectId}/eligible-users`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    }
+  );
+
+  if (!response.ok) {
+    if (response.status === 401) {
+      throw new Error("Session expired. Please log in again.");
+    }
+    if (response.status === 403) {
+      throw new Error("You do not have permission to manage this project's members.");
+    }
+    throw new Error("Failed to load eligible users");
+  }
+
+  return response.json();
+}
 
 // Update project details
 export async function updateProject(projectId, token, projectData) {

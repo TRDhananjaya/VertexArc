@@ -114,6 +114,24 @@ async function getMembersForProject(projectId) {
     return result.rows;
 }
 
+// Get active users who are not already members of this project
+async function getEligibleUsersForProject(projectId) {
+    const result = await pool.query(
+        `SELECT u.id, u.name, u.email, u.role
+         FROM users u
+         WHERE u.is_active = TRUE
+           AND u.id NOT IN (
+             SELECT pm.user_id
+             FROM project_members pm
+             WHERE pm.project_id = $1
+           )
+         ORDER BY u.name`,
+        [projectId]
+    );
+
+    return result.rows;
+}
+
 // Add an existing user only to an active project
 async function addMemberToProject(projectId, userId) {
     const result = await pool.query(
@@ -270,6 +288,7 @@ module.exports = {
     findProjectById,
     isProjectMember,
     getMembersForProject,
+    getEligibleUsersForProject,
     addMemberToProject,
     updateProjectDetails,
     softDeleteProject
