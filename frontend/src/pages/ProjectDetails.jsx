@@ -1,12 +1,15 @@
 import { useEffect, useState } from "react";
-import { getProjectTasks, deleteProject, updateTaskStatus, assignTask, getProjectMembers } from "../api";
+import { getProjectTasks, deleteProject, updateTaskStatus, assignTask, getProjectMembers, deleteTask } from "../api";
 import CreateTaskForm from "../components/CreateTaskForm";
 import EditProjectForm from "../components/EditProjectForm";
+import EditTaskForm from "../components/EditTaskForm";
 import ConfirmDialog from "../components/ConfirmDialog";
 import ProjectMembers from "../components/ProjectMembers";
+import TaskDetail from "./TaskDetail";
 
 function ProjectDetails({ project: initialProject, token, user, onBack }) {
   const [project, setProject] = useState(initialProject);
+  const [selectedTask, setSelectedTask] = useState(null);
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -32,6 +35,15 @@ function ProjectDetails({ project: initialProject, token, user, onBack }) {
   const [assigningTaskId, setAssigningTaskId] = useState(null);
   const [assignLoading, setAssignLoading] = useState(false);
   const [assignError, setAssignError] = useState("");
+
+  // editingTaskId: the ID of the task whose EditTaskForm is currently open (or null)
+  const [editingTaskId, setEditingTaskId] = useState(null);
+
+  // deleteTaskTarget: the full task object to be deleted (drives the ConfirmDialog)
+  // We store the whole object so the dialog can display the task title in its message
+  const [deleteTaskTarget, setDeleteTaskTarget] = useState(null);
+  const [deleteTaskLoading, setDeleteTaskLoading] = useState(false);
+  const [deleteTaskError, setDeleteTaskError] = useState("");
 
   // Can this user manage (edit/delete) this project?
   const canManageProject =
@@ -144,6 +156,32 @@ function ProjectDetails({ project: initialProject, token, user, onBack }) {
     }
   }
 
+  // Handle task update from EditTaskForm
+  function handleTaskUpdated(updatedTask) {
+    setTasks((currentTasks) =>
+      currentTasks.map((t) => (t.id === updatedTask.id ? updatedTask : t))
+    );
+    setEditingTaskId(null);
+  }
+
+  // Handle task soft-delete
+  async function handleDeleteTask() {
+    if (!deleteTaskTarget) return;
+
+    setDeleteTaskLoading(true);
+    setDeleteTaskError("");
+
+    try {
+      await deleteTask(project.id, deleteTaskTarget.id, token);
+      setDeleteTaskTarget(null);
+      setRefreshKey((k) => k + 1);
+    } catch (err) {
+      setDeleteTaskError(err.message);
+    } finally {
+      setDeleteTaskLoading(false);
+    }
+  }
+
   // Handle project deletion
   async function handleDeleteProject() {
     setDeleteLoading(true);
@@ -178,6 +216,25 @@ function ProjectDetails({ project: initialProject, token, user, onBack }) {
     MEDIUM: "text-amber-400",
     HIGH: "text-red-400"
   };
+
+  // If a task is selected, render the full TaskDetail view with discussions
+  if (selectedTask) {
+    return (
+      <TaskDetail
+        task={selectedTask}
+        project={project}
+        token={token}
+        user={user}
+        members={members}
+        memberMap={memberMap}
+        onBack={() => setSelectedTask(null)}
+        onTaskUpdated={(updatedTask) => {
+          setSelectedTask(updatedTask);
+          handleTaskUpdated(updatedTask);
+        }}
+      />
+    );
+  }
 
   return (
     <div className="min-h-screen bg-slate-950 text-white">
@@ -265,6 +322,22 @@ function ProjectDetails({ project: initialProject, token, user, onBack }) {
             onConfirm={handleDeleteProject}
             onCancel={() => setShowDeleteConfirm(false)}
             loading={deleteLoading}
+          />
+        )}
+
+        {/* Delete Task confirmation dialog */}
+        {deleteTaskTarget && (
+          <ConfirmDialog
+            title="Delete Task"
+            message={`Are you sure you want to delete "${deleteTaskTarget.title}"? This task will be archived and removed from active views. Its audit history will be preserved.`}
+            confirmLabel="Delete Task"
+            onConfirm={handleDeleteTask}
+            onCancel={() => {
+              setDeleteTaskTarget(null);
+              setDeleteTaskError("");
+            }}
+            loading={deleteTaskLoading}
+            error={deleteTaskError}
           />
         )}
 
@@ -359,7 +432,11 @@ function ProjectDetails({ project: initialProject, token, user, onBack }) {
               >
                 <div className="flex flex-wrap items-start justify-between gap-4">
                   <div>
-                    <h4 className="text-lg font-semibold">
+                    <h4
+                      onClick={() => setSelectedTask(task)}
+                      className="cursor-pointer text-lg font-semibold text-white transition hover:text-emerald-400"
+                      title="Click to view full details and discussions"
+                    >
                       {task.title}
                     </h4>
 
@@ -368,14 +445,42 @@ function ProjectDetails({ project: initialProject, token, user, onBack }) {
                     </p>
                   </div>
 
-                  {/* Task status */}
-                  <span
-                    className={`rounded-full px-3 py-1 text-xs font-medium ${statusStyles[task.status] ||
-                      statusStyles.TODO
-                      }`}
-                  >
-                    {task.status?.replaceAll("_", " ") || "UNKNOWN"}
-                  </span>
+                  <div className="flex items-center gap-3">
+                    {/* Task status */}
+                    <span
+                      className={`rounded-full px-3 py-1 text-xs font-medium ${statusStyles[task.status] ||
+                        statusStyles.TODO
+                        }`}
+                    >
+                      {task.status?.replaceAll("_", " ") || "UNKNOWN"}
+                    </span>
+
+                    {/* Edit & Delete buttons (Admin / project owner) */}
+                    {canManageProject && (
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setEditingTaskId(editingTaskId === task.id ? null : task.id)
+                          }
+                          className="rounded border border-slate-700 px-2 py-1 text-xs text-slate-300 hover:bg-slate-800"
+                        >
+                          {editingTaskId === task.id ? "Close" : "Edit"}
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setDeleteTaskError("");
+                            setDeleteTaskTarget(task);
+                          }}
+                          className="rounded border border-red-500/40 px-2 py-1 text-xs text-red-400 hover:bg-red-500/10"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 {/* Task details */}
@@ -530,6 +635,28 @@ function ProjectDetails({ project: initialProject, token, user, onBack }) {
                       </button>
                     )}
                   </div>
+                )}
+
+                {/* Details & Discussion link */}
+                <div className="mt-3 flex items-center justify-end">
+                  <button
+                    type="button"
+                    onClick={() => setSelectedTask(task)}
+                    className="text-xs font-medium text-emerald-400 transition hover:text-emerald-300"
+                  >
+                    View Details & Discussions →
+                  </button>
+                </div>
+
+                {/* Inline Edit Task Form */}
+                {editingTaskId === task.id && (
+                  <EditTaskForm
+                    task={task}
+                    projectId={project.id}
+                    token={token}
+                    onUpdated={handleTaskUpdated}
+                    onCancel={() => setEditingTaskId(null)}
+                  />
                 )}
               </div>
             ))}

@@ -1,4 +1,4 @@
-function ConfirmDialog({ title, message, confirmLabel, onConfirm, onCancel, loading }) {
+function ConfirmDialog({ title, message, confirmLabel, onConfirm, onCancel, loading, error }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
       <div className="w-full max-w-md rounded-2xl border border-slate-700 bg-slate-900 p-6 shadow-2xl">
@@ -9,6 +9,12 @@ function ConfirmDialog({ title, message, confirmLabel, onConfirm, onCancel, load
         <p className="mt-3 text-sm text-slate-400">
           {message}
         </p>
+
+        {error && (
+          <p role="alert" className="mt-3 rounded-lg border border-red-500/30 bg-red-500/10 p-3 text-xs text-red-400">
+            {error}
+          </p>
+        )}
 
         <div className="mt-6 flex justify-end gap-3">
           <button

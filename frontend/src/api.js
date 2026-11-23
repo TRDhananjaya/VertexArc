@@ -249,6 +249,50 @@ export async function deleteProject(projectId, token) {
 
   return data;
 }
+// Edit a task's title, description and priority (Admin / project owner only)
+export async function updateTaskDetails(projectId, taskId, token, taskData) {
+  const response = await fetch(
+    `${API_BASE_URL}/api/projects/${projectId}/tasks/${taskId}`,
+    {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify(taskData)
+    }
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Failed to update task");
+  }
+
+  return data;
+}
+
+// Soft-delete a task — audit history is preserved in the database
+export async function deleteTask(projectId, taskId, token) {
+  const response = await fetch(
+    `${API_BASE_URL}/api/projects/${projectId}/tasks/${taskId}`,
+    {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    }
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Failed to delete task");
+  }
+
+  return data;
+}
+
 // Assign a task to a project member (Admin / project owner only)
 export async function assignTask(projectId, taskId, token, userId) {
   const response = await fetch(
@@ -290,6 +334,49 @@ export async function updateTaskStatus(projectId, taskId, token, status) {
 
   if (!response.ok) {
     throw new Error(data.message || "Failed to update task status");
+  }
+
+  return data;
+}
+
+// Retrieve discussions / comments for a task
+export async function getTaskComments(projectId, taskId, token) {
+  const response = await fetch(
+    `${API_BASE_URL}/api/projects/${projectId}/tasks/${taskId}/comments`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    }
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Failed to load comments");
+  }
+
+  return data;
+}
+
+// Add a discussion comment to a task
+export async function addTaskComment(projectId, taskId, token, content) {
+  const response = await fetch(
+    `${API_BASE_URL}/api/projects/${projectId}/tasks/${taskId}/comments`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({ content })
+    }
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Failed to post comment");
   }
 
   return data;
