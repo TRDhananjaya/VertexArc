@@ -92,21 +92,21 @@ function AddProjectMemberForm({
     return (
         <form
             onSubmit={handleSubmit}
-            className="mb-5 rounded-lg border border-gray-200 dark:border-gray-300 dark:border-slate-700 bg-gray-50 dark:bg-slate-950 p-5"
+            className="mb-5 rounded-xl border border-gray-200 dark:border-[#272844] bg-white dark:bg-[#0c0d16] p-5 shadow-sm"
         >
-            <h4 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
+            <h4 className="mb-4 text-xs font-semibold uppercase tracking-wider text-gray-700 dark:text-slate-300">
                 Add Project Member
             </h4>
 
             {loading ? (
-                <p className="text-sm text-gray-500 dark:text-slate-400">
-                    Loading available users...
+                <p className="text-xs text-gray-500 dark:text-slate-400">
+                    Loading eligible users...
                 </p>
             ) : (
                 <>
                     <label
                         htmlFor="project-member"
-                        className="mb-2 block text-sm text-gray-600 dark:text-slate-300"
+                        className="mb-1.5 block text-xs font-semibold text-gray-700 dark:text-slate-300"
                     >
                         Select User
                     </label>
@@ -118,7 +118,7 @@ function AddProjectMemberForm({
                             setSelectedUserId(event.target.value)
                         }
                         disabled={saving || availableUsers.length === 0}
-                        className="w-full rounded-lg border border-gray-300 dark:border-slate-700 bg-gray-100 dark:bg-slate-800 px-4 py-3 text-gray-900 dark:text-white"
+                        className="w-full rounded-xl border border-gray-200 dark:border-[#272844] bg-gray-50 dark:bg-[#131422] px-3.5 py-2.5 text-sm text-gray-900 dark:text-white outline-none transition focus:border-[#3A0CA3] focus:ring-2 focus:ring-[#3A0CA3]/20"
                     >
                         <option value="">Choose a user</option>
 
@@ -130,7 +130,7 @@ function AddProjectMemberForm({
                     </select>
 
                     {availableUsers.length === 0 && !error && (
-                        <p className="mt-3 text-sm text-gray-500 dark:text-slate-400">
+                        <p className="mt-2 text-xs text-gray-500 dark:text-slate-400">
                             No available users to add.
                         </p>
                     )}
@@ -138,12 +138,12 @@ function AddProjectMemberForm({
             )}
 
             {error && (
-                <p role="alert" className="mt-3 text-sm text-red-400">
+                <p role="alert" className="mt-3 rounded-lg bg-red-500/10 p-2.5 text-xs font-medium text-red-500 dark:text-red-400">
                     {error}
                 </p>
             )}
 
-            <div className="mt-5 flex gap-3">
+            <div className="mt-4 flex flex-wrap items-center gap-2.5">
                 <button
                     type="submit"
                     disabled={
@@ -151,7 +151,7 @@ function AddProjectMemberForm({
                         saving ||
                         !selectedUserId
                     }
-                    className="rounded-lg bg-emerald-500 px-4 py-2 font-semibold text-slate-950 hover:bg-emerald-400 disabled:opacity-50"
+                    className="rounded-lg bg-gradient-to-r from-[#3A0CA3] to-[#4c1d95] hover:from-[#4313b8] hover:to-[#5b21b6] px-3.5 py-1.5 text-xs font-semibold text-white shadow-md shadow-[#3A0CA3]/25 transition hover:scale-[1.02] disabled:opacity-50"
                 >
                     {saving ? "Adding..." : "Add Member"}
                 </button>
@@ -160,7 +160,7 @@ function AddProjectMemberForm({
                     type="button"
                     onClick={onCancel}
                     disabled={saving}
-                    className="rounded-lg border border-gray-300 dark:border-slate-700 px-4 py-2 text-gray-600 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-gray-100 dark:bg-slate-800"
+                    className="rounded-lg border border-gray-200 dark:border-[#272844] bg-white dark:bg-[#131422] px-3.5 py-1.5 text-xs font-medium text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-[#1c1d30] transition"
                 >
                     Cancel
                 </button>

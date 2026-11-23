@@ -98,13 +98,13 @@ function LandingPage({ onGetStarted, theme, onToggleTheme }) {
   ];
 
   return (
-    <div className="min-h-screen bg-white dark:bg-slate-950 text-gray-900 dark:text-white transition-colors selection:bg-violet-500 selection:text-white font-sans antialiased">
+    <div className="min-h-screen bg-transparent text-gray-900 dark:text-white transition-colors selection:bg-[#3A0CA3] selection:text-white font-sans antialiased">
       {/* ── TOP HEADER / NAVIGATION ── */}
-      <header className="sticky top-0 z-40 border-b border-gray-100 dark:border-slate-800/80 bg-white/80 dark:bg-slate-950/80 backdrop-blur-md">
+      <header className="sticky top-0 z-40 border-b border-gray-100 dark:border-[#1c1d30]/80 bg-white/80 dark:bg-[#050505]/80 backdrop-blur-md">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
           {/* Brand */}
           <VertexArcLogo
-            className="h-9 w-9"
+            className="h-8 w-auto"
             textClassName="text-xl font-bold tracking-tight text-gray-950 dark:text-white"
           />
 
@@ -123,7 +123,7 @@ function LandingPage({ onGetStarted, theme, onToggleTheme }) {
                 type="button"
                 onClick={onToggleTheme}
                 title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
-                className="flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 dark:border-slate-800 text-gray-600 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800 transition"
+                className="flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 dark:border-[#1c1d30] text-gray-600 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-[#131422] transition"
               >
                 {theme === "dark" ? <SunIcon className="w-4 h-4 text-amber-400" /> : <MoonIcon className="w-4 h-4 text-slate-700" />}
               </button>
@@ -144,17 +144,17 @@ function LandingPage({ onGetStarted, theme, onToggleTheme }) {
       <section className="relative overflow-hidden pt-16 pb-24 md:pt-24 md:pb-32">
         {/* Subtle Ambient Orbital Background Rings */}
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center overflow-hidden">
-          <div className="h-[520px] w-[520px] md:h-[720px] md:w-[720px] rounded-full border border-gray-100 dark:border-slate-900" />
-          <div className="absolute h-[760px] w-[760px] md:h-[1050px] md:w-[1050px] rounded-full border border-gray-100/70 dark:border-slate-900/50" />
-          <div className="absolute h-[1020px] w-[1020px] md:h-[1380px] md:w-[1380px] rounded-full border border-gray-50 dark:border-slate-950" />
-          {/* Ambient Glow Center */}
-          <div className="absolute h-96 w-96 rounded-full bg-violet-500/5 dark:bg-violet-600/10 blur-3xl pointer-events-none" />
+          <div className="h-[520px] w-[520px] md:h-[720px] md:w-[720px] rounded-full border border-gray-100 dark:border-[#3A0CA3]/15" />
+          <div className="absolute h-[760px] w-[760px] md:h-[1050px] md:w-[1050px] rounded-full border border-gray-100/70 dark:border-[#3A0CA3]/10" />
+          <div className="absolute h-[1020px] w-[1020px] md:h-[1380px] md:w-[1380px] rounded-full border border-gray-50 dark:border-[#0c0d16]" />
+          {/* Ambient Obsidian Glow Center */}
+          <div className="absolute h-[420px] w-[420px] rounded-full bg-[#3A0CA3]/20 blur-[130px] pointer-events-none" />
         </div>
 
         {/* Floating orbital badges */}
         <div className="pointer-events-none absolute inset-0 max-w-6xl mx-auto hidden lg:block">
           {/* Floating badge 1: Slack */}
-          <div className="absolute top-24 left-16 flex items-center gap-2 rounded-2xl border border-gray-200/80 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 p-3 shadow-lg shadow-black/5 backdrop-blur-md">
+          <div className="absolute top-24 left-16 flex items-center gap-2 rounded-2xl border border-gray-200/80 dark:border-[#1c1d30] bg-white/90 dark:bg-[#0c0d16]/90 p-3 shadow-lg shadow-black/5 backdrop-blur-md">
             <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-bold text-xs">
               #
             </div>
@@ -162,7 +162,7 @@ function LandingPage({ onGetStarted, theme, onToggleTheme }) {
           </div>
 
           {/* Floating badge 2: Meta / API */}
-          <div className="absolute top-20 right-20 flex items-center gap-2 rounded-2xl border border-gray-200/80 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 p-3 shadow-lg shadow-black/5 backdrop-blur-md">
+          <div className="absolute top-20 right-20 flex items-center gap-2 rounded-2xl border border-gray-200/80 dark:border-[#1c1d30] bg-white/90 dark:bg-[#0c0d16]/90 p-3 shadow-lg shadow-black/5 backdrop-blur-md">
             <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400 font-bold text-xs">
               API
             </div>
@@ -170,7 +170,7 @@ function LandingPage({ onGetStarted, theme, onToggleTheme }) {
           </div>
 
           {/* Floating badge 3: Security Gate */}
-          <div className="absolute bottom-44 left-10 flex items-center gap-2 rounded-2xl border border-gray-200/80 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 p-3 shadow-lg shadow-black/5 backdrop-blur-md">
+          <div className="absolute bottom-44 left-10 flex items-center gap-2 rounded-2xl border border-gray-200/80 dark:border-[#1c1d30] bg-white/90 dark:bg-[#0c0d16]/90 p-3 shadow-lg shadow-black/5 backdrop-blur-md">
             <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-red-500/10 text-red-500">
               <ShieldCheckIcon className="w-4 h-4" />
             </div>
@@ -178,7 +178,7 @@ function LandingPage({ onGetStarted, theme, onToggleTheme }) {
           </div>
 
           {/* Floating badge 4: Audit Trail */}
-          <div className="absolute bottom-40 right-12 flex items-center gap-2 rounded-2xl border border-gray-200/80 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 p-3 shadow-lg shadow-black/5 backdrop-blur-md">
+          <div className="absolute bottom-40 right-12 flex items-center gap-2 rounded-2xl border border-gray-200/80 dark:border-[#1c1d30] bg-white/90 dark:bg-[#0c0d16]/90 p-3 shadow-lg shadow-black/5 backdrop-blur-md">
             <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-purple-500/10 text-purple-500">
               <FileTextIcon className="w-4 h-4" />
             </div>
@@ -189,7 +189,7 @@ function LandingPage({ onGetStarted, theme, onToggleTheme }) {
         {/* Hero Content */}
         <div className="relative mx-auto max-w-4xl px-6 text-center">
           {/* Social Proof Pill (Avatar stack + metric) */}
-          <div className="inline-flex items-center gap-3 rounded-full border border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 py-1.5 shadow-sm mb-8">
+          <div className="inline-flex items-center gap-3 rounded-full border border-gray-200 dark:border-[#1c1d30] bg-white dark:bg-[#0c0d16] px-4 py-1.5 shadow-sm mb-8">
             <div className="flex -space-x-1.5">
               <div className="flex h-6 w-6 items-center justify-center rounded-full bg-violet-600 text-[10px] font-bold text-white ring-2 ring-white dark:ring-slate-900">
                 JD
@@ -209,7 +209,7 @@ function LandingPage({ onGetStarted, theme, onToggleTheme }) {
           {/* Main Headline */}
           <h1 className="text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight text-gray-950 dark:text-white leading-[1.08]">
             Create better,<br />
-            faster, and together
+            <span className="bg-gradient-to-r from-[#3A0CA3] via-[#7C3AED] to-[#3A0CA3] bg-clip-text text-transparent">faster, and together</span>
           </h1>
 
           {/* Subtitle */}
@@ -223,14 +223,14 @@ function LandingPage({ onGetStarted, theme, onToggleTheme }) {
             <button
               type="button"
               onClick={onGetStarted}
-              className="rounded-full bg-black dark:bg-white text-white dark:text-black px-8 py-3.5 text-sm font-semibold hover:bg-gray-800 dark:hover:bg-gray-100 transition shadow-xl shadow-black/20 hover:scale-[1.02]"
+              className="rounded-full bg-gradient-to-r from-[#3A0CA3] to-[#4c1d95] hover:from-[#4313b8] hover:to-[#5b21b6] text-white px-8 py-3.5 text-sm font-semibold transition shadow-xl shadow-[#3A0CA3]/35 hover:scale-[1.02]"
             >
               Get Started
             </button>
 
             <a
               href="#preview"
-              className="rounded-full border border-gray-200 dark:border-slate-800 bg-gray-50 dark:bg-slate-900 px-7 py-3.5 text-sm font-medium text-gray-700 dark:text-slate-200 hover:bg-gray-100 dark:hover:bg-slate-800 transition"
+              className="rounded-full border border-gray-200 dark:border-[#1c1d30] bg-gray-50 dark:bg-[#0c0d16] px-7 py-3.5 text-sm font-medium text-gray-700 dark:text-slate-200 hover:bg-gray-100 dark:hover:bg-[#131422] transition"
             >
               See Demo
             </a>
@@ -239,9 +239,9 @@ function LandingPage({ onGetStarted, theme, onToggleTheme }) {
 
         {/* ── REALISTIC PRODUCT UI CARD PREVIEW (matching reference layout) ── */}
         <div id="preview" className="relative mx-auto max-w-6xl px-4 sm:px-6 mt-16 md:mt-20">
-          <div className="overflow-hidden rounded-2xl border border-gray-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-2xl shadow-slate-300/60 dark:shadow-black/70">
+          <div className="overflow-hidden rounded-2xl border border-gray-200/90 dark:border-[#2a1754] bg-white dark:bg-[#0c0d16] shadow-2xl shadow-slate-300/60 dark:shadow-[0_0_80px_-15px_rgba(58,12,163,0.35)]">
             {/* Window Topbar */}
-            <div className="flex items-center justify-between border-b border-gray-100 dark:border-slate-800/80 bg-gray-50/80 dark:bg-slate-950/80 px-5 py-3">
+            <div className="flex items-center justify-between border-b border-gray-100 dark:border-[#1c1d30]/80 bg-gray-50/80 dark:bg-[#050505]/80 px-5 py-3">
               <div className="flex items-center gap-2">
                 <div className="h-3 w-3 rounded-full bg-red-400" />
                 <div className="h-3 w-3 rounded-full bg-amber-400" />
@@ -257,10 +257,10 @@ function LandingPage({ onGetStarted, theme, onToggleTheme }) {
             {/* Mock Dashboard Layout */}
             <div className="grid grid-cols-1 md:grid-cols-5 min-h-[420px]">
               {/* Mock Sidebar */}
-              <div className="border-r border-gray-100 dark:border-slate-800/80 bg-gray-50/50 dark:bg-slate-950/50 p-4 space-y-5 hidden md:block">
+              <div className="border-r border-gray-100 dark:border-[#1c1d30]/80 bg-gray-50/50 dark:bg-[#050505]/50 p-4 space-y-5 hidden md:block">
                 <div className="flex items-center gap-2 px-2">
-                  <VertexArcEmblem className="h-5 w-5" />
-                  <span className="text-xs font-bold text-gray-800 dark:text-white">VertexArc</span>
+                  <VertexArcEmblem className="h-4 w-auto" />
+                  <span className="text-xs font-bold text-gray-800 dark:text-white font-sans">Vertex<span className="bg-gradient-to-r from-[#3A0CA3] via-[#6d28d9] to-[#7C3AED] bg-clip-text text-transparent">Arc</span></span>
                 </div>
 
                 {/* Mock Search */}
@@ -270,21 +270,21 @@ function LandingPage({ onGetStarted, theme, onToggleTheme }) {
                     type="text"
                     disabled
                     placeholder="Search tasks..."
-                    className="w-full rounded-lg border border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900 pl-8 pr-3 py-1.5 text-xs text-gray-500"
+                    className="w-full rounded-lg border border-gray-200 dark:border-[#1c1d30] bg-white dark:bg-[#0c0d16] pl-8 pr-3 py-1.5 text-xs text-gray-500"
                   />
                 </div>
 
                 <div className="space-y-1 text-xs">
-                  <div className="rounded-lg bg-white dark:bg-slate-900 px-3 py-2 font-semibold text-gray-900 dark:text-white shadow-xs border border-gray-200/60 dark:border-slate-800">
+                  <div className="rounded-lg bg-[#3A0CA3]/10 dark:bg-[#3A0CA3]/20 px-3 py-2 font-semibold text-[#3A0CA3] dark:text-[#c4b5fd] shadow-xs border border-[#3A0CA3]/25">
                     Dashboard
                   </div>
                   <div className="flex items-center justify-between px-3 py-2 text-gray-500 dark:text-slate-400 hover:text-gray-900">
                     <span>Projects</span>
-                    <span className="rounded bg-gray-200/70 dark:bg-slate-800 px-1.5 py-0.5 text-[10px]">3</span>
+                    <span className="rounded bg-gray-200/70 dark:bg-[#131422] px-1.5 py-0.5 text-[10px]">3</span>
                   </div>
                   <div className="flex items-center justify-between px-3 py-2 text-gray-500 dark:text-slate-400 hover:text-gray-900">
                     <span>Tasks</span>
-                    <span className="rounded bg-gray-200/70 dark:bg-slate-800 px-1.5 py-0.5 text-[10px]">8</span>
+                    <span className="rounded bg-gray-200/70 dark:bg-[#131422] px-1.5 py-0.5 text-[10px]">8</span>
                   </div>
                   <div className="px-3 py-2 text-gray-500 dark:text-slate-400 hover:text-gray-900">
                     Security Gates
@@ -305,13 +305,13 @@ function LandingPage({ onGetStarted, theme, onToggleTheme }) {
                   </div>
 
                   <div className="flex items-center gap-2">
-                    <span className="rounded-lg border border-gray-200 dark:border-slate-800 bg-gray-50 dark:bg-slate-950 px-3 py-1 text-xs text-gray-600 dark:text-slate-300">
+                    <span className="rounded-lg border border-gray-200 dark:border-[#1c1d30] bg-gray-50 dark:bg-[#050505] px-3 py-1 text-xs text-gray-600 dark:text-slate-300">
                       Mar 01 - Apr 01, 2026
                     </span>
                     <button
                       type="button"
                       onClick={onGetStarted}
-                      className="rounded-lg bg-gray-950 dark:bg-white text-white dark:text-gray-950 px-3 py-1 text-xs font-semibold hover:bg-gray-800 dark:hover:bg-gray-100 transition"
+                      className="rounded-lg bg-gradient-to-r from-[#3A0CA3] to-[#4c1d95] hover:from-[#4313b8] hover:to-[#5b21b6] text-white px-3 py-1 text-xs font-semibold transition shadow-sm shadow-[#3A0CA3]/30"
                     >
                       + Add Task
                     </button>
@@ -320,7 +320,7 @@ function LandingPage({ onGetStarted, theme, onToggleTheme }) {
 
                 {/* 5 Stats Cards Grid (matching reference image cards) */}
                 <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-                  <div className="rounded-xl border border-gray-100 dark:border-slate-800 bg-gray-50/50 dark:bg-slate-950/50 p-3.5">
+                  <div className="rounded-xl border border-gray-100 dark:border-[#1c1d30] bg-gray-50/50 dark:bg-[#050505]/50 p-3.5">
                     <span className="text-[11px] font-medium text-gray-500 dark:text-slate-400">Active Projects</span>
                     <div className="mt-1 flex items-baseline gap-2">
                       <span className="text-xl font-bold text-gray-900 dark:text-white">3</span>
@@ -328,7 +328,7 @@ function LandingPage({ onGetStarted, theme, onToggleTheme }) {
                     </div>
                   </div>
 
-                  <div className="rounded-xl border border-gray-100 dark:border-slate-800 bg-gray-50/50 dark:bg-slate-950/50 p-3.5">
+                  <div className="rounded-xl border border-gray-100 dark:border-[#1c1d30] bg-gray-50/50 dark:bg-[#050505]/50 p-3.5">
                     <span className="text-[11px] font-medium text-gray-500 dark:text-slate-400">Tasks Completed</span>
                     <div className="mt-1 flex items-baseline gap-2">
                       <span className="text-xl font-bold text-gray-900 dark:text-white">2</span>
@@ -336,7 +336,7 @@ function LandingPage({ onGetStarted, theme, onToggleTheme }) {
                     </div>
                   </div>
 
-                  <div className="rounded-xl border border-gray-100 dark:border-slate-800 bg-gray-50/50 dark:bg-slate-950/50 p-3.5">
+                  <div className="rounded-xl border border-gray-100 dark:border-[#1c1d30] bg-gray-50/50 dark:bg-[#050505]/50 p-3.5">
                     <span className="text-[11px] font-medium text-gray-500 dark:text-slate-400">In Review</span>
                     <div className="mt-1 flex items-baseline gap-2">
                       <span className="text-xl font-bold text-gray-900 dark:text-white">2</span>
@@ -344,7 +344,7 @@ function LandingPage({ onGetStarted, theme, onToggleTheme }) {
                     </div>
                   </div>
 
-                  <div className="rounded-xl border border-gray-100 dark:border-slate-800 bg-gray-50/50 dark:bg-slate-950/50 p-3.5">
+                  <div className="rounded-xl border border-gray-100 dark:border-[#1c1d30] bg-gray-50/50 dark:bg-[#050505]/50 p-3.5">
                     <span className="text-[11px] font-medium text-gray-500 dark:text-slate-400">Security Gate</span>
                     <div className="mt-1 flex items-baseline gap-2">
                       <span className="text-xl font-bold text-emerald-600 dark:text-emerald-400">3/3</span>
@@ -352,7 +352,7 @@ function LandingPage({ onGetStarted, theme, onToggleTheme }) {
                     </div>
                   </div>
 
-                  <div className="rounded-xl border border-gray-100 dark:border-slate-800 bg-gray-50/50 dark:bg-slate-950/50 p-3.5 col-span-2 sm:col-span-1">
+                  <div className="rounded-xl border border-gray-100 dark:border-[#1c1d30] bg-gray-50/50 dark:bg-[#050505]/50 p-3.5 col-span-2 sm:col-span-1">
                     <span className="text-[11px] font-medium text-gray-500 dark:text-slate-400">Audit Events</span>
                     <div className="mt-1 flex items-baseline gap-2">
                       <span className="text-xl font-bold text-gray-900 dark:text-white">18</span>
@@ -363,7 +363,7 @@ function LandingPage({ onGetStarted, theme, onToggleTheme }) {
 
                 {/* Sample Live Task Items */}
                 <div className="space-y-2.5 pt-2">
-                  <div className="flex items-center justify-between rounded-xl border border-gray-100 dark:border-slate-800/80 bg-white dark:bg-slate-900 p-3.5 shadow-xs">
+                  <div className="flex items-center justify-between rounded-xl border border-gray-100 dark:border-[#1c1d30]/80 bg-white dark:bg-[#0c0d16] p-3.5 shadow-xs">
                     <div className="flex items-center gap-3">
                       <span className="h-2 w-2 rounded-full bg-blue-500" />
                       <div>
@@ -376,7 +376,7 @@ function LandingPage({ onGetStarted, theme, onToggleTheme }) {
                     </span>
                   </div>
 
-                  <div className="flex items-center justify-between rounded-xl border border-gray-100 dark:border-slate-800/80 bg-white dark:bg-slate-900 p-3.5 shadow-xs">
+                  <div className="flex items-center justify-between rounded-xl border border-gray-100 dark:border-[#1c1d30]/80 bg-white dark:bg-[#0c0d16] p-3.5 shadow-xs">
                     <div className="flex items-center gap-3">
                       <span className="h-2 w-2 rounded-full bg-amber-500" />
                       <div>
@@ -389,7 +389,7 @@ function LandingPage({ onGetStarted, theme, onToggleTheme }) {
                     </span>
                   </div>
 
-                  <div className="flex items-center justify-between rounded-xl border border-gray-100 dark:border-slate-800/80 bg-white dark:bg-slate-900 p-3.5 shadow-xs">
+                  <div className="flex items-center justify-between rounded-xl border border-gray-100 dark:border-[#1c1d30]/80 bg-white dark:bg-[#0c0d16] p-3.5 shadow-xs">
                     <div className="flex items-center gap-3">
                       <span className="h-2 w-2 rounded-full bg-emerald-500" />
                       <div>
@@ -409,7 +409,7 @@ function LandingPage({ onGetStarted, theme, onToggleTheme }) {
       </section>
 
       {/* ── TRUSTED BY ENGINEERING TEAMS LOGO STRIP ── */}
-      <section className="border-y border-gray-100 dark:border-slate-900 py-12 bg-gray-50/50 dark:bg-slate-950/50">
+      <section className="border-y border-gray-100 dark:border-slate-900 py-12 bg-gray-50/50 dark:bg-[#050505]/50">
         <div className="mx-auto max-w-6xl px-6 text-center">
           <p className="text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-slate-500">
             Trusted by security and engineering teams at leading companies
@@ -446,9 +446,9 @@ function LandingPage({ onGetStarted, theme, onToggleTheme }) {
           {features.map((feat) => (
             <div
               key={feat.title}
-              className="rounded-2xl border border-gray-100 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm hover:shadow-md transition"
+              className="rounded-2xl border border-gray-100 dark:border-[#1c1d30] bg-white dark:bg-[#0c0d16] p-6 shadow-sm hover:shadow-md transition"
             >
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-100 dark:border-slate-700">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gray-50 dark:bg-[#131422] border border-gray-100 dark:border-[#272844]">
                 {feat.icon}
               </div>
               <h3 className="mt-4 text-base font-bold text-gray-900 dark:text-white">
@@ -463,7 +463,7 @@ function LandingPage({ onGetStarted, theme, onToggleTheme }) {
       </section>
 
       {/* ── WORKFLOW STATE MACHINE ── */}
-      <section id="workflow" className="border-t border-gray-100 dark:border-slate-900 bg-gray-50/50 dark:bg-slate-950/50 py-24">
+      <section id="workflow" className="border-t border-gray-100 dark:border-slate-900 bg-gray-50/50 dark:bg-[#050505]/50 py-24">
         <div className="mx-auto max-w-6xl px-6">
           <div className="text-center max-w-2xl mx-auto">
             <h2 className="text-xs font-bold uppercase tracking-widest text-violet-600 dark:text-violet-400">
@@ -481,7 +481,7 @@ function LandingPage({ onGetStarted, theme, onToggleTheme }) {
             {workflowSteps.map((step) => (
               <div
                 key={step.name}
-                className="relative rounded-2xl border border-gray-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-xs"
+                className="relative rounded-2xl border border-gray-200/80 dark:border-[#1c1d30] bg-white dark:bg-[#0c0d16] p-6 shadow-xs"
               >
                 <div className="text-[11px] font-mono font-bold text-violet-600 dark:text-violet-400">
                   STEP {step.id}
@@ -492,7 +492,7 @@ function LandingPage({ onGetStarted, theme, onToggleTheme }) {
                 <p className="mt-1 text-xs text-gray-500 dark:text-slate-400">
                   {step.desc}
                 </p>
-                <div className="mt-4 pt-4 border-t border-gray-100 dark:border-slate-800 text-[11px] text-gray-400 dark:text-slate-500">
+                <div className="mt-4 pt-4 border-t border-gray-100 dark:border-[#1c1d30] text-[11px] text-gray-400 dark:text-slate-500">
                   Authorized: <strong className="text-gray-700 dark:text-slate-300">{step.role}</strong>
                 </div>
               </div>
@@ -519,7 +519,7 @@ function LandingPage({ onGetStarted, theme, onToggleTheme }) {
           {roles.map((r) => (
             <div
               key={r.name}
-              className="rounded-2xl border border-gray-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 p-7 shadow-xs"
+              className="rounded-2xl border border-gray-200/90 dark:border-[#1c1d30] bg-white dark:bg-[#0c0d16] p-7 shadow-xs"
             >
               <div className="flex items-center justify-between">
                 <h3 className="text-lg font-bold text-gray-900 dark:text-white">
@@ -546,8 +546,11 @@ function LandingPage({ onGetStarted, theme, onToggleTheme }) {
       </section>
 
       {/* ── BOTTOM CTA ── */}
-      <section className="border-t border-gray-100 dark:border-slate-900 bg-gray-50/50 dark:bg-slate-950/50 py-20 text-center">
-        <div className="mx-auto max-w-3xl px-6">
+      <section className="border-t border-gray-100 dark:border-[#1c1d30] bg-gradient-to-b from-transparent via-[#3A0CA3]/5 to-[#3A0CA3]/15 dark:from-[#050505] dark:via-[#160442]/30 dark:to-[#050505] py-24 text-center relative overflow-hidden">
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+          <div className="h-64 w-96 rounded-full bg-[#3A0CA3]/20 blur-[100px]" />
+        </div>
+        <div className="relative mx-auto max-w-3xl px-6">
           <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-950 dark:text-white tracking-tight">
             Ready to build secure software together?
           </h2>
@@ -558,7 +561,7 @@ function LandingPage({ onGetStarted, theme, onToggleTheme }) {
             <button
               type="button"
               onClick={onGetStarted}
-              className="rounded-full bg-black dark:bg-white text-white dark:text-black px-8 py-3.5 text-sm font-semibold hover:bg-gray-800 dark:hover:bg-gray-100 transition shadow-xl shadow-black/15 hover:scale-[1.02]"
+              className="rounded-full bg-gradient-to-r from-[#3A0CA3] to-[#4c1d95] hover:from-[#4313b8] hover:to-[#5b21b6] text-white px-9 py-4 text-sm font-semibold transition shadow-xl shadow-[#3A0CA3]/40 hover:scale-[1.02]"
             >
               Launch VertexArc →
             </button>

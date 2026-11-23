@@ -32,16 +32,21 @@ function CreateUserForm({ token, onCreated, onCancel }) {
     }
 
     return (
-        <div className="mb-8 rounded-xl border border-gray-200 dark:border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-900 p-6">
-            <h3 className="mb-5 text-xl font-semibold text-gray-900 dark:text-white">
-                Create New User
-            </h3>
+        <div className="mb-8 rounded-2xl border border-gray-200 dark:border-[#221c44] bg-white dark:bg-[#0c0d16] p-6 shadow-sm">
+            <div className="mb-5">
+                <h2 className="text-base font-semibold text-gray-900 dark:text-white">
+                    Create New User
+                </h2>
+                <p className="mt-0.5 text-xs text-gray-500 dark:text-slate-400">
+                    Provision credentials and role access for a new engineering team member.
+                </p>
+            </div>
 
-            <form onSubmit={handleSubmit} className="space-y-5">
+            <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
                     <label
                         htmlFor="user-name"
-                        className="mb-2 block text-sm text-gray-600 dark:text-slate-300"
+                        className="mb-1.5 block text-xs font-semibold text-gray-700 dark:text-slate-300"
                     >
                         Full Name
                     </label>
@@ -54,16 +59,17 @@ function CreateUserForm({ token, onCreated, onCancel }) {
                         autoComplete="name"
                         value={name}
                         onChange={(event) => setName(event.target.value)}
-                        className="w-full rounded-lg border border-gray-300 dark:border-slate-700 bg-gray-100 dark:bg-slate-800 px-4 py-3 text-gray-900 dark:text-white outline-none focus:border-emerald-500"
+                        placeholder="e.g. Alex Johnson"
+                        className="w-full rounded-xl border border-gray-200 dark:border-[#272844] bg-gray-50 dark:bg-[#131422] px-3.5 py-2.5 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-500 outline-none transition focus:border-[#3A0CA3] focus:ring-2 focus:ring-[#3A0CA3]/20"
                     />
                 </div>
 
                 <div>
                     <label
                         htmlFor="user-email"
-                        className="mb-2 block text-sm text-gray-600 dark:text-slate-300"
+                        className="mb-1.5 block text-xs font-semibold text-gray-700 dark:text-slate-300"
                     >
-                        Email
+                        Email Address
                     </label>
 
                     <input
@@ -74,14 +80,15 @@ function CreateUserForm({ token, onCreated, onCancel }) {
                         autoComplete="off"
                         value={email}
                         onChange={(event) => setEmail(event.target.value)}
-                        className="w-full rounded-lg border border-gray-300 dark:border-slate-700 bg-gray-100 dark:bg-slate-800 px-4 py-3 text-gray-900 dark:text-white outline-none focus:border-emerald-500"
+                        placeholder="name@company.com"
+                        className="w-full rounded-xl border border-gray-200 dark:border-[#272844] bg-gray-50 dark:bg-[#131422] px-3.5 py-2.5 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-500 outline-none transition focus:border-[#3A0CA3] focus:ring-2 focus:ring-[#3A0CA3]/20"
                     />
                 </div>
 
                 <div>
                     <label
                         htmlFor="user-password"
-                        className="mb-2 block text-sm text-gray-600 dark:text-slate-300"
+                        className="mb-1.5 block text-xs font-semibold text-gray-700 dark:text-slate-300"
                     >
                         Initial Password
                     </label>
@@ -94,10 +101,10 @@ function CreateUserForm({ token, onCreated, onCancel }) {
                         autoComplete="new-password"
                         value={password}
                         onChange={(event) => setPassword(event.target.value)}
-                        className="w-full rounded-lg border border-gray-300 dark:border-slate-700 bg-gray-100 dark:bg-slate-800 px-4 py-3 text-gray-900 dark:text-white outline-none focus:border-emerald-500"
+                        className="w-full rounded-xl border border-gray-200 dark:border-[#272844] bg-gray-50 dark:bg-[#131422] px-3.5 py-2.5 text-sm text-gray-900 dark:text-white outline-none transition focus:border-[#3A0CA3] focus:ring-2 focus:ring-[#3A0CA3]/20"
                     />
 
-                    <p className="mt-2 text-xs text-gray-500 dark:text-slate-500">
+                    <p className="mt-1.5 text-[11px] text-gray-400 dark:text-slate-500">
                         At least 8 characters. Maximum 72 UTF-8 bytes.
                     </p>
                 </div>
@@ -105,7 +112,7 @@ function CreateUserForm({ token, onCreated, onCancel }) {
                 <div>
                     <label
                         htmlFor="user-role"
-                        className="mb-2 block text-sm text-gray-600 dark:text-slate-300"
+                        className="mb-1.5 block text-xs font-semibold text-gray-700 dark:text-slate-300"
                     >
                         Role
                     </label>
@@ -114,7 +121,7 @@ function CreateUserForm({ token, onCreated, onCancel }) {
                         id="user-role"
                         value={role}
                         onChange={(event) => setRole(event.target.value)}
-                        className="w-full rounded-lg border border-gray-300 dark:border-slate-700 bg-gray-100 dark:bg-slate-800 px-4 py-3 text-gray-900 dark:text-white"
+                        className="w-full rounded-xl border border-gray-200 dark:border-[#272844] bg-gray-50 dark:bg-[#131422] px-3.5 py-2.5 text-sm text-gray-900 dark:text-white outline-none transition focus:border-[#3A0CA3] focus:ring-2 focus:ring-[#3A0CA3]/20"
                     >
                         <option value="DEVELOPER">Developer</option>
                         <option value="PROJECT_MANAGER">Project Manager</option>
@@ -122,16 +129,16 @@ function CreateUserForm({ token, onCreated, onCancel }) {
                 </div>
 
                 {error && (
-                    <p role="alert" className="text-sm text-red-400">
+                    <p role="alert" className="rounded-lg bg-red-500/10 p-3 text-xs font-medium text-red-500 dark:text-red-400">
                         {error}
                     </p>
                 )}
 
-                <div className="flex flex-wrap gap-3">
+                <div className="flex flex-wrap items-center gap-3 pt-1">
                     <button
                         type="submit"
                         disabled={loading}
-                        className="rounded-lg bg-emerald-500 px-5 py-2.5 font-semibold text-slate-950 hover:bg-emerald-400 disabled:opacity-60"
+                        className="rounded-lg bg-gradient-to-r from-[#3A0CA3] to-[#4c1d95] hover:from-[#4313b8] hover:to-[#5b21b6] px-4 py-2 text-xs font-semibold text-white shadow-md shadow-[#3A0CA3]/25 transition hover:scale-[1.02] disabled:opacity-60"
                     >
                         {loading ? "Creating..." : "Create User"}
                     </button>
@@ -140,7 +147,7 @@ function CreateUserForm({ token, onCreated, onCancel }) {
                         type="button"
                         onClick={onCancel}
                         disabled={loading}
-                        className="rounded-lg border border-gray-300 dark:border-slate-700 px-5 py-2.5 text-gray-600 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-gray-100 dark:bg-slate-800"
+                        className="rounded-lg border border-gray-200 dark:border-[#272844] bg-white dark:bg-[#131422] px-4 py-2 text-xs font-medium text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-[#1c1d30] transition"
                     >
                         Cancel
                     </button>

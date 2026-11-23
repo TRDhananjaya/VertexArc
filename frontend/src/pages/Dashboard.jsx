@@ -64,7 +64,7 @@ function Dashboard({
     }, [token, refreshKey]);
 
     return (
-        <div className="min-h-screen bg-gray-50 dark:bg-slate-950 text-gray-900 dark:text-white">
+        <div className="min-h-screen bg-transparent text-gray-900 dark:text-white">
 
             <Navbar
                 user={user}
@@ -77,32 +77,27 @@ function Dashboard({
 
             <main className="mx-auto max-w-6xl px-6 py-10">
 
-                <div className="mb-8">
-                    <h2 className="text-3xl font-bold">
-                        Dashboard
-                    </h2>
-
-                    <p className="mt-2 text-gray-500 dark:text-slate-400">
-                        Your projects and development workspace
-                    </p>
-                </div>
-
-                <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-
-                    <h3 className="text-xl font-semibold">
-                        Your Projects
-                    </h3>
+                {/* Page Header */}
+                <div className="mb-8 flex flex-wrap items-center justify-between gap-4 border-b border-gray-200/80 dark:border-[#1c1d30] pb-6">
+                    <div>
+                        <h1 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
+                            Projects
+                        </h1>
+                        <p className="mt-1 text-sm text-gray-500 dark:text-slate-400">
+                            Workspaces and active backlogs for your development teams
+                        </p>
+                    </div>
 
                     {canCreateProject && (
                         <button
                             type="button"
                             onClick={() => setShowCreateForm(true)}
-                            className="rounded-lg bg-emerald-500 px-4 py-2 font-semibold text-slate-950 hover:bg-emerald-400"
+                            className="inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-[#3A0CA3] to-[#4c1d95] hover:from-[#4313b8] hover:to-[#5b21b6] px-4 py-2 text-xs font-semibold text-white shadow-md shadow-[#3A0CA3]/25 transition hover:scale-[1.02]"
                         >
-                            + New Project
+                            <span>+</span>
+                            <span>New Project</span>
                         </button>
                     )}
-
                 </div>
 
                 {showCreateForm && canCreateProject && (
@@ -117,7 +112,7 @@ function Dashboard({
                 )}
 
                 {loading && (
-                    <p className="text-gray-500 dark:text-slate-400">
+                    <p className="text-sm text-gray-500 dark:text-slate-400">
                         Loading projects...
                     </p>
                 )}
@@ -125,15 +120,15 @@ function Dashboard({
                 {error && (
                     <div
                         role="alert"
-                        className="mb-6 rounded-lg border border-red-500/30 bg-red-500/10 p-4 text-red-400"
+                        className="mb-6 rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-xs font-medium text-red-500 dark:text-red-400"
                     >
                         {error}
                     </div>
                 )}
 
                 {!loading && !error && projects.length === 0 && (
-                    <div className="rounded-xl border border-gray-200 dark:border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-8 text-center text-gray-500 dark:text-slate-400">
-                        No projects found.
+                    <div className="rounded-2xl border border-gray-200 dark:border-[#1c1d30] bg-white dark:bg-[#0c0d16] p-10 text-center text-sm text-gray-500 dark:text-slate-400">
+                        No projects found. Create your first project workspace to get started.
                     </div>
                 )}
 
@@ -145,20 +140,25 @@ function Dashboard({
                                 key={project.id}
                                 type="button"
                                 onClick={() => onSelectProject(project)}
-                                className="w-full rounded-xl border border-gray-200 dark:border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 text-left transition hover:border-emerald-500/50 focus-visible:outline-2 focus-visible:outline-emerald-400"
+                                className="group w-full rounded-2xl border border-gray-200 dark:border-[#1c1d30] bg-white dark:bg-[#0c0d16] p-6 text-left transition hover:border-[#3A0CA3] hover:shadow-lg hover:shadow-[#3A0CA3]/10 focus-visible:outline-2 focus-visible:outline-[#3A0CA3]"
                             >
-                                <h4 className="text-lg font-semibold text-gray-900 dark:text-white">
-                                    {project.name}
-                                </h4>
+                                <div className="flex items-start justify-between gap-2">
+                                    <h2 className="text-base font-semibold text-gray-900 dark:text-white group-hover:text-[#3A0CA3] dark:group-hover:text-[#a78bfa] transition-colors">
+                                        {project.name}
+                                    </h2>
+                                </div>
 
-                                <p className="mt-3 line-clamp-3 text-sm text-gray-500 dark:text-slate-400">
+                                <p className="mt-2 line-clamp-3 text-xs leading-relaxed text-gray-500 dark:text-slate-400">
                                     {project.description ||
                                         "No description provided."}
                                 </p>
 
-                                <div className="mt-5 border-t border-gray-200 dark:border-slate-800 pt-4">
-                                    <span className="text-xs text-gray-500 dark:text-slate-500">
-                                        Project ID: {project.id}
+                                <div className="mt-5 border-t border-gray-100 dark:border-[#1c1d30] pt-3.5 flex items-center justify-between">
+                                    <span className="text-xs font-mono text-gray-400 dark:text-slate-500">
+                                        ID #{project.id}
+                                    </span>
+                                    <span className="text-xs font-medium text-[#3A0CA3] dark:text-[#a78bfa] opacity-0 group-hover:opacity-100 transition-opacity">
+                                        Open workspace →
                                     </span>
                                 </div>
 

@@ -50,7 +50,7 @@ function TaskAuditHistory({ projectId, taskId, token }) {
       case "TASK_DELETED":
         return <span className="rounded bg-red-500/15 px-2 py-0.5 text-xs font-semibold text-red-400">Soft Deleted</span>;
       default:
-        return <span className="rounded bg-gray-100 dark:bg-slate-800 px-2 py-0.5 text-xs font-semibold text-gray-600 dark:text-slate-300">{action}</span>;
+        return <span className="rounded bg-gray-100 dark:bg-[#131422] px-2 py-0.5 text-xs font-semibold text-gray-600 dark:text-slate-300">{action}</span>;
     }
   }
 
@@ -76,7 +76,7 @@ function TaskAuditHistory({ projectId, taskId, token }) {
   }
 
   return (
-    <section className="mt-8 rounded-2xl border border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-xl">
+    <section className="mt-8 rounded-2xl border border-gray-200 dark:border-[#1c1d30] bg-white dark:bg-[#0c0d16] p-6 shadow-xl">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2.5">
           <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-500">
@@ -88,14 +88,14 @@ function TaskAuditHistory({ projectId, taskId, token }) {
         <button
           type="button"
           onClick={() => setIsExpanded((prev) => !prev)}
-          className="rounded-lg border border-gray-300 dark:border-slate-700 px-3 py-1 text-xs font-medium text-gray-600 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800 transition"
+          className="rounded-lg border border-gray-300 dark:border-[#272844] px-3 py-1 text-xs font-medium text-gray-600 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-[#131422] transition"
         >
           {isExpanded ? "Hide Audit History" : "View Audit History"}
         </button>
       </div>
 
       {isExpanded && (
-        <div className="mt-6 border-t border-gray-200 dark:border-slate-800 pt-5">
+        <div className="mt-6 border-t border-gray-200 dark:border-[#1c1d30] pt-5">
           {loading && <p className="text-xs text-gray-500 dark:text-slate-400">Loading audit history…</p>}
           {error && <p role="alert" className="text-xs text-red-400">{error}</p>}
 
@@ -108,7 +108,7 @@ function TaskAuditHistory({ projectId, taskId, token }) {
               {logs.map((log) => (
                 <div
                   key={log.id}
-                  className="rounded-lg border border-gray-200 dark:border-slate-800/80 bg-gray-50 dark:bg-slate-950 p-3 text-xs"
+                  className="rounded-lg border border-gray-200 dark:border-[#1c1d30]/80 bg-gray-50 dark:bg-[#050505] p-3 text-xs"
                 >
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <div className="flex items-center gap-2">

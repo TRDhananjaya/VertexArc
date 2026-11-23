@@ -151,7 +151,7 @@ function TaskDetail({
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-slate-950 text-gray-900 dark:text-white">
+    <div className="min-h-screen bg-transparent text-gray-900 dark:text-white">
       {/* Top Header */}
       <Navbar
         user={user}
@@ -169,13 +169,13 @@ function TaskDetail({
         <button
           type="button"
           onClick={onBack}
-          className="mb-6 flex items-center gap-2 text-sm text-emerald-600 dark:text-emerald-400 transition hover:text-emerald-500 dark:hover:text-emerald-300"
+          className="mb-6 flex items-center gap-2 text-sm text-[#3A0CA3] dark:text-[#a78bfa] transition hover:text-[#4812c5] dark:hover:text-[#c4b5fd] font-medium"
         >
           ← Back to Project Tasks
         </button>
 
         {/* Task Details Card */}
-        <div className="rounded-2xl border border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-8 shadow-sm dark:shadow-xl">
+        <div className="rounded-2xl border border-gray-200 dark:border-[#1c1d30] bg-white dark:bg-[#0c0d16] p-8 shadow-sm dark:shadow-xl">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div className="space-y-2">
               <div className="flex flex-wrap items-center gap-3">
@@ -202,7 +202,7 @@ function TaskDetail({
                 )}
               </div>
 
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{task.title}</h2>
+              <h1 className="text-xl font-bold tracking-tight text-gray-900 dark:text-white">{task.title}</h1>
             </div>
 
             {/* Quick Assign / Reassign */}
@@ -216,7 +216,7 @@ function TaskDetail({
                       onChange={(e) => {
                         if (e.target.value) handleAssignUser(e.target.value);
                       }}
-                      className="rounded-lg border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-1.5 text-xs text-gray-900 dark:text-white"
+                      className="rounded-lg border border-gray-300 dark:border-[#272844] bg-white dark:bg-[#131422] px-3 py-1.5 text-xs text-gray-900 dark:text-white"
                     >
                       <option value="" disabled>
                         Choose member…
@@ -239,7 +239,7 @@ function TaskDetail({
                   <button
                     type="button"
                     onClick={() => setShowAssignDropdown(true)}
-                    className="rounded-lg border border-gray-300 dark:border-slate-700 px-3 py-1.5 text-xs font-medium text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800 transition"
+                    className="rounded-lg border border-gray-300 dark:border-[#272844] px-3 py-1.5 text-xs font-medium text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-[#131422] transition"
                   >
                     {task.assigned_to ? "Reassign Member" : "+ Assign Member"}
                   </button>
@@ -260,7 +260,7 @@ function TaskDetail({
           </div>
 
           {/* Description */}
-          <div className="mt-6 border-t border-gray-200 dark:border-slate-800 pt-6">
+          <div className="mt-6 border-t border-gray-200 dark:border-[#1c1d30] pt-6">
             <h3 className="text-sm font-semibold uppercase tracking-wider text-gray-500 dark:text-slate-400">
               Description
             </h3>
@@ -270,7 +270,7 @@ function TaskDetail({
           </div>
 
           {/* Workflow Status Actions */}
-          <div className="mt-6 flex flex-wrap items-center gap-3 border-t border-gray-200 dark:border-slate-800 pt-6">
+          <div className="mt-6 flex flex-wrap items-center gap-3 border-t border-gray-200 dark:border-[#1c1d30] pt-6">
             <span className="text-xs uppercase tracking-wider text-gray-400 dark:text-slate-500">Workflow Action:</span>
 
             {/* Developer Actions */}
@@ -347,11 +347,11 @@ function TaskDetail({
         )}
 
         {/* Discussions / Comments Section */}
-        <section className="mt-10 rounded-2xl border border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-8 shadow-sm dark:shadow-xl">
-          <div className="flex items-center justify-between border-b border-gray-200 dark:border-slate-800 pb-4">
-            <div className="flex items-center gap-3">
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white">Discussions</h3>
-              <span className="rounded-full bg-gray-100 dark:bg-slate-800 px-2.5 py-0.5 text-xs font-medium text-gray-600 dark:text-slate-400">
+        <section className="mt-8 rounded-2xl border border-gray-200 dark:border-[#1c1d30] bg-white dark:bg-[#0c0d16] p-6 shadow-sm">
+          <div className="flex items-center justify-between border-b border-gray-200 dark:border-[#1c1d30] pb-4">
+            <div className="flex items-center gap-2.5">
+              <h2 className="text-base font-semibold text-gray-900 dark:text-white">Discussions</h2>
+              <span className="rounded-full bg-gray-100 dark:bg-[#131422] px-2 py-0.5 text-xs font-semibold text-gray-600 dark:text-slate-400">
                 {comments.length}
               </span>
             </div>
@@ -359,8 +359,8 @@ function TaskDetail({
           </div>
 
           {/* Comment submission form */}
-          <form onSubmit={handleAddComment} className="mt-6">
-            <label htmlFor="task-comment" className="mb-2 block text-xs font-medium text-gray-600 dark:text-slate-300">
+          <form onSubmit={handleAddComment} className="mt-5">
+            <label htmlFor="task-comment" className="mb-1.5 block text-xs font-semibold text-gray-700 dark:text-slate-300">
               Add to discussion
             </label>
 
@@ -371,16 +371,16 @@ function TaskDetail({
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
               placeholder="Ask a question, share progress, or leave feedback…"
-              className="w-full resize-y rounded-xl border border-gray-300 dark:border-slate-700 bg-gray-50 dark:bg-slate-950 p-4 text-sm text-gray-900 dark:text-white outline-none transition focus:border-emerald-500"
+              className="w-full resize-y rounded-xl border border-gray-200 dark:border-[#272844] bg-gray-50 dark:bg-[#131422] px-3.5 py-2.5 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-500 outline-none transition focus:border-[#3A0CA3] focus:ring-2 focus:ring-[#3A0CA3]/20"
             />
 
-            <div className="mt-2 flex items-center justify-between">
+            <div className="mt-2.5 flex items-center justify-between">
               <span className="text-xs text-gray-400 dark:text-slate-500">{newComment.length} / 2000 characters</span>
 
               <button
                 type="submit"
                 disabled={postingComment || !newComment.trim()}
-                className="rounded-lg bg-emerald-500 px-5 py-2 text-xs font-semibold text-slate-950 transition hover:bg-emerald-400 disabled:opacity-50"
+                className="rounded-lg bg-gradient-to-r from-[#3A0CA3] to-[#4c1d95] hover:from-[#4313b8] hover:to-[#5b21b6] px-4 py-2 text-xs font-semibold text-white transition disabled:opacity-50 shadow-md shadow-[#3A0CA3]/25 hover:scale-[1.02]"
               >
                 {postingComment ? "Posting..." : "Post Comment"}
               </button>
@@ -406,7 +406,7 @@ function TaskDetail({
             )}
 
             {!commentsLoading && !commentsError && comments.length === 0 && (
-              <div className="rounded-xl border border-dashed border-gray-300 dark:border-slate-800 p-8 text-center text-sm text-gray-400 dark:text-slate-500">
+              <div className="rounded-xl border border-dashed border-gray-300 dark:border-[#1c1d30] p-8 text-center text-sm text-gray-400 dark:text-slate-500">
                 No comments yet. Start the conversation above!
               </div>
             )}
@@ -416,13 +416,13 @@ function TaskDetail({
                 {comments.map((c) => (
                   <div
                     key={c.id}
-                    className="rounded-xl border border-gray-200 dark:border-slate-800/80 bg-gray-50 dark:bg-slate-950 p-5 transition hover:border-gray-300 dark:hover:border-slate-700"
+                    className="rounded-xl border border-gray-200 dark:border-[#1c1d30]/80 bg-gray-50 dark:bg-[#050505] p-5 transition hover:border-gray-300 dark:hover:border-[#272844]"
                   >
                     <div className="flex items-center justify-between text-xs">
                       <div className="flex items-center gap-2">
-                        <span className="font-semibold text-emerald-600 dark:text-emerald-400">{c.author_name}</span>
+                        <span className="font-semibold text-[#3A0CA3] dark:text-[#a78bfa]">{c.author_name}</span>
                         {c.user_id === user?.id && (
-                          <span className="rounded bg-emerald-500/10 px-1.5 py-0.5 text-[10px] font-medium text-emerald-600 dark:text-emerald-400">
+                          <span className="rounded bg-[#3A0CA3]/10 px-1.5 py-0.5 text-[10px] font-medium text-[#3A0CA3] dark:text-[#c4b5fd]">
                             You
                           </span>
                         )}

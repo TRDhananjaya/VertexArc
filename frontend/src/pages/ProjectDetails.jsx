@@ -255,7 +255,7 @@ function ProjectDetails({
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-slate-950 text-gray-900 dark:text-white">
+    <div className="min-h-screen bg-transparent text-gray-900 dark:text-white">
       {/* Unified Navbar */}
       <Navbar
         user={user}
@@ -273,31 +273,31 @@ function ProjectDetails({
         <button
           type="button"
           onClick={onBack}
-          className="mb-6 text-sm text-emerald-600 dark:text-emerald-400 hover:text-emerald-500 dark:hover:text-emerald-300 transition"
+          className="mb-6 text-sm text-[#3A0CA3] dark:text-[#a78bfa] hover:text-[#4812c5] dark:hover:text-[#c4b5fd] transition font-medium"
         >
           ← Back to Dashboard
         </button>
 
         {/* Project information */}
-        <div className="mb-10">
+        <div className="mb-8 border-b border-gray-200/80 dark:border-[#1c1d30] pb-6">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
-              <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
+              <h1 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
                 {project.name}
-              </h2>
+              </h1>
 
-              <p className="mt-3 text-gray-500 dark:text-slate-400">
+              <p className="mt-1.5 text-sm text-gray-500 dark:text-slate-400">
                 {project.description || "No description provided."}
               </p>
             </div>
 
             {/* Edit / Delete buttons — only for authorized users */}
             {canManageProject && !showEditForm && (
-              <div className="flex gap-3">
+              <div className="flex items-center gap-2.5">
                 <button
                   type="button"
                   onClick={() => setShowEditForm(true)}
-                  className="rounded-lg border border-gray-300 dark:border-slate-700 px-4 py-2 text-sm text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800 transition"
+                  className="rounded-lg border border-gray-200 dark:border-[#272844] bg-white dark:bg-[#131422] px-3.5 py-1.5 text-xs font-medium text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-[#1c1d30] transition shadow-sm"
                 >
                   Edit Project
                 </button>
@@ -305,7 +305,7 @@ function ProjectDetails({
                 <button
                   type="button"
                   onClick={() => setShowDeleteConfirm(true)}
-                  className="rounded-lg border border-red-500/50 px-4 py-2 text-sm text-red-500 dark:text-red-400 hover:bg-red-500/10 transition"
+                  className="rounded-lg border border-red-500/40 bg-red-500/5 px-3.5 py-1.5 text-xs font-medium text-red-500 dark:text-red-400 hover:bg-red-500/10 transition"
                 >
                   Delete Project
                 </button>
@@ -317,7 +317,7 @@ function ProjectDetails({
           {deleteError && (
             <div
               role="alert"
-              className="mt-4 rounded-lg border border-red-500/30 bg-red-500/10 p-4 text-red-500 dark:text-red-400"
+              className="mt-4 rounded-xl border border-red-500/30 bg-red-500/10 p-3.5 text-xs font-medium text-red-500 dark:text-red-400"
             >
               {deleteError}
             </div>
@@ -375,13 +375,13 @@ function ProjectDetails({
         {/* Tasks heading and Create Task button */}
         <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
           <div>
-            <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
               Project Tasks
-            </h3>
+            </h2>
 
             {!loading && !error && (
-              <p className="mt-1 text-sm text-gray-500 dark:text-slate-400">
-                {tasks.length} task{tasks.length !== 1 ? "s" : ""}
+              <p className="mt-0.5 text-xs text-gray-500 dark:text-slate-400">
+                {tasks.length} task{tasks.length !== 1 ? "s" : ""} in development backlog
               </p>
             )}
           </div>
@@ -391,9 +391,10 @@ function ProjectDetails({
             <button
               type="button"
               onClick={() => setShowCreateForm(true)}
-              className="rounded-lg bg-emerald-500 px-4 py-2 font-semibold text-slate-950 hover:bg-emerald-400 transition"
+              className="inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-[#3A0CA3] to-[#4c1d95] hover:from-[#4313b8] hover:to-[#5b21b6] px-3.5 py-2 text-xs font-semibold text-white shadow-md shadow-[#3A0CA3]/25 transition hover:scale-[1.02]"
             >
-              + New Task
+              <span>+</span>
+              <span>New Task</span>
             </button>
           )}
         </div>
@@ -413,7 +414,7 @@ function ProjectDetails({
 
         {/* Loading state */}
         {loading && (
-          <p className="text-gray-500 dark:text-slate-400">
+          <p className="text-sm text-gray-500 dark:text-slate-400">
             Loading tasks...
           </p>
         )}
@@ -422,7 +423,7 @@ function ProjectDetails({
         {error && (
           <div
             role="alert"
-            className="rounded-lg border border-red-500/30 bg-red-500/10 p-4 text-red-500 dark:text-red-400"
+            className="rounded-xl border border-red-500/30 bg-red-500/10 p-3.5 text-xs font-medium text-red-500 dark:text-red-400"
           >
             {error}
           </div>
@@ -432,7 +433,7 @@ function ProjectDetails({
         {statusError && (
           <div
             role="alert"
-            className="mb-4 rounded-lg border border-red-500/30 bg-red-500/10 p-4 text-red-500 dark:text-red-400"
+            className="mb-4 rounded-xl border border-red-500/30 bg-red-500/10 p-3.5 text-xs font-medium text-red-500 dark:text-red-400"
           >
             {statusError}
           </div>
@@ -440,7 +441,7 @@ function ProjectDetails({
 
         {/* Empty task list */}
         {!loading && !error && tasks.length === 0 && (
-          <div className="rounded-xl border border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-8 text-center text-gray-500 dark:text-slate-400 shadow-sm">
+          <div className="rounded-2xl border border-gray-200 dark:border-[#1c1d30] bg-white dark:bg-[#0c0d16] p-8 text-center text-sm text-gray-500 dark:text-slate-400 shadow-sm">
             No tasks found in this project.
           </div>
         )}
@@ -451,19 +452,19 @@ function ProjectDetails({
             {tasks.map((task) => (
               <div
                 key={task.id}
-                className="rounded-xl border border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm"
+                className="group rounded-2xl border border-gray-200 dark:border-[#1c1d30] bg-white dark:bg-[#0c0d16] p-6 shadow-sm transition hover:border-[#3A0CA3]/40"
               >
                 <div className="flex flex-wrap items-start justify-between gap-4">
                   <div>
-                    <h4
+                    <h3
                       onClick={() => setSelectedTask(task)}
-                      className="cursor-pointer text-lg font-semibold text-gray-900 dark:text-white transition hover:text-emerald-600 dark:hover:text-emerald-400"
+                      className="cursor-pointer text-base font-semibold text-gray-900 dark:text-white transition group-hover:text-[#3A0CA3] dark:group-hover:text-[#a78bfa]"
                       title="Click to view full details and discussions"
                     >
                       {task.title}
-                    </h4>
+                    </h3>
 
-                    <p className="mt-2 text-sm text-gray-500 dark:text-slate-400">
+                    <p className="mt-1.5 text-xs leading-relaxed text-gray-500 dark:text-slate-400">
                       {task.description || "No description provided."}
                     </p>
                   </div>
@@ -471,7 +472,7 @@ function ProjectDetails({
                   <div className="flex items-center gap-3">
                     {/* Task status */}
                     <span
-                      className={`rounded-full px-3 py-1 text-xs font-medium ${statusStyles[task.status] ||
+                      className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${statusStyles[task.status] ||
                         statusStyles.TODO
                         }`}
                     >
@@ -486,7 +487,7 @@ function ProjectDetails({
                           onClick={() =>
                             setEditingTaskId(editingTaskId === task.id ? null : task.id)
                           }
-                          className="rounded border border-gray-300 dark:border-slate-700 px-2 py-1 text-xs text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800 transition"
+                          className="rounded-lg border border-gray-200 dark:border-[#272844] bg-white dark:bg-[#131422] px-2.5 py-1 text-xs font-medium text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-[#1c1d30] transition"
                         >
                           {editingTaskId === task.id ? "Close" : "Edit"}
                         </button>
@@ -497,7 +498,7 @@ function ProjectDetails({
                             setDeleteTaskError("");
                             setDeleteTaskTarget(task);
                           }}
-                          className="rounded border border-red-500/40 px-2 py-1 text-xs text-red-500 dark:text-red-400 hover:bg-red-500/10 transition"
+                          className="rounded-lg border border-red-500/40 bg-red-500/5 px-2.5 py-1 text-xs font-medium text-red-500 dark:text-red-400 hover:bg-red-500/10 transition"
                         >
                           Delete
                         </button>
@@ -507,7 +508,7 @@ function ProjectDetails({
                 </div>
 
                 {/* Task details */}
-                <div className="mt-5 flex flex-wrap items-center gap-4 border-t border-gray-200 dark:border-slate-800 pt-4 text-sm">
+                <div className="mt-4 flex flex-wrap items-center gap-3 border-t border-gray-100 dark:border-[#1c1d30] pt-3 text-xs text-gray-500 dark:text-slate-400">
                   {/* Priority */}
                   <span
                     className={
@@ -520,28 +521,28 @@ function ProjectDetails({
 
                   {/* Security-sensitive indicator */}
                   {task.is_security_sensitive && (
-                    <span className="rounded-md bg-red-500/10 px-3 py-1 text-xs font-medium text-red-500 dark:text-red-400">
+                    <span className="rounded-md bg-red-500/10 px-2 py-0.5 text-[11px] font-semibold text-red-500 dark:text-red-400">
                       Security Sensitive
                     </span>
                   )}
 
                   {/* Security risk level */}
                   {task.risk_level && (
-                    <span className="text-gray-500 dark:text-slate-400">
+                    <span>
                       Risk: {task.risk_level}
                     </span>
                   )}
 
                   {/* Assigned user — show name from memberMap, or "Unassigned" */}
-                  <span className="text-gray-500 dark:text-slate-400">
+                  <span>
                     {task.assigned_to
                       ? `Assigned: ${memberMap[task.assigned_to] || `User #${task.assigned_to}`}`
                       : "Unassigned"}
                   </span>
 
                   {/* Task ID */}
-                  <span className="ml-auto text-xs text-gray-400 dark:text-slate-500">
-                    Task #{task.id}
+                  <span className="ml-auto font-mono text-gray-400 dark:text-slate-500">
+                    #{task.id}
                   </span>
                 </div>
 
@@ -621,7 +622,7 @@ function ProjectDetails({
                           onChange={(e) => {
                             if (e.target.value) handleAssign(task.id, e.target.value);
                           }}
-                          className="rounded-lg border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-1.5 text-sm text-gray-900 dark:text-white"
+                          className="rounded-lg border border-gray-300 dark:border-[#272844] bg-white dark:bg-[#131422] px-3 py-1.5 text-sm text-gray-900 dark:text-white"
                         >
                           <option value="" disabled>
                             {members.length === 0 ? "No members yet" : "Select a member…"}
@@ -650,7 +651,7 @@ function ProjectDetails({
                       <button
                         type="button"
                         onClick={() => { setAssigningTaskId(task.id); setAssignError(""); }}
-                        className="text-xs text-emerald-600 dark:text-emerald-400 hover:text-emerald-500 dark:hover:text-emerald-300 transition"
+                        className="text-xs text-[#3A0CA3] dark:text-[#a78bfa] hover:text-[#4812c5] dark:hover:text-[#c4b5fd] transition"
                       >
                         {task.assigned_to ? "Reassign →" : "Assign →"}
                       </button>
@@ -663,7 +664,7 @@ function ProjectDetails({
                   <button
                     type="button"
                     onClick={() => setSelectedTask(task)}
-                    className="text-xs font-medium text-emerald-600 dark:text-emerald-400 transition hover:text-emerald-500 dark:hover:text-emerald-300"
+                    className="text-xs font-medium text-[#3A0CA3] dark:text-[#a78bfa] transition hover:text-[#4812c5] dark:hover:text-[#c4b5fd]"
                   >
                     View Details & Discussions →
                   </button>

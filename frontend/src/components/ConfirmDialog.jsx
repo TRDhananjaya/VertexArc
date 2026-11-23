@@ -3,12 +3,12 @@ function ConfirmDialog({ title, message, confirmLabel, onConfirm, onCancel, load
   const confirmStyles = {
     danger:  "bg-red-500 hover:bg-red-400 text-white",
     warning: "bg-amber-500 hover:bg-amber-400 text-slate-950",
-    primary: "bg-emerald-500 hover:bg-emerald-400 text-slate-950",
+    primary: "bg-gradient-to-r from-[#3A0CA3] to-[#4c1d95] hover:from-[#4313b8] hover:to-[#5b21b6] text-white shadow-md shadow-[#3A0CA3]/25",
   };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 dark:bg-black/60 px-4">
-      <div className="w-full max-w-md rounded-2xl border border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-2xl">
+      <div className="w-full max-w-md rounded-2xl border border-gray-200 dark:border-[#1c1d30] bg-white dark:bg-[#0c0d16] p-6 shadow-2xl">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
           {title}
         </h3>
@@ -28,7 +28,7 @@ function ConfirmDialog({ title, message, confirmLabel, onConfirm, onCancel, load
             type="button"
             onClick={onCancel}
             disabled={loading}
-            className="rounded-lg border border-gray-300 dark:border-slate-700 px-4 py-2 text-sm text-gray-600 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800 disabled:opacity-60 transition"
+            className="rounded-lg border border-gray-300 dark:border-[#272844] px-4 py-2 text-sm text-gray-600 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-[#131422] disabled:opacity-60 transition"
           >
             Cancel
           </button>

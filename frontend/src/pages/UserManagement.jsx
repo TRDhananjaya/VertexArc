@@ -50,7 +50,7 @@ function UserManagement({ token, user, onLogout, onBack, onGoDashboard, onOpenAu
     }, [token, refreshKey]);
 
     return (
-        <div className="min-h-screen bg-gray-50 dark:bg-slate-950 text-gray-900 dark:text-white">
+        <div className="min-h-screen bg-transparent text-gray-900 dark:text-white">
             <Navbar
                 user={user}
                 onLogout={onLogout}
@@ -65,19 +65,19 @@ function UserManagement({ token, user, onLogout, onBack, onGoDashboard, onOpenAu
                 <button
                     type="button"
                     onClick={onBack}
-                    className="mb-6 text-sm text-emerald-400 hover:text-emerald-300"
+                    className="mb-6 text-sm text-[#3A0CA3] dark:text-[#a78bfa] hover:text-[#4812c5] dark:hover:text-[#c4b5fd] font-medium"
                 >
                     ← Back to Dashboard
                 </button>
 
-                <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
+                <div className="mb-8 flex flex-wrap items-center justify-between gap-4 border-b border-gray-200/80 dark:border-[#1c1d30] pb-6">
                     <div>
-                        <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
+                        <h1 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
                             User Management
-                        </h2>
+                        </h1>
 
-                        <p className="mt-2 text-gray-500 dark:text-slate-400">
-                            Manage VertexArc team accounts.
+                        <p className="mt-1 text-sm text-gray-500 dark:text-slate-400">
+                            Manage VertexArc team accounts, access roles, and status
                         </p>
                     </div>
 
@@ -85,9 +85,10 @@ function UserManagement({ token, user, onLogout, onBack, onGoDashboard, onOpenAu
                         <button
                             type="button"
                             onClick={() => setShowCreateForm(true)}
-                            className="rounded-lg bg-emerald-500 px-4 py-2 font-semibold text-slate-950 hover:bg-emerald-400"
+                            className="inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-[#3A0CA3] to-[#4c1d95] hover:from-[#4313b8] hover:to-[#5b21b6] px-3.5 py-2 text-xs font-semibold text-white shadow-md shadow-[#3A0CA3]/25 transition hover:scale-[1.02]"
                         >
-                            + Create User
+                            <span>+</span>
+                            <span>Create User</span>
                         </button>
                     )}
                 </div>
@@ -104,19 +105,19 @@ function UserManagement({ token, user, onLogout, onBack, onGoDashboard, onOpenAu
                 )}
 
                 <div className="mb-5 flex items-center justify-between">
-                    <h3 className="text-xl font-semibold">
+                    <h2 className="text-base font-semibold text-gray-900 dark:text-white">
                         Team Members
-                    </h3>
+                    </h2>
 
                     {!loading && !error && (
-                        <span className="text-sm text-gray-500 dark:text-slate-400">
+                        <span className="text-xs text-gray-500 dark:text-slate-400">
                             {users.length} user{users.length !== 1 ? "s" : ""}
                         </span>
                     )}
                 </div>
 
                 {loading && (
-                    <p className="text-gray-500 dark:text-slate-400">
+                    <p className="text-xs text-gray-500 dark:text-slate-400">
                         Loading users...
                     </p>
                 )}
@@ -124,7 +125,7 @@ function UserManagement({ token, user, onLogout, onBack, onGoDashboard, onOpenAu
                 {error && (
                     <div
                         role="alert"
-                        className="rounded-lg border border-red-500/30 bg-red-500/10 p-4 text-red-400"
+                        className="rounded-xl border border-red-500/30 bg-red-500/10 p-3.5 text-xs font-medium text-red-500 dark:text-red-400"
                     >
                         {error}
 
@@ -141,41 +142,46 @@ function UserManagement({ token, user, onLogout, onBack, onGoDashboard, onOpenAu
                 )}
 
                 {!loading && !error && users.length === 0 && (
-                    <div className="rounded-xl border border-gray-200 dark:border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-8 text-center text-gray-500 dark:text-slate-400">
+                    <div className="rounded-2xl border border-gray-200 dark:border-[#1c1d30] bg-white dark:bg-[#0c0d16] p-8 text-center text-xs text-gray-500 dark:text-slate-400">
                         No users found.
                     </div>
                 )}
 
                 {!loading && !error && users.length > 0 && (
-                    <div className="space-y-4">
+                    <div className="space-y-3">
                         {users.map((account) => (
                             <div
                                 key={account.id}
-                                className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-gray-200 dark:border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5"
+                                className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-gray-200 dark:border-[#1c1d30] bg-white dark:bg-[#0c0d16] p-4 shadow-sm"
                             >
-                                <div>
-                                    <h4 className="font-semibold">
-                                        {account.name}
-                                    </h4>
+                                <div className="flex items-center gap-3">
+                                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-100 dark:bg-indigo-900/50 text-xs font-bold text-indigo-700 dark:text-indigo-300">
+                                        {account.name?.charAt(0)?.toUpperCase() || "U"}
+                                    </div>
+                                    <div>
+                                        <h3 className="text-xs font-semibold text-gray-900 dark:text-white">
+                                            {account.name}
+                                        </h3>
 
-                                    <p className="mt-1 text-sm text-gray-500 dark:text-slate-400">
-                                        {account.email}
-                                    </p>
+                                        <p className="text-[11px] text-gray-500 dark:text-slate-400">
+                                            {account.email}
+                                        </p>
 
-                                    <p className="mt-1 text-xs text-gray-500 dark:text-slate-500">
-                                        User #{account.id}
-                                    </p>
+                                        <p className="font-mono text-[10px] text-gray-400 dark:text-slate-500">
+                                            User #{account.id}
+                                        </p>
+                                    </div>
                                 </div>
 
-                                <div className="flex flex-wrap items-center gap-3">
-                                    <span className="rounded-md bg-blue-500/10 px-3 py-1 text-xs font-medium text-blue-400">
+                                <div className="flex flex-wrap items-center gap-2">
+                                    <span className="rounded-full border border-gray-200 dark:border-[#272844] bg-white dark:bg-[#131422] px-2.5 py-0.5 text-[11px] font-semibold text-gray-700 dark:text-slate-300">
                                         {account.role?.replaceAll("_", " ")}
                                     </span>
 
                                     <span
-                                        className={`rounded-md px-3 py-1 text-xs font-medium ${account.is_active
-                                                ? "bg-emerald-500/10 text-emerald-400"
-                                                : "bg-red-500/10 text-red-400"
+                                        className={`rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${account.is_active
+                                                ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30"
+                                                : "bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/30"
                                             }`}
                                     >
                                         {account.is_active ? "Active" : "Inactive"}

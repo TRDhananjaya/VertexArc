@@ -91,8 +91,8 @@ function SecurityReviewPanel({
   }
 
   return (
-    <section className="mt-8 rounded-2xl border border-red-300 dark:border-red-500/30 bg-white dark:bg-slate-900/90 p-6 shadow-xl">
-      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-gray-200 dark:border-slate-800 pb-4">
+    <section className="mt-8 rounded-2xl border border-red-300 dark:border-red-500/30 bg-white dark:bg-[#0c0d16]/90 p-6 shadow-xl">
+      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-gray-200 dark:border-[#1c1d30] pb-4">
         <div>
           <div className="flex items-center gap-2">
             <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-red-500/10 text-red-500">
@@ -127,21 +127,21 @@ function SecurityReviewPanel({
         <form onSubmit={handleSaveReview} className="mt-5 space-y-4">
           {/* Status Context Banner */}
           {taskStatus !== "IN_REVIEW" && (
-            <div className="flex items-center gap-2 rounded-lg border border-gray-200 dark:border-slate-800 bg-gray-50 dark:bg-slate-950 p-3 text-xs text-gray-500 dark:text-slate-400">
+            <div className="flex items-center gap-2 rounded-lg border border-gray-200 dark:border-[#1c1d30] bg-gray-50 dark:bg-[#050505] p-3 text-xs text-gray-500 dark:text-slate-400">
               <AlertCircleIcon className="w-4 h-4 shrink-0 text-amber-500" />
               <span>Status is currently <strong className="text-gray-900 dark:text-white">{taskStatus}</strong>. Security checklist updates are only permitted while the task is <strong className="text-amber-600 dark:text-amber-400">IN_REVIEW</strong>.</span>
             </div>
           )}
 
           {!isReviewer && (
-            <div className="flex items-center gap-2 rounded-lg border border-gray-200 dark:border-slate-800 bg-gray-50 dark:bg-slate-950 p-3 text-xs text-gray-500 dark:text-slate-400">
+            <div className="flex items-center gap-2 rounded-lg border border-gray-200 dark:border-[#1c1d30] bg-gray-50 dark:bg-[#050505] p-3 text-xs text-gray-500 dark:text-slate-400">
               <LockIcon className="w-4 h-4 shrink-0 text-slate-400" />
               <span>Read-only view. Only designated project reviewers (Admin or Project Manager) can check off security requirements.</span>
             </div>
           )}
 
           {/* Checklist Items */}
-          <div className="space-y-3 rounded-xl border border-gray-200 dark:border-slate-800 bg-gray-50 dark:bg-slate-950 p-4">
+          <div className="space-y-3 rounded-xl border border-gray-200 dark:border-[#1c1d30] bg-gray-50 dark:bg-[#050505] p-4">
             {/* Check 1 */}
             <label className={`flex items-start gap-3 text-sm ${canEdit ? "cursor-pointer" : "cursor-not-allowed opacity-80"}`}>
               <input
