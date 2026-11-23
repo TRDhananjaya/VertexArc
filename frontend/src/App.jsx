@@ -3,12 +3,14 @@ import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import ProjectDetails from "./pages/ProjectDetails";
 import UserManagement from "./pages/UserManagement";
+import AdminAuditLogs from "./pages/AdminAuditLogs";
 
 function App() {
   const [token, setToken] = useState(null);
   const [user, setUser] = useState(null);
   const [selectedProject, setSelectedProject] = useState(null);
   const [showUserManagement, setShowUserManagement] = useState(false);
+  const [showAuditLogs, setShowAuditLogs] = useState(false);
 
   function handleLogin(data) {
     if (!data.token || typeof data.token !== "string") {
@@ -19,6 +21,7 @@ function App() {
     setUser(data.user || null);
     setSelectedProject(null);
     setShowUserManagement(false);
+    setShowAuditLogs(false);
   }
 
   function handleLogout() {
@@ -26,6 +29,7 @@ function App() {
     setUser(null);
     setSelectedProject(null);
     setShowUserManagement(false);
+    setShowAuditLogs(false);
   }
 
   // 1. Show login page if user is not authenticated
@@ -39,6 +43,16 @@ function App() {
       <UserManagement
         token={token}
         onBack={() => setShowUserManagement(false)}
+      />
+    );
+  }
+
+  // 3. Show System Audit Logs for Admin only
+  if (showAuditLogs && user?.role === "ADMIN") {
+    return (
+      <AdminAuditLogs
+        token={token}
+        onBack={() => setShowAuditLogs(false)}
       />
     );
   }
@@ -64,10 +78,17 @@ function App() {
       onSelectProject={(project) => {
         setSelectedProject(project);
         setShowUserManagement(false);
+        setShowAuditLogs(false);
       }}
       onOpenUserManagement={() => {
         setSelectedProject(null);
         setShowUserManagement(true);
+        setShowAuditLogs(false);
+      }}
+      onOpenAuditLogs={() => {
+        setSelectedProject(null);
+        setShowUserManagement(false);
+        setShowAuditLogs(true);
       }}
     />
   );

@@ -7,7 +7,8 @@ function Dashboard({
     user,
     onLogout,
     onSelectProject,
-    onOpenUserManagement
+    onOpenUserManagement,
+    onOpenAuditLogs
 }) {
     const [projects, setProjects] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -72,13 +73,22 @@ function Dashboard({
                     <div className="flex items-center gap-3">
 
                         {user?.role === "ADMIN" && (
-                            <button
-                                type="button"
-                                onClick={onOpenUserManagement}
-                                className="rounded-lg border border-emerald-500/50 px-4 py-2 text-sm text-emerald-400 hover:bg-emerald-500/10"
-                            >
-                                User Management
-                            </button>
+                            <>
+                                <button
+                                    type="button"
+                                    onClick={onOpenAuditLogs}
+                                    className="rounded-lg border border-purple-500/50 px-4 py-2 text-sm text-purple-400 hover:bg-purple-500/10"
+                                >
+                                    Audit Logs
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={onOpenUserManagement}
+                                    className="rounded-lg border border-emerald-500/50 px-4 py-2 text-sm text-emerald-400 hover:bg-emerald-500/10"
+                                >
+                                    User Management
+                                </button>
+                            </>
                         )}
 
                         <button

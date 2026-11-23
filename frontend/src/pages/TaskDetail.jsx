@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { getTaskComments, addTaskComment, updateTaskStatus, assignTask } from "../api";
+import SecurityReviewPanel from "../components/SecurityReviewPanel";
+import TaskAuditHistory from "../components/TaskAuditHistory";
 
 function TaskDetail({
   task: initialTask,
@@ -320,6 +322,21 @@ function TaskDetail({
           )}
         </div>
 
+        {/* Security Review Gate Panel (Only for security-sensitive tasks) */}
+        {task.is_security_sensitive && (
+          <SecurityReviewPanel
+            projectId={project.id}
+            taskId={task.id}
+            token={token}
+            taskStatus={task.status}
+            isReviewer={isReviewer}
+            memberMap={memberMap}
+            onReviewUpdated={() => {
+              setStatusError("");
+            }}
+          />
+        )}
+
         {/* Discussions / Comments Section */}
         <section className="mt-10 rounded-2xl border border-slate-800 bg-slate-900 p-8 shadow-xl">
           <div className="flex items-center justify-between border-b border-slate-800 pb-4">
@@ -415,6 +432,13 @@ function TaskDetail({
             )}
           </div>
         </section>
+
+        {/* Task Audit History */}
+        <TaskAuditHistory
+          projectId={project.id}
+          taskId={task.id}
+          token={token}
+        />
       </main>
     </div>
   );

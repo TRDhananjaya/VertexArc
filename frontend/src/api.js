@@ -381,3 +381,106 @@ export async function addTaskComment(projectId, taskId, token, content) {
 
   return data;
 }
+
+// Retrieve security review checklist for a task
+export async function getSecurityReview(projectId, taskId, token) {
+  const response = await fetch(
+    `${API_BASE_URL}/api/projects/${projectId}/tasks/${taskId}/security-review`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    }
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Failed to load security review");
+  }
+
+  return data;
+}
+
+// Update security review checklist (Admin / project owner only)
+export async function updateSecurityReview(projectId, taskId, token, checks) {
+  const response = await fetch(
+    `${API_BASE_URL}/api/projects/${projectId}/tasks/${taskId}/security-review`,
+    {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify(checks)
+    }
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Failed to update security review");
+  }
+
+  return data;
+}
+
+// Retrieve task-level audit history
+export async function getTaskAuditLogs(projectId, taskId, token) {
+  const response = await fetch(
+    `${API_BASE_URL}/api/projects/${projectId}/tasks/${taskId}/audit-logs`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    }
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Failed to load task audit logs");
+  }
+
+  return data;
+}
+
+// Retrieve administrative project audit logs (Admin only)
+export async function getAdminProjectAuditLogs(token) {
+  const response = await fetch(
+    `${API_BASE_URL}/api/admin/audit-logs/projects`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    }
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Failed to load project audit logs");
+  }
+
+  return data;
+}
+
+// Retrieve administrative task audit logs (Admin only)
+export async function getAdminTaskAuditLogs(token) {
+  const response = await fetch(
+    `${API_BASE_URL}/api/admin/audit-logs/tasks`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    }
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Failed to load task audit logs");
+  }
+
+  return data;
+}
