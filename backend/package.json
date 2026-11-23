@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start": "node server.js",
     "test": "cross-env NODE_ENV=test node --env-file=.env.test ./node_modules/jest/bin/jest.js --runInBand",
     "test:watch": "jest --watch --runInBand",
     "seed": "node seed.js"

@@ -13,9 +13,10 @@ const userRoutes = require("./routes/userRoutes");
 
 const app = express();
 
-// Allow the local React frontend to call our backend API
+// Allow the frontend to call our backend API (configurable via CORS_ORIGIN)
+const allowedOrigin = process.env.CORS_ORIGIN || "http://localhost:5173";
 app.use(cors({
-    origin: "http://localhost:5173"
+    origin: allowedOrigin
 }));
 
 // Apply security headers to all API responses

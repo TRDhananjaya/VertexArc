@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { loginUser } from "../api";
 
-function Login({ onLogin }) {
+function Login({ onLogin, sessionMessage }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -45,6 +45,15 @@ function Login({ onLogin }) {
         <h2 className="mb-6 text-xl font-semibold text-white">
           Sign in to your account
         </h2>
+
+        {sessionMessage && (
+          <div
+            role="status"
+            className="mb-5 rounded-lg border border-amber-500/40 bg-amber-500/10 p-3.5 text-xs font-medium text-amber-300"
+          >
+            ⚠️ {sessionMessage}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>

@@ -6,8 +6,18 @@ import EditTaskForm from "../components/EditTaskForm";
 import ConfirmDialog from "../components/ConfirmDialog";
 import ProjectMembers from "../components/ProjectMembers";
 import TaskDetail from "./TaskDetail";
+import Navbar from "../components/Navbar";
 
-function ProjectDetails({ project: initialProject, token, user, onBack }) {
+function ProjectDetails({
+  project: initialProject,
+  token,
+  user,
+  onBack,
+  onLogout,
+  onGoDashboard,
+  onOpenUserManagement,
+  onOpenAuditLogs
+}) {
   const [project, setProject] = useState(initialProject);
   const [selectedTask, setSelectedTask] = useState(null);
   const [tasks, setTasks] = useState([]);
@@ -227,6 +237,10 @@ function ProjectDetails({ project: initialProject, token, user, onBack }) {
         user={user}
         members={members}
         memberMap={memberMap}
+        onLogout={onLogout}
+        onGoDashboard={onGoDashboard}
+        onOpenUserManagement={onOpenUserManagement}
+        onOpenAuditLogs={onOpenAuditLogs}
         onBack={() => setSelectedTask(null)}
         onTaskUpdated={(updatedTask) => {
           setSelectedTask(updatedTask);
@@ -238,14 +252,15 @@ function ProjectDetails({ project: initialProject, token, user, onBack }) {
 
   return (
     <div className="min-h-screen bg-slate-950 text-white">
-      {/* Header */}
-      <header className="border-b border-slate-800 bg-slate-900">
-        <div className="mx-auto max-w-6xl px-6 py-5">
-          <h1 className="text-2xl font-bold text-emerald-400">
-            VertexArc
-          </h1>
-        </div>
-      </header>
+      {/* Unified Navbar */}
+      <Navbar
+        user={user}
+        onLogout={onLogout}
+        onGoDashboard={onGoDashboard}
+        onOpenUserManagement={onOpenUserManagement}
+        onOpenAuditLogs={onOpenAuditLogs}
+        subtitle={`Project: ${project.name}`}
+      />
 
       <main className="mx-auto max-w-6xl px-6 py-10">
         {/* Back button */}
@@ -559,16 +574,27 @@ function ProjectDetails({ project: initialProject, token, user, onBack }) {
                   )}
 
                   {/* Reviewer actions: Admin or project owner sees these */}
-                  {/* IN_REVIEW → DONE: "Approve" */}
+                  {/* IN_REVIEW → DONE: "Approve" (for security-sensitive tasks, directs to Security Review checklist) */}
                   {isReviewer &&
                     task.status === "IN_REVIEW" && (
                     <button
                       type="button"
                       disabled={statusLoading === task.id}
-                      onClick={() => handleStatusChange(task.id, "DONE")}
+                      onClick={() => {
+                        if (task.is_security_sensitive) {
+                          setSelectedTask(task);
+                        } else {
+                          handleStatusChange(task.id, "DONE");
+                        }
+                      }}
                       className="rounded-lg bg-emerald-500 px-3 py-1.5 text-xs font-semibold text-slate-950 hover:bg-emerald-400 disabled:opacity-60"
+                      title={task.is_security_sensitive ? "Open security checklist to review & approve" : "Approve task"}
                     >
-                      {statusLoading === task.id ? "Updating..." : "Approve"}
+                      {statusLoading === task.id
+                        ? "Updating..."
+                        : task.is_security_sensitive
+                        ? "Security Review & Approve"
+                        : "Approve"}
                     </button>
                   )}
 

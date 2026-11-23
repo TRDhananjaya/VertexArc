@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { getUsers } from "../api";
 import CreateUserForm from "../components/CreateUserForm";
+import Navbar from "../components/Navbar";
 
-function UserManagement({ token, onBack }) {
+function UserManagement({ token, user, onLogout, onBack, onGoDashboard, onOpenAuditLogs }) {
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
@@ -50,13 +51,13 @@ function UserManagement({ token, onBack }) {
 
     return (
         <div className="min-h-screen bg-slate-950 text-white">
-            <header className="border-b border-slate-800 bg-slate-900">
-                <div className="mx-auto max-w-6xl px-6 py-5">
-                    <h1 className="text-2xl font-bold text-emerald-400">
-                        VertexArc
-                    </h1>
-                </div>
-            </header>
+            <Navbar
+                user={user}
+                onLogout={onLogout}
+                onGoDashboard={onGoDashboard}
+                onOpenAuditLogs={onOpenAuditLogs}
+                subtitle="Administration / User Management"
+            />
 
             <main className="mx-auto max-w-6xl px-6 py-10">
                 <button

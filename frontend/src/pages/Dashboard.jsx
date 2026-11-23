@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { getProjects } from "../api";
 import CreateProjectForm from "../components/CreateProjectForm";
+import Navbar from "../components/Navbar";
 
 function Dashboard({
     token,
@@ -63,45 +64,12 @@ function Dashboard({
     return (
         <div className="min-h-screen bg-slate-950 text-white">
 
-            <header className="border-b border-slate-800 bg-slate-900">
-                <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
-
-                    <h1 className="text-2xl font-bold text-emerald-400">
-                        VertexArc
-                    </h1>
-
-                    <div className="flex items-center gap-3">
-
-                        {user?.role === "ADMIN" && (
-                            <>
-                                <button
-                                    type="button"
-                                    onClick={onOpenAuditLogs}
-                                    className="rounded-lg border border-purple-500/50 px-4 py-2 text-sm text-purple-400 hover:bg-purple-500/10"
-                                >
-                                    Audit Logs
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={onOpenUserManagement}
-                                    className="rounded-lg border border-emerald-500/50 px-4 py-2 text-sm text-emerald-400 hover:bg-emerald-500/10"
-                                >
-                                    User Management
-                                </button>
-                            </>
-                        )}
-
-                        <button
-                            type="button"
-                            onClick={onLogout}
-                            className="rounded-lg border border-slate-700 px-4 py-2 text-sm hover:bg-slate-800"
-                        >
-                            Log out
-                        </button>
-
-                    </div>
-                </div>
-            </header>
+            <Navbar
+                user={user}
+                onLogout={onLogout}
+                onOpenUserManagement={onOpenUserManagement}
+                onOpenAuditLogs={onOpenAuditLogs}
+            />
 
             <main className="mx-auto max-w-6xl px-6 py-10">
 

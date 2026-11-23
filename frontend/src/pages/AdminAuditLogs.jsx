@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { getAdminProjectAuditLogs, getAdminTaskAuditLogs } from "../api";
+import Navbar from "../components/Navbar";
 
-function AdminAuditLogs({ token, onBack }) {
+function AdminAuditLogs({ token, user, onLogout, onBack, onGoDashboard, onOpenUserManagement }) {
   const [activeTab, setActiveTab] = useState("projects"); // "projects" | "tasks"
   const [projectLogs, setProjectLogs] = useState([]);
   const [taskLogs, setTaskLogs] = useState([]);
@@ -78,14 +79,13 @@ function AdminAuditLogs({ token, onBack }) {
   return (
     <div className="min-h-screen bg-slate-950 text-white">
       {/* Header */}
-      <header className="border-b border-slate-800 bg-slate-900">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
-          <h1 className="text-2xl font-bold text-emerald-400">VertexArc</h1>
-          <span className="rounded bg-purple-500/15 px-3 py-1 text-xs font-semibold text-purple-400">
-            Admin Audit Mode
-          </span>
-        </div>
-      </header>
+      <Navbar
+        user={user}
+        onLogout={onLogout}
+        onGoDashboard={onGoDashboard}
+        onOpenUserManagement={onOpenUserManagement}
+        subtitle="Administration / System Audit Trail"
+      />
 
       <main className="mx-auto max-w-6xl px-6 py-10">
         {/* Back button */}

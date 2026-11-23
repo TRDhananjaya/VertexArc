@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { getTaskComments, addTaskComment, updateTaskStatus, assignTask } from "../api";
 import SecurityReviewPanel from "../components/SecurityReviewPanel";
 import TaskAuditHistory from "../components/TaskAuditHistory";
+import Navbar from "../components/Navbar";
 
 function TaskDetail({
   task: initialTask,
@@ -11,7 +12,11 @@ function TaskDetail({
   members = [],
   memberMap = {},
   onBack,
-  onTaskUpdated
+  onTaskUpdated,
+  onLogout,
+  onGoDashboard,
+  onOpenUserManagement,
+  onOpenAuditLogs
 }) {
   const [task, setTask] = useState(initialTask);
   const [comments, setComments] = useState([]);
@@ -146,14 +151,14 @@ function TaskDetail({
   return (
     <div className="min-h-screen bg-slate-950 text-white">
       {/* Top Header */}
-      <header className="border-b border-slate-800 bg-slate-900">
-        <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-5">
-          <h1 className="text-2xl font-bold text-emerald-400">VertexArc</h1>
-          <span className="text-sm text-slate-400">
-            Project: <span className="font-medium text-white">{project.name}</span>
-          </span>
-        </div>
-      </header>
+      <Navbar
+        user={user}
+        onLogout={onLogout}
+        onGoDashboard={onGoDashboard}
+        onOpenUserManagement={onOpenUserManagement}
+        onOpenAuditLogs={onOpenAuditLogs}
+        subtitle={`Project: ${project.name} | Task #${task.id}`}
+      />
 
       <main className="mx-auto max-w-5xl px-6 py-8">
         {/* Navigation */}

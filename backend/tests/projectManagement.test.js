@@ -9,7 +9,8 @@ jest.mock("../models/userModel", () => ({
 jest.mock("../models/projectModel", () => ({
     findProjectById: jest.fn(),
     updateProjectDetails: jest.fn(),
-    softDeleteProject: jest.fn()
+    softDeleteProject: jest.fn(),
+    getEligibleUsersForProject: jest.fn()
 }));
 
 const userModel = require("../models/userModel");
@@ -148,4 +149,51 @@ test("Deleting a missing project returns 404", async () => {
         .set("Authorization", `Bearer ${createToken(1)}`);
 
     expect(response.status).toBe(404);
+});
+
+// A project creator can retrieve eligible users to add as members
+test("Project creator can view eligible users to add as members", async () => {
+    userModel.findUserById.mockResolvedValue({
+        id: 2,
+        role: "PROJECT_MANAGER",
+        is_active: true
+    });
+
+    projectModel.findProjectById.mockResolvedValue({
+        id: 1,
+        created_by: 2
+    });
+
+    projectModel.getEligibleUsersForProject.mockResolvedValue([
+        { id: 4, full_name: "Dev One", email: "dev1@vertexarc.com", role: "DEVELOPER" }
+    ]);
+
+    const response = await request(app)
+        .get("/api/projects/1/eligible-users")
+        .set("Authorization", `Bearer ${createToken(2)}`);
+
+    expect(response.status).toBe(200);
+    expect(response.body.users).toHaveLength(1);
+    expect(projectModel.getEligibleUsersForProject).toHaveBeenCalledWith("1");
+});
+
+// A project manager cannot retrieve eligible users for another creator's project
+test("Non-creator PM cannot view eligible users", async () => {
+    userModel.findUserById.mockResolvedValue({
+        id: 3,
+        role: "PROJECT_MANAGER",
+        is_active: true
+    });
+
+    projectModel.findProjectById.mockResolvedValue({
+        id: 1,
+        created_by: 2
+    });
+
+    const response = await request(app)
+        .get("/api/projects/1/eligible-users")
+        .set("Authorization", `Bearer ${createToken(3)}`);
+
+    expect(response.status).toBe(403);
+    expect(projectModel.getEligibleUsersForProject).not.toHaveBeenCalled();
 });

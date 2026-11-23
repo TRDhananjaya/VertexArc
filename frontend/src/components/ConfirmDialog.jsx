@@ -1,4 +1,11 @@
-function ConfirmDialog({ title, message, confirmLabel, onConfirm, onCancel, loading, error }) {
+// variant: "danger" (default, red) | "warning" (amber) | "primary" (emerald)
+function ConfirmDialog({ title, message, confirmLabel, onConfirm, onCancel, loading, error, variant = "danger" }) {
+  const confirmStyles = {
+    danger:  "bg-red-500 hover:bg-red-400 text-white",
+    warning: "bg-amber-500 hover:bg-amber-400 text-slate-950",
+    primary: "bg-emerald-500 hover:bg-emerald-400 text-slate-950",
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
       <div className="w-full max-w-md rounded-2xl border border-slate-700 bg-slate-900 p-6 shadow-2xl">
@@ -30,9 +37,9 @@ function ConfirmDialog({ title, message, confirmLabel, onConfirm, onCancel, load
             type="button"
             onClick={onConfirm}
             disabled={loading}
-            className="rounded-lg bg-red-500 px-4 py-2 text-sm font-semibold text-white hover:bg-red-400 disabled:opacity-60"
+            className={`rounded-lg px-4 py-2 text-sm font-semibold disabled:opacity-60 ${confirmStyles[variant] || confirmStyles.danger}`}
           >
-            {loading ? "Deleting..." : confirmLabel || "Delete"}
+            {loading ? "Please wait..." : confirmLabel || "Confirm"}
           </button>
         </div>
       </div>

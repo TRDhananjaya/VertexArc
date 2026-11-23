@@ -1,6 +1,24 @@
 const API_BASE_URL =
   import.meta.env.VITE_API_URL || "http://localhost:5000";
 
+let onSessionExpired = null;
+
+// Register a global callback when any authenticated API request receives HTTP 401
+export function setSessionExpiredHandler(handler) {
+  onSessionExpired = handler;
+}
+
+// Wrapper around fetch that catches 401 Unauthorized responses
+async function authFetch(url, options = {}) {
+  const response = await fetch(url, options);
+
+  if (response.status === 401 && typeof onSessionExpired === "function") {
+    onSessionExpired();
+  }
+
+  return response;
+}
+
 // Send login credentials to our Express backend
 export async function loginUser(email, password) {
   const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
@@ -22,7 +40,7 @@ export async function loginUser(email, password) {
 
 // Retrieve projects that the authenticated user can access
 export async function getProjects(token) {
-  const response = await fetch(
+  const response = await authFetch(
     `${API_BASE_URL}/api/projects`,
     {
       headers: {
@@ -44,7 +62,7 @@ export async function getProjects(token) {
 
 // List tasks within a project (only for members)
 export async function getProjectTasks(projectId, token) {
-  const response = await fetch(
+  const response = await authFetch(
     `${API_BASE_URL}/api/projects/${projectId}/tasks`,
     {
       headers: {
@@ -66,7 +84,7 @@ export async function getProjectTasks(projectId, token) {
 
 // Create a new project (Admin and Project Manager)
 export async function createProject(token, name, description) {
-  const response = await fetch(`${API_BASE_URL}/api/projects`, {
+  const response = await authFetch(`${API_BASE_URL}/api/projects`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -89,7 +107,7 @@ export async function createProject(token, name, description) {
 
 // Create a new task within a project (only for members)
 export async function createTask(projectId, token, taskData) {
-  const response = await fetch(
+  const response = await authFetch(
     `${API_BASE_URL}/api/projects/${projectId}/tasks`,
     {
       method: "POST",
@@ -113,7 +131,7 @@ export async function createTask(projectId, token, taskData) {
 }
 
 export async function getUsers(token) {
-  const response = await fetch(`${API_BASE_URL}/api/users`, {
+  const response = await authFetch(`${API_BASE_URL}/api/users`, {
     headers: {
       Authorization: `Bearer ${token}`
     }
@@ -135,7 +153,7 @@ export async function getUsers(token) {
 }
 
 export async function createUser(token, userData) {
-  const response = await fetch(`${API_BASE_URL}/api/users`, {
+  const response = await authFetch(`${API_BASE_URL}/api/users`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -156,7 +174,7 @@ export async function createUser(token, userData) {
 }
 
 export async function getProjectMembers(projectId, token) {
-  const response = await fetch(
+  const response = await authFetch(
     `${API_BASE_URL}/api/projects/${projectId}/members`,
     {
       headers: {
@@ -182,7 +200,7 @@ export async function getProjectMembers(projectId, token) {
 
 
 export async function addProjectMember(projectId, token, userId) {
-  const response = await fetch(
+  const response = await authFetch(
     `${API_BASE_URL}/api/projects/${projectId}/members`,
     {
       method: "POST",
@@ -207,7 +225,7 @@ export async function addProjectMember(projectId, token, userId) {
 
 // Retrieve candidate users eligible to be added to this project (Admin / Project Manager owner)
 export async function getEligibleUsers(projectId, token) {
-  const response = await fetch(
+  const response = await authFetch(
     `${API_BASE_URL}/api/projects/${projectId}/eligible-users`,
     {
       headers: {
@@ -231,7 +249,7 @@ export async function getEligibleUsers(projectId, token) {
 
 // Update project details
 export async function updateProject(projectId, token, projectData) {
-  const response = await fetch(
+  const response = await authFetch(
     `${API_BASE_URL}/api/projects/${projectId}`,
     {
       method: "PATCH",
@@ -254,7 +272,7 @@ export async function updateProject(projectId, token, projectData) {
 
 // Soft-delete a project
 export async function deleteProject(projectId, token) {
-  const response = await fetch(
+  const response = await authFetch(
     `${API_BASE_URL}/api/projects/${projectId}`,
     {
       method: "DELETE",
@@ -274,7 +292,7 @@ export async function deleteProject(projectId, token) {
 }
 // Edit a task's title, description and priority (Admin / project owner only)
 export async function updateTaskDetails(projectId, taskId, token, taskData) {
-  const response = await fetch(
+  const response = await authFetch(
     `${API_BASE_URL}/api/projects/${projectId}/tasks/${taskId}`,
     {
       method: "PATCH",
@@ -297,7 +315,7 @@ export async function updateTaskDetails(projectId, taskId, token, taskData) {
 
 // Soft-delete a task — audit history is preserved in the database
 export async function deleteTask(projectId, taskId, token) {
-  const response = await fetch(
+  const response = await authFetch(
     `${API_BASE_URL}/api/projects/${projectId}/tasks/${taskId}`,
     {
       method: "DELETE",
@@ -318,7 +336,7 @@ export async function deleteTask(projectId, taskId, token) {
 
 // Assign a task to a project member (Admin / project owner only)
 export async function assignTask(projectId, taskId, token, userId) {
-  const response = await fetch(
+  const response = await authFetch(
     `${API_BASE_URL}/api/projects/${projectId}/tasks/${taskId}/assign`,
     {
       method: "PATCH",
@@ -341,7 +359,7 @@ export async function assignTask(projectId, taskId, token, userId) {
 
 // Update a task's workflow status
 export async function updateTaskStatus(projectId, taskId, token, status) {
-  const response = await fetch(
+  const response = await authFetch(
     `${API_BASE_URL}/api/projects/${projectId}/tasks/${taskId}/status`,
     {
       method: "PATCH",
@@ -364,7 +382,7 @@ export async function updateTaskStatus(projectId, taskId, token, status) {
 
 // Retrieve discussions / comments for a task
 export async function getTaskComments(projectId, taskId, token) {
-  const response = await fetch(
+  const response = await authFetch(
     `${API_BASE_URL}/api/projects/${projectId}/tasks/${taskId}/comments`,
     {
       headers: {
@@ -384,7 +402,7 @@ export async function getTaskComments(projectId, taskId, token) {
 
 // Add a discussion comment to a task
 export async function addTaskComment(projectId, taskId, token, content) {
-  const response = await fetch(
+  const response = await authFetch(
     `${API_BASE_URL}/api/projects/${projectId}/tasks/${taskId}/comments`,
     {
       method: "POST",
@@ -407,7 +425,7 @@ export async function addTaskComment(projectId, taskId, token, content) {
 
 // Retrieve security review checklist for a task
 export async function getSecurityReview(projectId, taskId, token) {
-  const response = await fetch(
+  const response = await authFetch(
     `${API_BASE_URL}/api/projects/${projectId}/tasks/${taskId}/security-review`,
     {
       headers: {
@@ -427,7 +445,7 @@ export async function getSecurityReview(projectId, taskId, token) {
 
 // Update security review checklist (Admin / project owner only)
 export async function updateSecurityReview(projectId, taskId, token, checks) {
-  const response = await fetch(
+  const response = await authFetch(
     `${API_BASE_URL}/api/projects/${projectId}/tasks/${taskId}/security-review`,
     {
       method: "PATCH",
@@ -450,7 +468,7 @@ export async function updateSecurityReview(projectId, taskId, token, checks) {
 
 // Retrieve task-level audit history
 export async function getTaskAuditLogs(projectId, taskId, token) {
-  const response = await fetch(
+  const response = await authFetch(
     `${API_BASE_URL}/api/projects/${projectId}/tasks/${taskId}/audit-logs`,
     {
       headers: {
@@ -470,7 +488,7 @@ export async function getTaskAuditLogs(projectId, taskId, token) {
 
 // Retrieve administrative project audit logs (Admin only)
 export async function getAdminProjectAuditLogs(token) {
-  const response = await fetch(
+  const response = await authFetch(
     `${API_BASE_URL}/api/admin/audit-logs/projects`,
     {
       headers: {
@@ -490,7 +508,7 @@ export async function getAdminProjectAuditLogs(token) {
 
 // Retrieve administrative task audit logs (Admin only)
 export async function getAdminTaskAuditLogs(token) {
-  const response = await fetch(
+  const response = await authFetch(
     `${API_BASE_URL}/api/admin/audit-logs/tasks`,
     {
       headers: {
