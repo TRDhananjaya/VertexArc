@@ -249,3 +249,48 @@ export async function deleteProject(projectId, token) {
 
   return data;
 }
+// Assign a task to a project member (Admin / project owner only)
+export async function assignTask(projectId, taskId, token, userId) {
+  const response = await fetch(
+    `${API_BASE_URL}/api/projects/${projectId}/tasks/${taskId}/assign`,
+    {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({ userId })
+    }
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Failed to assign task");
+  }
+
+  return data;
+}
+
+// Update a task's workflow status
+export async function updateTaskStatus(projectId, taskId, token, status) {
+  const response = await fetch(
+    `${API_BASE_URL}/api/projects/${projectId}/tasks/${taskId}/status`,
+    {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({ status })
+    }
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Failed to update task status");
+  }
+
+  return data;
+}

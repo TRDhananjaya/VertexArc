@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getProjectTasks, deleteProject } from "../api";
+import { getProjectTasks, deleteProject, updateTaskStatus, assignTask, getProjectMembers } from "../api";
 import CreateTaskForm from "../components/CreateTaskForm";
 import EditProjectForm from "../components/EditProjectForm";
 import ConfirmDialog from "../components/ConfirmDialog";
@@ -16,6 +16,22 @@ function ProjectDetails({ project: initialProject, token, user, onBack }) {
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [deleteError, setDeleteError] = useState("");
   const [refreshKey, setRefreshKey] = useState(0);
+  const [statusLoading, setStatusLoading] = useState(null);
+  const [statusError, setStatusError] = useState("");
+
+  // Members list — used to build the assign dropdown and name lookup map
+  const [members, setMembers] = useState([]);
+
+  // memberMap lets us look up a user's name by ID: memberMap[5] → "Alice Chen"
+  // This is built from the members array so we don't have to search the array every render
+  const memberMap = {};
+  members.forEach((m) => { memberMap[m.id] = m.name; });
+
+  // Per-task assign dropdown visibility: assigningTaskId holds the task ID whose
+  // dropdown is currently open, or null if none
+  const [assigningTaskId, setAssigningTaskId] = useState(null);
+  const [assignLoading, setAssignLoading] = useState(false);
+  const [assignError, setAssignError] = useState("");
 
   // Can this user manage (edit/delete) this project?
   const canManageProject =
@@ -27,6 +43,28 @@ function ProjectDetails({ project: initialProject, token, user, onBack }) {
 
   // Can this user create tasks in this project?
   const canCreateTask = canManageProject;
+
+  // Is this user a reviewer? (Admin or the PM who created the project)
+  // Reviewers can approve tasks (IN_REVIEW → DONE) or request changes (IN_REVIEW → IN_PROGRESS)
+  const isReviewer = canManageProject;
+
+  // Handle task status transitions
+  // This function is called when a user clicks a status action button
+  async function handleStatusChange(taskId, newStatus) {
+    setStatusLoading(taskId);  // Show loading on this specific task
+    setStatusError("");
+
+    try {
+      await updateTaskStatus(project.id, taskId, token, newStatus);
+
+      // Refresh the task list to reflect the change
+      setRefreshKey((current) => current + 1);
+    } catch (err) {
+      setStatusError(err.message);
+    } finally {
+      setStatusLoading(null);  // Clear loading state
+    }
+  }
 
   // Load tasks whenever the project changes or a task is created.
   useEffect(() => {
@@ -67,6 +105,44 @@ function ProjectDetails({ project: initialProject, token, user, onBack }) {
       active = false;
     };
   }, [project.id, token, refreshKey]);
+
+  // Load project members so we can:
+  // 1. Build the memberMap for displaying assignee names
+  // 2. Populate the assign dropdown with eligible users
+  useEffect(() => {
+    let active = true;
+
+    async function loadMembers() {
+      try {
+        const data = await getProjectMembers(project.id, token);
+        if (!active) return;
+        const list = Array.isArray(data) ? data : data.members;
+        if (Array.isArray(list)) setMembers(list);
+      } catch {
+        // If we can't load members, the page still works — assignment just won't show names
+      }
+    }
+
+    loadMembers();
+    return () => { active = false; };
+  }, [project.id, token]);
+
+  // Handle task assignment
+  // userId: the ID of the member to assign (comes from the dropdown selection)
+  async function handleAssign(taskId, userId) {
+    setAssignLoading(true);
+    setAssignError("");
+
+    try {
+      await assignTask(project.id, taskId, token, Number(userId));
+      setAssigningTaskId(null);           // Close the dropdown
+      setRefreshKey((k) => k + 1);        // Refresh task list to show updated assignment
+    } catch (err) {
+      setAssignError(err.message);
+    } finally {
+      setAssignLoading(false);
+    }
+  }
 
   // Handle project deletion
   async function handleDeleteProject() {
@@ -256,6 +332,16 @@ function ProjectDetails({ project: initialProject, token, user, onBack }) {
           </div>
         )}
 
+        {/* Status change error */}
+        {statusError && (
+          <div
+            role="alert"
+            className="mb-4 rounded-lg border border-red-500/30 bg-red-500/10 p-4 text-red-400"
+          >
+            {statusError}
+          </div>
+        )}
+
         {/* Empty task list */}
         {!loading && !error && tasks.length === 0 && (
           <div className="rounded-xl border border-slate-800 bg-slate-900 p-8 text-center text-slate-400">
@@ -318,11 +404,133 @@ function ProjectDetails({ project: initialProject, token, user, onBack }) {
                     </span>
                   )}
 
+                  {/* Assigned user — show name from memberMap, or "Unassigned" */}
+                  <span className="text-slate-500">
+                    {task.assigned_to
+                      ? `Assigned: ${memberMap[task.assigned_to] || `User #${task.assigned_to}`}`
+                      : "Unassigned"}
+                  </span>
+
                   {/* Task ID */}
                   <span className="ml-auto text-xs text-slate-500">
                     Task #{task.id}
                   </span>
                 </div>
+
+                {/* ── Status action buttons ── */}
+                {/* These buttons implement the task workflow state machine.
+                    Which buttons appear depends on:
+                    1. The task's current status
+                    2. Whether the logged-in user is the assigned developer
+                    3. Whether the logged-in user is a reviewer (Admin / project owner)
+                */}
+                <div className="mt-4 flex flex-wrap gap-2">
+
+                  {/* Developer actions: only the ASSIGNED developer sees these */}
+                  {/* TODO → IN_PROGRESS: "Start Work" */}
+                  {task.assigned_to === user?.id &&
+                    task.status === "TODO" && (
+                    <button
+                      type="button"
+                      disabled={statusLoading === task.id}
+                      onClick={() => handleStatusChange(task.id, "IN_PROGRESS")}
+                      className="rounded-lg bg-blue-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-blue-400 disabled:opacity-60"
+                    >
+                      {statusLoading === task.id ? "Updating..." : "Start Work"}
+                    </button>
+                  )}
+
+                  {/* IN_PROGRESS → IN_REVIEW: "Submit for Review" */}
+                  {task.assigned_to === user?.id &&
+                    task.status === "IN_PROGRESS" && (
+                    <button
+                      type="button"
+                      disabled={statusLoading === task.id}
+                      onClick={() => handleStatusChange(task.id, "IN_REVIEW")}
+                      className="rounded-lg bg-amber-500 px-3 py-1.5 text-xs font-semibold text-slate-950 hover:bg-amber-400 disabled:opacity-60"
+                    >
+                      {statusLoading === task.id ? "Updating..." : "Submit for Review"}
+                    </button>
+                  )}
+
+                  {/* Reviewer actions: Admin or project owner sees these */}
+                  {/* IN_REVIEW → DONE: "Approve" */}
+                  {isReviewer &&
+                    task.status === "IN_REVIEW" && (
+                    <button
+                      type="button"
+                      disabled={statusLoading === task.id}
+                      onClick={() => handleStatusChange(task.id, "DONE")}
+                      className="rounded-lg bg-emerald-500 px-3 py-1.5 text-xs font-semibold text-slate-950 hover:bg-emerald-400 disabled:opacity-60"
+                    >
+                      {statusLoading === task.id ? "Updating..." : "Approve"}
+                    </button>
+                  )}
+
+                  {/* IN_REVIEW → IN_PROGRESS: "Request Changes" */}
+                  {isReviewer &&
+                    task.status === "IN_REVIEW" && (
+                    <button
+                      type="button"
+                      disabled={statusLoading === task.id}
+                      onClick={() => handleStatusChange(task.id, "IN_PROGRESS")}
+                      className="rounded-lg border border-amber-500/50 px-3 py-1.5 text-xs font-semibold text-amber-400 hover:bg-amber-500/10 disabled:opacity-60"
+                    >
+                      {statusLoading === task.id ? "Updating..." : "Request Changes"}
+                    </button>
+                  )}
+                </div>
+
+                {/* ── Assign Task ── */}
+                {/* Only reviewers (Admin / PM owner) can assign tasks.
+                    We show an "Assign" button that expands into a dropdown of project members. */}
+                {canManageProject && task.status !== "DONE" && (
+                  <div className="mt-3">
+                    {assigningTaskId === task.id ? (
+                      /* Dropdown is open for this task */
+                      <div className="flex flex-wrap items-center gap-2">
+                        <select
+                          defaultValue=""
+                          disabled={assignLoading}
+                          onChange={(e) => {
+                            if (e.target.value) handleAssign(task.id, e.target.value);
+                          }}
+                          className="rounded-lg border border-slate-700 bg-slate-800 px-3 py-1.5 text-sm text-white"
+                        >
+                          <option value="" disabled>
+                            {members.length === 0 ? "No members yet" : "Select a member…"}
+                          </option>
+                          {members.map((m) => (
+                            <option key={m.id} value={m.id}>
+                              {m.name} — {m.role.replaceAll("_", " ")}
+                            </option>
+                          ))}
+                        </select>
+
+                        <button
+                          type="button"
+                          onClick={() => { setAssigningTaskId(null); setAssignError(""); }}
+                          className="text-xs text-slate-400 hover:text-slate-200"
+                        >
+                          Cancel
+                        </button>
+
+                        {assignError && (
+                          <span className="text-xs text-red-400">{assignError}</span>
+                        )}
+                      </div>
+                    ) : (
+                      /* Show the "Assign" button */
+                      <button
+                        type="button"
+                        onClick={() => { setAssigningTaskId(task.id); setAssignError(""); }}
+                        className="text-xs text-emerald-400 hover:text-emerald-300"
+                      >
+                        {task.assigned_to ? "Reassign →" : "Assign →"}
+                      </button>
+                    )}
+                  </div>
+                )}
               </div>
             ))}
           </div>
