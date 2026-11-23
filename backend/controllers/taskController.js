@@ -238,7 +238,7 @@ async function assignTask(req, res) {
                 userId,
                 title: "Task Assigned",
                 message: `You were assigned to task #${taskId}: "${updatedTask.title}"`,
-                link: `/projects/${projectId}`,
+                link: `/projects/${projectId}/tasks/${taskId}`,
                 type: "TASK_ASSIGNED"
             }).catch(() => {});
         }
@@ -352,6 +352,17 @@ async function updateTaskStatus(req, res) {
             return res.status(409).json({
                 message: "Status update blocked. Check the current task status and required security approvals"
             });
+        }
+
+        // Notify task assignee if someone else changed the status
+        if (task.assigned_to && Number(task.assigned_to) !== req.user.id) {
+            notificationModel.createNotification({
+                userId: task.assigned_to,
+                title: "Task Status Updated",
+                message: `Task #${taskId} "${task.title}" status changed from ${task.status} to ${status}`,
+                link: `/projects/${projectId}/tasks/${taskId}`,
+                type: "STATUS_CHANGE"
+            }).catch(() => {});
         }
 
         return res.status(200).json({

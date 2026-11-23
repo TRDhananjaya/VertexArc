@@ -5,7 +5,7 @@ const pool = require("../db");
 // Returns the full row including password_hash (needed for bcrypt comparison).
 async function findUserByEmail(email) {
     const result = await pool.query(
-        `SELECT id, name, email, password_hash, role, is_active
+        `SELECT id, name, email, password_hash, role, is_active, avatar_url
          FROM users
          WHERE email = $1`,
         [email]
@@ -17,7 +17,7 @@ async function findUserByEmail(email) {
 // Find a user by ID — used by authenticateToken to validate the token's userId.
 async function findUserById(id) {
     const result = await pool.query(
-        `SELECT id, name, email, role, is_active
+        `SELECT id, name, email, role, is_active, avatar_url
          FROM users
          WHERE id = $1`,
         [id]
@@ -54,7 +54,7 @@ async function createUserWithRole({
   return result.rows[0];
 }
 
-async function updateUser(id, { name, email, role, isActive }) {
+async function updateUser(id, { name, email, role, isActive, avatarUrl }) {
   const fields = [];
   const values = [];
   let paramIndex = 1;
@@ -75,6 +75,10 @@ async function updateUser(id, { name, email, role, isActive }) {
     fields.push(`is_active = $${paramIndex++}`);
     values.push(isActive);
   }
+  if (avatarUrl !== undefined) {
+    fields.push(`avatar_url = $${paramIndex++}`);
+    values.push(avatarUrl);
+  }
 
   if (fields.length === 0) {
     return findUserById(id);
@@ -87,7 +91,7 @@ async function updateUser(id, { name, email, role, isActive }) {
     UPDATE users
     SET ${fields.join(", ")}
     WHERE id = $${paramIndex}
-    RETURNING id, name, email, role, is_active, created_at, updated_at
+    RETURNING id, name, email, role, is_active, avatar_url, created_at, updated_at
   `;
 
   const result = await pool.query(query, values);

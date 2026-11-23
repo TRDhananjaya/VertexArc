@@ -12,6 +12,7 @@ function ProjectDetails({
   project: initialProject,
   token,
   user,
+  initialTaskId = null,
   onBack,
   onGoDashboard,
   onToggleSidebar,
@@ -109,6 +110,14 @@ function ProjectDetails({
         }
 
         setTasks(taskList);
+
+        // If an initialTaskId was passed (e.g. from clicking a notification), auto-select it
+        if (initialTaskId) {
+          const match = taskList.find((t) => Number(t.id) === Number(initialTaskId));
+          if (match) {
+            setSelectedTask(match);
+          }
+        }
       } catch (err) {
         if (active) {
           setError(err.message);
@@ -125,7 +134,7 @@ function ProjectDetails({
     return () => {
       active = false;
     };
-  }, [project.id, token, refreshKey]);
+  }, [project.id, token, refreshKey, initialTaskId]);
 
   // Load project members so we can:
   // 1. Build the memberMap for displaying assignee names

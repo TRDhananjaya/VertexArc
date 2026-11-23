@@ -12,6 +12,7 @@ import NotificationsPage from "./pages/NotificationsPage";
 import {
   setSessionExpiredHandler,
   getNotifications,
+  getProjects,
   markNotificationRead,
   markAllNotificationsRead
 } from "./api";
@@ -60,6 +61,7 @@ function App() {
   const [token, setToken] = useState(persisted.token);
   const [user, setUser]   = useState(persisted.user);
   const [selectedProject, setSelectedProject]       = useState(null);
+  const [initialTaskId, setInitialTaskId]           = useState(null);
   const [showUserManagement, setShowUserManagement] = useState(false);
   const [showAuditLogs, setShowAuditLogs]           = useState(false);
   const [showNotificationsView, setShowNotificationsView] = useState(false);
@@ -205,6 +207,7 @@ function App() {
 
   function handleGoDashboard() {
     setSelectedProject(null);
+    setInitialTaskId(null);
     setShowUserManagement(false);
     setShowAuditLogs(false);
     setShowNotificationsView(false);
@@ -212,6 +215,7 @@ function App() {
 
   function handleOpenUserManagement() {
     setSelectedProject(null);
+    setInitialTaskId(null);
     setShowUserManagement(true);
     setShowAuditLogs(false);
     setShowNotificationsView(false);
@@ -219,6 +223,7 @@ function App() {
 
   function handleOpenAuditLogs() {
     setSelectedProject(null);
+    setInitialTaskId(null);
     setShowUserManagement(false);
     setShowAuditLogs(true);
     setShowNotificationsView(false);
@@ -226,9 +231,53 @@ function App() {
 
   function handleOpenNotifications() {
     setSelectedProject(null);
+    setInitialTaskId(null);
     setShowUserManagement(false);
     setShowAuditLogs(false);
     setShowNotificationsView(true);
+  }
+
+  async function handleNavigateNotification(notification) {
+    if (!notification) return;
+
+    // Automatically mark as read if not already read
+    if (!notification.is_read) {
+      handleMarkNotificationRead(notification.id);
+    }
+
+    const link = notification.link || "";
+
+    // 1. Dashboard link
+    if (link === "/dashboard" || link === "") {
+      handleGoDashboard();
+      return;
+    }
+
+    // 2. Project or task link: e.g. /projects/2 or /projects/2/tasks/10
+    const projectMatch = link.match(/\/projects\/(\d+)(?:\/tasks\/(\d+))?/);
+    if (projectMatch) {
+      const projId = Number(projectMatch[1]);
+      const taskId = projectMatch[2] ? Number(projectMatch[2]) : null;
+
+      try {
+        const data = await getProjects(token);
+        const targetProj = data?.projects?.find((p) => Number(p.id) === projId);
+
+        if (targetProj) {
+          setSelectedProject(targetProj);
+          setInitialTaskId(taskId);
+          setShowNotificationsView(false);
+          setShowUserManagement(false);
+          setShowAuditLogs(false);
+          return;
+        }
+      } catch (err) {
+        console.error("Failed to fetch projects for notification navigation:", err);
+      }
+    }
+
+    // Fallback if specific project isn't found
+    handleGoDashboard();
   }
 
   // 1. Landing page — shown to unauthenticated users who haven't clicked "Sign In"
@@ -300,8 +349,10 @@ function App() {
             onMarkRead={handleMarkNotificationRead}
             onMarkAllRead={handleMarkAllNotificationsRead}
             onGoDashboard={handleGoDashboard}
+            onNavigateNotification={handleNavigateNotification}
             onSelectProject={(project) => {
               setSelectedProject(project);
+              setInitialTaskId(null);
               setShowNotificationsView(false);
               setShowUserManagement(false);
               setShowAuditLogs(false);
@@ -330,6 +381,7 @@ function App() {
             project={selectedProject}
             token={token}
             user={user}
+            initialTaskId={initialTaskId}
             onBack={handleGoDashboard}
             onGoDashboard={handleGoDashboard}
             onToggleSidebar={toggleSidebarExpanded}
@@ -341,6 +393,7 @@ function App() {
             user={user}
             onSelectProject={(project) => {
               setSelectedProject(project);
+              setInitialTaskId(null);
               setShowNotificationsView(false);
               setShowUserManagement(false);
               setShowAuditLogs(false);

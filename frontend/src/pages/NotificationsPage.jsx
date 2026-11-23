@@ -33,6 +33,7 @@ function NotificationsPage({
   onMarkRead,
   onMarkAllRead,
   onGoDashboard,
+  onNavigateNotification,
   onToggleSidebar
 }) {
   const [filter, setFilter] = useState("all"); // "all" | "unread"
@@ -172,11 +173,17 @@ function NotificationsPage({
                 return (
                   <div
                     key={item.id}
-                    className={`p-4 sm:p-5 flex flex-col sm:flex-row sm:items-start justify-between gap-4 transition ${
+                    onClick={() => {
+                      if (onNavigateNotification) {
+                        onNavigateNotification(item);
+                      }
+                    }}
+                    className={`group/card p-4 sm:p-5 flex flex-col sm:flex-row sm:items-start justify-between gap-4 transition cursor-pointer ${
                       item.is_read
-                        ? "hover:bg-gray-50 dark:hover:bg-[#131422]/50"
-                        : "bg-[#3A0CA3]/5 dark:bg-[#3A0CA3]/10 hover:bg-[#3A0CA3]/10 dark:hover:bg-[#3A0CA3]/15"
+                        ? "hover:bg-gray-50/80 dark:hover:bg-[#131422]/70"
+                        : "bg-[#3A0CA3]/5 dark:bg-[#3A0CA3]/10 hover:bg-[#3A0CA3]/15 dark:hover:bg-[#3A0CA3]/20"
                     }`}
+                    title={item.link ? `Go to ${item.link}` : "Click to view"}
                   >
                     <div className="flex items-start gap-3.5 flex-1 min-w-0">
                       {/* Unread indicator bullet */}
@@ -197,7 +204,7 @@ function NotificationsPage({
                             {badge.icon}
                             <span>{badge.label}</span>
                           </span>
-                          <h4 className="text-xs font-semibold text-gray-900 dark:text-white">
+                          <h4 className="text-xs font-semibold text-gray-900 dark:text-white group-hover/card:text-[#3A0CA3] dark:group-hover/card:text-[#a78bfa] transition-colors">
                             {item.title}
                           </h4>
                         </div>
@@ -211,8 +218,8 @@ function NotificationsPage({
                           {item.link && (
                             <>
                               <span>•</span>
-                              <span className="text-[#3A0CA3] dark:text-[#c4b5fd] font-medium">
-                                {item.link}
+                              <span className="text-[#3A0CA3] dark:text-[#c4b5fd] font-medium group-hover/card:underline">
+                                {item.link.startsWith("/projects") ? "Open in workspace →" : "View →"}
                               </span>
                             </>
                           )}
@@ -225,8 +232,11 @@ function NotificationsPage({
                       {!item.is_read && onMarkRead && (
                         <button
                           type="button"
-                          onClick={() => onMarkRead(item.id)}
-                          className="rounded-lg border border-gray-200 dark:border-[#272844] bg-white dark:bg-[#131422] px-2.5 py-1 text-xs font-medium text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-[#1c1d30] transition"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onMarkRead(item.id);
+                          }}
+                          className="rounded-lg border border-gray-200 dark:border-[#272844] bg-white dark:bg-[#131422] px-2.5 py-1 text-xs font-medium text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-[#1c1d30] transition shadow-xs"
                           title="Mark as read"
                         >
                           Mark read

@@ -1,4 +1,3 @@
-require("dotenv").config({ path: __dirname + "/.env" });
 const pool = require("./db");
 
 async function initDb() {
@@ -29,8 +28,19 @@ async function initDb() {
 
       CREATE INDEX IF NOT EXISTS idx_password_resets_token 
       ON password_resets(token_hash, used);
+
+      ALTER TABLE users ADD COLUMN IF NOT EXISTS avatar_url TEXT;
     `);
-    console.log("Database tables verified: notifications, password_resets.");
+
+    // Ensure users have an initial welcome notification if they have none
+    await pool.query(`
+      INSERT INTO notifications (user_id, title, message, link, type, is_read, created_at)
+      SELECT u.id, 'Welcome to VertexArc', 'Your workspace account is active. You will receive notifications here for task assignments, project updates, and security reviews.', '/dashboard', 'INFO', false, NOW()
+      FROM users u
+      WHERE NOT EXISTS (
+        SELECT 1 FROM notifications n WHERE n.user_id = u.id
+      );
+    `);
   } catch (err) {
     console.error("Database table initialization error:", err.message);
   }

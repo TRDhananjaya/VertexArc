@@ -116,10 +116,11 @@ async function login(req, res) {
             message: "Login successful",
             token,
             user: {
-                id:    user.id,
-                name:  user.name,
-                email: user.email,
-                role:  user.role,
+                id:        user.id,
+                name:      user.name,
+                email:     user.email,
+                role:      user.role,
+                avatar_url: user.avatar_url || null,
             },
         });
     } catch (error) {
@@ -141,10 +142,10 @@ async function getProfile(req, res) {
     }
 }
 
-// PATCH /api/auth/profile — update own name or change password
+// PATCH /api/auth/profile — update own name, avatar, or change password
 async function updateProfile(req, res) {
     try {
-        const { name, currentPassword, newPassword } = req.body ?? {};
+        const { name, avatarUrl, currentPassword, newPassword } = req.body ?? {};
 
         const fields = [];
         const values = [];
@@ -158,6 +159,22 @@ async function updateProfile(req, res) {
             }
             fields.push(`name = $${paramIndex++}`);
             values.push(name.trim());
+        }
+
+        if (avatarUrl !== undefined) {
+            if (avatarUrl !== null && typeof avatarUrl !== "string") {
+                return res.status(400).json({
+                    message: "Avatar must be a valid image string or URL"
+                });
+            }
+            // Limit payload size to ~2MB data URI or URL
+            if (typeof avatarUrl === "string" && avatarUrl.length > 2097152) {
+                return res.status(400).json({
+                    message: "Avatar image is too large (maximum 2MB)"
+                });
+            }
+            fields.push(`avatar_url = $${paramIndex++}`);
+            values.push(avatarUrl ? avatarUrl.trim() : null);
         }
 
         if (newPassword !== undefined) {
@@ -216,7 +233,7 @@ async function updateProfile(req, res) {
             `UPDATE users
              SET ${fields.join(", ")}
              WHERE id = $${paramIndex}
-             RETURNING id, name, email, role, is_active, created_at, updated_at`,
+             RETURNING id, name, email, role, is_active, avatar_url, created_at, updated_at`,
             values
         );
 

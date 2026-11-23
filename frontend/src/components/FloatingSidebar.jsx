@@ -392,8 +392,12 @@ function FloatingSidebar({
               {/* User Identity Info */}
               <div className="flex items-center justify-between gap-2 px-1">
                 <div className="flex items-center gap-3 overflow-hidden min-w-0 flex-1">
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 font-bold text-xs border border-indigo-200 dark:border-indigo-500/30">
-                    {user?.name?.charAt(0)?.toUpperCase() || "U"}
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 font-bold text-xs border border-indigo-200 dark:border-indigo-500/30 overflow-hidden">
+                    {user?.avatar_url ? (
+                      <img src={user.avatar_url} alt={user?.name || "Avatar"} className="h-full w-full object-cover" />
+                    ) : (
+                      user?.name?.charAt(0)?.toUpperCase() || "U"
+                    )}
                   </div>
                   <div className="truncate min-w-0 flex-1">
                     <p className="text-xs font-semibold text-gray-900 dark:text-white truncate">
@@ -436,8 +440,12 @@ function FloatingSidebar({
             /* COLLAPSED PROFILE ICONS */
             <div className="flex flex-col items-center gap-2.5 w-full">
               {user && (
-                <div className="group relative flex h-9 w-9 items-center justify-center rounded-full bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 font-bold text-xs border border-indigo-200 dark:border-indigo-500/30 cursor-default">
-                  {user.name?.charAt(0)?.toUpperCase() || "U"}
+                <div className="group relative flex h-9 w-9 items-center justify-center rounded-full bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 font-bold text-xs border border-indigo-200 dark:border-indigo-500/30 overflow-hidden cursor-default">
+                  {user?.avatar_url ? (
+                    <img src={user.avatar_url} alt={user?.name || "Avatar"} className="h-full w-full object-cover" />
+                  ) : (
+                    user.name?.charAt(0)?.toUpperCase() || "U"
+                  )}
                   <div className="absolute left-full ml-3 hidden items-center group-hover:flex pointer-events-none z-50">
                     <div className="rounded-lg bg-gray-900 px-2.5 py-1 text-xs font-semibold text-white shadow-xl dark:bg-white dark:text-gray-950 whitespace-nowrap">
                       {user.name} ({user.role?.replaceAll("_", " ")})

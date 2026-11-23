@@ -226,6 +226,16 @@ async function addMember(req, res) {
             });
         }
 
+        // Notify added user
+        const notificationModel = require("../models/notificationModel");
+        notificationModel.createNotification({
+            userId,
+            title: "Added to Project",
+            message: `You were added as a team member to project "${project.name}"`,
+            link: `/projects/${projectId}`,
+            type: "PROJECT"
+        }).catch(() => {});
+
         return res.status(201).json({
             message: "Member added successfully",
             member

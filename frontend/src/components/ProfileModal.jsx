@@ -1,15 +1,46 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { updateProfile } from "../api";
-import { ShieldCheckIcon, AlertCircleIcon, KeyIcon } from "./Icons";
+import { AlertCircleIcon, KeyIcon, CameraIcon, ShieldCheckIcon } from "./Icons";
 
 function ProfileModal({ user, token, onProfileUpdated, onClose }) {
   const [name, setName] = useState(user?.name || "");
+  const [avatarUrl, setAvatarUrl] = useState(user?.avatar_url || "");
   const [showPasswordChange, setShowPasswordChange] = useState(false);
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const fileInputRef = useRef(null);
+
+  function handleImageUpload(e) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      setError("Please select an image file (PNG, JPG, WebP, etc.).");
+      return;
+    }
+
+    if (file.size > 2 * 1024 * 1024) {
+      setError("Profile image must be less than 2MB.");
+      return;
+    }
+
+    setError("");
+    const reader = new FileReader();
+    reader.onload = (uploadEvent) => {
+      setAvatarUrl(uploadEvent.target?.result || "");
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function handleRemoveImage() {
+    setAvatarUrl("");
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  }
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -23,6 +54,10 @@ function ProfileModal({ user, token, onProfileUpdated, onClose }) {
     const updates = {};
     if (trimmedName !== user.name) {
       updates.name = trimmedName;
+    }
+
+    if (avatarUrl !== (user.avatar_url || "")) {
+      updates.avatarUrl = avatarUrl || null;
     }
 
     if (showPasswordChange) {
@@ -52,7 +87,7 @@ function ProfileModal({ user, token, onProfileUpdated, onClose }) {
 
     try {
       const data = await updateProfile(token, updates);
-      onProfileUpdated(data.user || { ...user, name: trimmedName });
+      onProfileUpdated(data.user || { ...user, name: trimmedName, avatar_url: avatarUrl });
     } catch (err) {
       setError(err.message);
     } finally {
@@ -66,19 +101,23 @@ function ProfileModal({ user, token, onProfileUpdated, onClose }) {
       aria-modal="true"
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200"
     >
-      <div className="w-full max-w-md rounded-2xl border border-gray-200/90 dark:border-[#2a1754] bg-white dark:bg-[#0c0d16] p-6 shadow-2xl shadow-slate-300/60 dark:shadow-[0_0_60px_-10px_rgba(58,12,163,0.35)]">
+      <div className="w-full max-w-md rounded-2xl border border-gray-200/90 dark:border-[#2a1754] bg-white dark:bg-[#0c0d16] p-6 shadow-2xl shadow-slate-300/60 dark:shadow-[0_0_60px_-10px_rgba(58,12,163,0.35)] max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-gray-100 dark:border-[#1c1d30] pb-4">
           <div className="flex items-center gap-2.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-[#3A0CA3] to-[#4c1d95] text-white font-bold text-xs shadow-sm">
-              {user?.name?.charAt(0)?.toUpperCase() || "U"}
+            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-[#3A0CA3] to-[#4c1d95] text-white font-bold text-xs shadow-sm overflow-hidden">
+              {avatarUrl ? (
+                <img src={avatarUrl} alt={user?.name || "Avatar"} className="h-full w-full object-cover" />
+              ) : (
+                user?.name?.charAt(0)?.toUpperCase() || "U"
+              )}
             </div>
             <div>
               <h2 className="text-sm font-bold text-gray-900 dark:text-white">
                 Account Settings
               </h2>
               <p className="text-[11px] text-gray-400 dark:text-slate-500">
-                Update your personal profile and security credentials
+                Update your personal profile, photo, and security credentials
               </p>
             </div>
           </div>
@@ -92,8 +131,57 @@ function ProfileModal({ user, token, onProfileUpdated, onClose }) {
           </button>
         </div>
 
+        {/* Profile Avatar Upload Section */}
+        <div className="mt-5 flex items-center gap-4 rounded-xl border border-gray-100 dark:border-[#1c1d30] bg-gray-50/70 dark:bg-[#131422]/40 p-3.5">
+          <div className="relative group shrink-0">
+            <div className="flex h-16 w-16 items-center justify-center rounded-2xl border-2 border-[#3A0CA3]/30 bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 font-bold text-lg overflow-hidden shadow-inner">
+              {avatarUrl ? (
+                <img src={avatarUrl} alt="Preview" className="h-full w-full object-cover" />
+              ) : (
+                user?.name?.charAt(0)?.toUpperCase() || "U"
+              )}
+            </div>
+          </div>
+
+          <div className="flex-1 min-w-0">
+            <p className="text-xs font-semibold text-gray-900 dark:text-white mb-1">
+              Profile Photo
+            </p>
+            <div className="flex flex-wrap items-center gap-2">
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+                className="hidden"
+                id="avatar-file-upload"
+              />
+              <label
+                htmlFor="avatar-file-upload"
+                className="inline-flex items-center gap-1.5 cursor-pointer rounded-lg bg-[#3A0CA3] hover:bg-[#4c1d95] text-white px-2.5 py-1.5 text-[11px] font-semibold transition shadow-xs"
+              >
+                <CameraIcon className="w-3.5 h-3.5" />
+                <span>{avatarUrl ? "Change Photo" : "Upload Photo"}</span>
+              </label>
+
+              {avatarUrl && (
+                <button
+                  type="button"
+                  onClick={handleRemoveImage}
+                  className="rounded-lg border border-red-500/30 bg-red-500/10 hover:bg-red-500/20 text-red-600 dark:text-red-400 px-2.5 py-1.5 text-[11px] font-medium transition"
+                >
+                  Remove
+                </button>
+              )}
+            </div>
+            <p className="mt-1 text-[10px] text-gray-400 dark:text-slate-500">
+              PNG, JPG, or WebP up to 2MB
+            </p>
+          </div>
+        </div>
+
         {/* Form */}
-        <form onSubmit={handleSubmit} className="mt-5 space-y-4">
+        <form onSubmit={handleSubmit} className="mt-4 space-y-4">
           {/* Email (Read-only) */}
           <div>
             <label className="mb-1 block text-xs font-semibold text-gray-700 dark:text-slate-300">

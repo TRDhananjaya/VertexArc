@@ -23,7 +23,8 @@ app.use(cors({
 // Apply security headers to all API responses
 app.use(helmet());
 
-app.use(express.json()); // Parse JSON request bodies
+app.use(express.json({ limit: "5mb" })); // Parse JSON request bodies (supports base64 profile pictures up to 5MB)
+app.use(express.urlencoded({ extended: true, limit: "5mb" }));
 
 // Public routes — no authentication required
 app.use("/api/auth", authRoutes);
