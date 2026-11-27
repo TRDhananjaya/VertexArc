@@ -442,7 +442,8 @@ async function updateTaskDetails(req, res) {
             projectId,
             title.trim(),
             description === undefined ? null : description,
-            priority
+            priority,
+            req.user.id
         );
 
         if (!task) {

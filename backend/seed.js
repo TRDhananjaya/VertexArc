@@ -2,7 +2,20 @@ require("dotenv").config({ path: __dirname + "/.env" });
 const bcrypt = require("bcrypt");
 const pool = require("./db");
 
-const DEFAULT_PASSWORD = "password123";
+// Guardrail: prevent destructive seeding against production or unintended databases
+if (process.env.NODE_ENV === "production") {
+  console.error("ABORTED: Seeding is strictly disabled in production environments.");
+  process.exit(1);
+}
+
+if (process.env.ALLOW_DB_SEED !== "true") {
+  console.error(
+    "ABORTED: To prevent accidental data loss (TRUNCATE CASCADE), set ALLOW_DB_SEED=true before running this script."
+  );
+  process.exit(1);
+}
+
+const DEFAULT_PASSWORD = process.env.SEED_DEFAULT_PASSWORD || "password123";
 
 const USERS = [
   // ID 1

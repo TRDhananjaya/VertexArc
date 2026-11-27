@@ -41,11 +41,10 @@ function Login({ onLogin, sessionMessage, onBack, theme, onToggleTheme }) {
 
     try {
       const data = await requestPasswordReset(resetEmail.trim());
-      setSuccessMsg(data.message || "Reset instructions generated.");
-      if (data.resetToken) {
-        setResetToken(data.resetToken);
-        setMode("reset");
-      }
+      setSuccessMsg(
+        data.message ||
+          "If an account with that email exists, reset instructions have been sent."
+      );
     } catch (err) {
       setError(err.message);
     } finally {
@@ -128,7 +127,7 @@ function Login({ onLogin, sessionMessage, onBack, theme, onToggleTheme }) {
             {mode === "login"
               ? "Secure Software Development & Engineering Platform"
               : mode === "forgot"
-              ? "Enter your registered email to receive a password reset token"
+              ? "Account recovery requires administrator assistance"
               : "Enter your verification token and your new password"}
           </p>
         </div>
@@ -232,55 +231,23 @@ function Login({ onLogin, sessionMessage, onBack, theme, onToggleTheme }) {
         {/* ── MODE 2: FORGOT PASSWORD ── */}
         {mode === "forgot" && (
           <form onSubmit={handleForgotSubmit} className="space-y-4">
-            <div>
-              <label
-                htmlFor="reset-email"
-                className="mb-1.5 block text-xs font-semibold text-gray-700 dark:text-slate-300"
-              >
-                Enter your account email
-              </label>
-              <input
-                id="reset-email"
-                type="email"
-                required
-                value={resetEmail}
-                onChange={(e) => setResetEmail(e.target.value)}
-                placeholder="you@company.com"
-                className="w-full rounded-xl border border-gray-200 dark:border-[#1c1d30] bg-gray-50 dark:bg-[#050505] px-4 py-2.5 text-sm text-gray-900 dark:text-white outline-none transition focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20"
-              />
-            </div>
+              <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-3.5 text-xs text-amber-800 dark:text-amber-300 leading-relaxed">
+                Self-service password recovery is currently disabled until private email delivery is configured. Please contact your system administrator to reset your password.
+              </div>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full rounded-xl bg-gradient-to-r from-[#3A0CA3] to-[#4c1d95] hover:from-[#4313b8] hover:to-[#5b21b6] text-white py-3 text-sm font-semibold transition disabled:opacity-60 shadow-lg shadow-[#3A0CA3]/25"
-            >
-              {loading ? "Generating token..." : "Continue"}
-            </button>
-
-            <div className="flex items-center justify-between pt-2">
-              <button
-                type="button"
-                onClick={() => {
-                  setError("");
-                  setMode("login");
-                }}
-                className="text-xs text-gray-500 hover:text-gray-900 dark:hover:text-white transition"
-              >
-                ← Back to Login
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  setError("");
-                  setMode("reset");
-                }}
-                className="text-xs font-medium text-[#3A0CA3] dark:text-[#a78bfa] hover:underline"
-              >
-                Already have a token?
-              </button>
-            </div>
+              <div className="flex items-center justify-between pt-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setError("");
+                    setSuccessMsg("");
+                    setMode("login");
+                  }}
+                  className="text-xs text-gray-500 hover:text-gray-900 dark:hover:text-white transition"
+                >
+                  ← Back to Login
+                </button>
+              </div>
           </form>
         )}
 

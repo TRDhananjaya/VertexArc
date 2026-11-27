@@ -4,7 +4,8 @@ const crypto = require("crypto");
 const bcrypt = require("bcrypt");
 
 jest.mock("../db", () => ({
-  query: jest.fn()
+  query: jest.fn(),
+  connect: jest.fn()
 }));
 
 const pool = require("../db");
@@ -127,45 +128,86 @@ describe("Profile, Notifications, and Password Reset Features", () => {
   });
 
   describe("3. Forgot Password Flow", () => {
-    test("Forgot password returns generic confirmation to prevent user enumeration", async () => {
-      pool.query.mockResolvedValueOnce({ rows: [] }); // user not found
+    const originalPasswordResetFlag = process.env.PASSWORD_RESET_ENABLED;
 
-      const response = await request(app)
+    afterEach(() => {
+      if (originalPasswordResetFlag === undefined) {
+        delete process.env.PASSWORD_RESET_ENABLED;
+      } else {
+        process.env.PASSWORD_RESET_ENABLED = originalPasswordResetFlag;
+      }
+    });
+
+    test("Password recovery endpoints are disabled (503) until email delivery is configured", async () => {
+      delete process.env.PASSWORD_RESET_ENABLED;
+
+      const forgotRes = await request(app)
+        .post("/api/auth/forgot-password")
+        .send({ email: "dev1@vertexarc.com" });
+
+      expect(forgotRes.status).toBe(503);
+      expect(forgotRes.body.resetToken).toBeUndefined();
+
+      const resetRes = await request(app)
+        .post("/api/auth/reset-password")
+        .send({ token: "any-token", newPassword: "BrandNewSecurePassword123" });
+
+      expect(resetRes.status).toBe(503);
+    });
+
+    test("When enabled, forgot password returns generic confirmation and never exposes resetToken", async () => {
+      process.env.PASSWORD_RESET_ENABLED = "true";
+
+      // 1. Unknown user
+      pool.query.mockResolvedValueOnce({ rows: [] });
+      const unknownRes = await request(app)
         .post("/api/auth/forgot-password")
         .send({ email: "nonexistent@vertexarc.com" });
 
-      expect(response.status).toBe(200);
-      expect(response.body.message).toMatch(/if an account with that email exists/i);
-    });
+      expect(unknownRes.status).toBe(200);
+      expect(unknownRes.body.message).toMatch(/if an account with that email exists/i);
+      expect(unknownRes.body.resetToken).toBeUndefined();
 
-    test("Existing user gets a reset token generated", async () => {
-      // find user
+      // 2. Existing active user
       pool.query
         .mockResolvedValueOnce({
           rows: [{ id: 4, name: "Dev Charlie", email: "dev1@vertexarc.com", is_active: true }]
         })
-        // insert into password_resets
         .mockResolvedValueOnce({ rows: [] });
 
-      const response = await request(app)
+      const knownRes = await request(app)
         .post("/api/auth/forgot-password")
         .send({ email: "dev1@vertexarc.com" });
 
-      expect(response.status).toBe(200);
-      expect(response.body.resetToken).toBeDefined();
+      expect(knownRes.status).toBe(200);
+      expect(knownRes.body.message).toMatch(/if an account with that email exists/i);
+      expect(knownRes.body.resetToken).toBeUndefined();
     });
 
-    test("Reset password with valid token updates password", async () => {
+    test("When enabled, reset password runs atomically in a transaction and updates password", async () => {
+      process.env.PASSWORD_RESET_ENABLED = "true";
       const sampleToken = "sample-valid-hex-token-12345";
-      pool.query
-        // lookup token in password_resets
-        .mockResolvedValueOnce({
-          rows: [{ id: 1, user_id: 4, expires_at: new Date(Date.now() + 100000), used: false }]
-        })
-        // update users table
-        .mockResolvedValueOnce({ rows: [] })
-        // mark token used
-        .mockResolvedValueOnce({ rows: [] });
+
+      const mockClient = {
+        query: jest.fn(async (sql) => {
+          const stmt = String(sql).trim();
+          if (stmt === "BEGIN" || stmt === "COMMIT" || stmt === "ROLLBACK") {
+            return { rows: [] };
+          }
+          if (stmt.startsWith("SELECT") && stmt.includes("FROM password_resets")) {
+            return {
+              rows: [{ id: 1, user_id: 4, expires_at: new Date(Date.now() + 100000), used: false }]
+            };
+          }
+          if (stmt.startsWith("UPDATE users") || stmt.startsWith("UPDATE password_resets")) {
+            return { rows: [] };
+          }
+          throw new Error(`Unexpected SQL: ${stmt}`);
+        }),
+        release: jest.fn()
+      };
+
+      pool.connect.mockResolvedValueOnce(mockClient);
 
       const response = await request(app)
         .post("/api/auth/reset-password")
@@ -176,6 +218,9 @@ describe("Profile, Notifications, and Password Reset Features", () => {
 
       expect(response.status).toBe(200);
       expect(response.body.message).toMatch(/password has been reset successfully/i);
+      expect(mockClient.query).toHaveBeenCalledWith("BEGIN");
+      expect(mockClient.query).toHaveBeenCalledWith("COMMIT");
+      expect(mockClient.release).toHaveBeenCalled();
     });
   });
 });

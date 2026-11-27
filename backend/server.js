@@ -5,8 +5,13 @@ const app    = require("./app");
 const initDb = require("./initDb");
 const PORT   = process.env.PORT || 5000;
 
-initDb().then(() => {
-    app.listen(PORT, () => {
-        console.log(`VertexArc server running on port ${PORT}`);
+initDb()
+    .then(() => {
+        app.listen(PORT, () => {
+            console.log(`VertexArc server running on port ${PORT}`);
+        });
+    })
+    .catch((err) => {
+        console.error("Server failed to start due to database initialization error:", err.message);
+        process.exit(1);
     });
-});

@@ -247,8 +247,15 @@ async function updateProfile(req, res) {
     }
 }
 
-// POST /api/auth/forgot-password — generate secure password reset token
+// POST /api/auth/forgot-password — generate secure password reset token (disabled until email delivery is configured)
 async function forgotPassword(req, res) {
+    // Security: disable public password recovery until private email delivery is configured
+    if (process.env.PASSWORD_RESET_ENABLED !== "true") {
+        return res.status(503).json({
+            message: "Self-service password recovery is currently disabled until email delivery is configured. Please contact your administrator."
+        });
+    }
+
     try {
         const { email } = req.body ?? {};
 
@@ -262,11 +269,11 @@ async function forgotPassword(req, res) {
         // Security: always return generic message to prevent email enumeration
         if (!user || !user.is_active) {
             return res.json({
-                message: "If an account with that email exists, reset instructions have been generated."
+                message: "If an account with that email exists, reset instructions have been sent."
             });
         }
 
-        // Generate 32-byte cryptographic token
+        // Generate 32-byte cryptographic token and store only its SHA-256 hash
         const resetToken = crypto.randomBytes(32).toString("hex");
         const tokenHash  = crypto.createHash("sha256").update(resetToken).digest("hex");
         const expiresAt  = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
@@ -277,9 +284,10 @@ async function forgotPassword(req, res) {
             [user.id, tokenHash, expiresAt]
         );
 
+        // Security: never return resetToken in the HTTP response.
+        // Deliver resetToken privately via the configured email transport here.
         return res.json({
-            message: "If an account with that email exists, reset instructions have been generated.",
-            resetToken // Included for development/demo testing
+            message: "If an account with that email exists, reset instructions have been sent."
         });
     } catch (error) {
         console.error("Forgot password request failed:", error.message);
@@ -287,8 +295,15 @@ async function forgotPassword(req, res) {
     }
 }
 
-// POST /api/auth/reset-password — verify token and apply new password
+// POST /api/auth/reset-password — verify token and apply new password atomically
 async function resetPassword(req, res) {
+    if (process.env.PASSWORD_RESET_ENABLED !== "true") {
+        return res.status(503).json({
+            message: "Self-service password recovery is currently disabled until email delivery is configured. Please contact your administrator."
+        });
+    }
+
+    let client;
     try {
         const { token, newPassword } = req.body ?? {};
 
@@ -308,19 +323,25 @@ async function resetPassword(req, res) {
 
         const tokenHash = crypto.createHash("sha256").update(token.trim()).digest("hex");
 
-        const resetQuery = await pool.query(
+        client = await pool.connect();
+        await client.query("BEGIN");
+
+        // Lock the matching unused, unexpired token row to prevent concurrent reuse
+        const resetQuery = await client.query(
             `SELECT id, user_id, expires_at, used
              FROM password_resets
              WHERE token_hash = $1
                AND used = false
                AND expires_at > NOW()
              ORDER BY id DESC
-             LIMIT 1`,
+             LIMIT 1
+             FOR UPDATE`,
             [tokenHash]
         );
 
         const resetRecord = resetQuery.rows[0];
         if (!resetRecord) {
+            await client.query("ROLLBACK");
             return res.status(400).json({
                 message: "Password reset link is invalid or has expired."
             });
@@ -328,23 +349,32 @@ async function resetPassword(req, res) {
 
         const newHash = await bcrypt.hash(newPassword, 12);
 
-        // Update password and invalidate the token
-        await pool.query(
+        // Update password and consume the reset token atomically in the same transaction
+        await client.query(
             "UPDATE users SET password_hash = $1, updated_at = NOW() WHERE id = $2",
             [newHash, resetRecord.user_id]
         );
 
-        await pool.query(
+        await client.query(
             "UPDATE password_resets SET used = true WHERE id = $1",
             [resetRecord.id]
         );
+
+        await client.query("COMMIT");
 
         return res.json({
             message: "Password has been reset successfully. You can now log in with your new password."
         });
     } catch (error) {
+        if (client) {
+            await client.query("ROLLBACK").catch(() => {});
+        }
         console.error("Password reset failed:", error.message);
         return res.status(500).json({ message: "Password reset failed" });
+    } finally {
+        if (client) {
+            client.release();
+        }
     }
 }
 

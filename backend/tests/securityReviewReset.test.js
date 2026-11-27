@@ -63,7 +63,7 @@ function mockDatabase(task) {
             return {
                 rows: [{
                     id: task.id,
-                    status: params[0]
+                    status: statement.includes("SET title =") ? params[3] : params[0]
                 }]
             };
         }
@@ -205,6 +205,37 @@ describe("VertexArc Security Review Reset", () => {
 
         expect(mockClient.query).toHaveBeenCalledWith("COMMIT");
         expect(mockClient.release).toHaveBeenCalledTimes(1);
+    });
+
+    test("Resets security approvals and moves DONE task back to IN_REVIEW when security-sensitive task details are edited", async () => {
+        const doneSecurityTask = {
+            id: 2,
+            title: "Original Title",
+            description: "Original Description",
+            priority: "HIGH",
+            status: "DONE",
+            is_security_sensitive: true
+        };
+
+        mockDatabase(doneSecurityTask);
+
+        const updated = await taskModel.updateTaskDetails(
+            2,
+            1,
+            "Modified Security Title",
+            "Modified Description",
+            "HIGH",
+            1
+        );
+
+        expect(updated.status).toBe("IN_REVIEW");
+
+        const resetQueries = mockClient.query.mock.calls.filter(
+            ([sql]) =>
+                String(sql).trim().startsWith("UPDATE task_security_reviews")
+        );
+        expect(resetQueries).toHaveLength(1);
+        expect(mockClient.query).toHaveBeenCalledWith("COMMIT");
     });
 
 });

@@ -255,23 +255,105 @@ async function updateTaskStatus(
     }
 }
 
-// Update editable task details without changing its workflow status
-async function updateTaskDetails(taskId, projectId, title, description, priority) {
-    const result = await pool.query(
-        `UPDATE tasks
-                 SET title = $1,
-                     description = $2,
-                     priority = $3,
+// Update editable task details and invalidate security approvals if a security-sensitive task changed
+async function updateTaskDetails(taskId, projectId, title, description, priority, actorId = null) {
+    const client = await pool.connect();
+
+    try {
+        await client.query("BEGIN");
+
+        const existingResult = await client.query(
+            `SELECT id, title, description, priority, status, is_security_sensitive
+             FROM tasks
+             WHERE id = $1
+               AND project_id = $2
+               AND deleted_at IS NULL
+             FOR UPDATE`,
+            [taskId, projectId]
+        );
+
+        const existing = existingResult.rows[0];
+        if (!existing) {
+            await client.query("ROLLBACK");
+            return null;
+        }
+
+        const detailsChanged =
+            existing.title !== title ||
+            (existing.description ?? null) !== (description ?? null) ||
+            existing.priority !== priority;
+
+        const shouldResetReview = existing.is_security_sensitive && detailsChanged;
+        const nextStatus =
+            shouldResetReview && existing.status === "DONE"
+                ? "IN_REVIEW"
+                : existing.status;
+
+        const updateResult = await client.query(
+            `UPDATE tasks
+             SET title = $1,
+                 description = $2,
+                 priority = $3,
+                 status = $4,
+                 updated_at = NOW()
+             WHERE id = $5
+               AND project_id = $6
+               AND deleted_at IS NULL
+             RETURNING id, project_id, title, description,
+                       priority, status, assigned_to, is_security_sensitive, updated_at`,
+            [title, description, priority, nextStatus, taskId, projectId]
+        );
+
+        if (shouldResetReview) {
+            const resetReview = await client.query(
+                `UPDATE task_security_reviews
+                 SET code_reviewed = FALSE,
+                     security_tests_passed = FALSE,
+                     no_unresolved_vulnerabilities = FALSE,
+                     reviewed_by = NULL,
+                     reviewed_at = NULL,
                      updated_at = NOW()
-                 WHERE id = $4
-                 AND project_id = $5
-                 AND deleted_at IS NULL
-                 RETURNING id, project_id, title, description,
-                           priority, status, assigned_to, updated_at`,
-                [title, description, priority, taskId, projectId]
+                 WHERE task_id = $1
+                   AND (
+                       code_reviewed = TRUE OR
+                       security_tests_passed = TRUE OR
+                       no_unresolved_vulnerabilities = TRUE
+                   )
+                 RETURNING task_id`,
+                [taskId]
             );
 
-            return result.rows[0] || null;
+            if (resetReview.rowCount > 0) {
+                await client.query(
+                    `INSERT INTO task_audit_logs
+                        (task_id, actor_id, action, old_value, new_value)
+                     VALUES ($1, $2, 'SECURITY_REVIEW_RESET', $3::jsonb, $4::jsonb)`,
+                    [
+                        taskId,
+                        actorId,
+                        JSON.stringify({
+                            status: existing.status,
+                            reason: "Security-sensitive task details edited"
+                        }),
+                        JSON.stringify({
+                            status: nextStatus,
+                            codeReviewed: false,
+                            securityTestsPassed: false,
+                            noUnresolvedVulnerabilities: false
+                        })
+                    ]
+                );
+            }
+        }
+
+        await client.query("COMMIT");
+        return updateResult.rows[0] || null;
+    } catch (error) {
+        await client.query("ROLLBACK");
+        throw error;
+    } finally {
+        client.release();
+    }
 }
 
 // Soft-delete a task and record who deleted it in one transaction
