@@ -8,7 +8,14 @@ jest.mock("../db", () => ({
   connect: jest.fn()
 }));
 
+// Mock email service so tests never make real Brevo API calls
+jest.mock("../emailService", () => ({
+  sendEmail: jest.fn().mockResolvedValue(undefined),
+  sendPasswordResetEmail: jest.fn().mockResolvedValue(undefined),
+}));
+
 const pool = require("../db");
+const { sendPasswordResetEmail } = require("../emailService");
 const app = require("../app");
 
 describe("Profile, Notifications, and Password Reset Features", () => {
@@ -138,6 +145,10 @@ describe("Profile, Notifications, and Password Reset Features", () => {
       }
     });
 
+    beforeEach(() => {
+      jest.clearAllMocks();
+    });
+
     test("Password recovery endpoints are disabled (503) until email delivery is configured", async () => {
       delete process.env.PASSWORD_RESET_ENABLED;
 
@@ -182,6 +193,10 @@ describe("Profile, Notifications, and Password Reset Features", () => {
       expect(knownRes.status).toBe(200);
       expect(knownRes.body.message).toMatch(/if an account with that email exists/i);
       expect(knownRes.body.resetToken).toBeUndefined();
+      // Email service must have been called with the user's address — token stays in email only
+      expect(sendPasswordResetEmail).toHaveBeenCalledWith(
+        expect.objectContaining({ to: "dev1@vertexarc.com" })
+      );
     });
 
     test("When enabled, reset password runs atomically in a transaction and updates password", async () => {

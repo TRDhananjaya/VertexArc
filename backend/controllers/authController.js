@@ -1,9 +1,10 @@
 // Handles user registration and login.
-const bcrypt    = require("bcrypt");
-const jwt       = require("jsonwebtoken");
-const crypto    = require("crypto");
-const pool      = require("../db");
-const userModel = require("../models/userModel");
+const bcrypt        = require("bcrypt");
+const jwt           = require("jsonwebtoken");
+const crypto        = require("crypto");
+const pool          = require("../db");
+const userModel     = require("../models/userModel");
+const { sendPasswordResetEmail } = require("../emailService");
 
 // POST /api/auth/register — validate input, hash password, create user
 async function register(req, res) {
@@ -247,9 +248,8 @@ async function updateProfile(req, res) {
     }
 }
 
-// POST /api/auth/forgot-password — generate secure password reset token (disabled until email delivery is configured)
+// POST /api/auth/forgot-password — generate secure token and send reset email via Brevo
 async function forgotPassword(req, res) {
-    // Security: disable public password recovery until private email delivery is configured
     if (process.env.PASSWORD_RESET_ENABLED !== "true") {
         return res.status(503).json({
             message: "Self-service password recovery is currently disabled until email delivery is configured. Please contact your administrator."
@@ -266,17 +266,21 @@ async function forgotPassword(req, res) {
         const normalizedEmail = email.trim().toLowerCase();
         const user = await userModel.findUserByEmail(normalizedEmail);
 
-        // Security: always return generic message to prevent email enumeration
+        // Security: always return the same generic message — prevents email enumeration
+        const genericResponse = {
+            message: "If an account with that email exists, reset instructions have been sent."
+        };
+
         if (!user || !user.is_active) {
-            return res.json({
-                message: "If an account with that email exists, reset instructions have been sent."
-            });
+            return res.json(genericResponse);
         }
 
-        // Generate 32-byte cryptographic token and store only its SHA-256 hash
+        // Generate a 32-byte cryptographic token; store only its SHA-256 hash in the DB.
+        // The plain-text token travels exclusively via the private email channel.
         const resetToken = crypto.randomBytes(32).toString("hex");
         const tokenHash  = crypto.createHash("sha256").update(resetToken).digest("hex");
-        const expiresAt  = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
+        const expiryMin  = Number(process.env.PASSWORD_RESET_EXPIRY_MINUTES) || 15;
+        const expiresAt  = new Date(Date.now() + expiryMin * 60 * 1000);
 
         await pool.query(
             `INSERT INTO password_resets (user_id, token_hash, expires_at, used)
@@ -284,11 +288,15 @@ async function forgotPassword(req, res) {
             [user.id, tokenHash, expiresAt]
         );
 
-        // Security: never return resetToken in the HTTP response.
-        // Deliver resetToken privately via the configured email transport here.
-        return res.json({
-            message: "If an account with that email exists, reset instructions have been sent."
+        // Deliver the plain-text token privately via email — never in the HTTP response
+        await sendPasswordResetEmail({
+            to:        user.email,
+            name:      user.name,
+            token:     resetToken,
+            expiryMin,
         });
+
+        return res.json(genericResponse);
     } catch (error) {
         console.error("Forgot password request failed:", error.message);
         return res.status(500).json({ message: "Failed to process request" });

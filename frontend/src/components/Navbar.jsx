@@ -21,6 +21,7 @@ function Navbar({
   return (
     <header className="md:hidden border-b border-gray-200/80 dark:border-[#1c1d30] bg-white/75 dark:bg-[#0c0d16]/75 backdrop-blur-md sticky top-0 z-30 transition-colors">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3">
+
         {/* Left: Mobile Toggle & Contextual Breadcrumb */}
         <div className="flex items-center gap-3">
           {onToggleSidebar && (
@@ -50,28 +51,28 @@ function Navbar({
           </div>
         </div>
 
-        {/* Right: User Identity Pill (Clean, zero duplicate navigation buttons) */}
+        {/* Right: User Identity Pill */}
         {user && (
           <div className="flex items-center gap-2 rounded-full border border-gray-200 dark:border-[#1c1d30] bg-gray-50/80 dark:bg-[#050505]/80 px-3 py-1 text-xs shadow-sm">
-            <div className="flex h-5 w-5 items-center justify-center rounded-full bg-indigo-100 dark:bg-indigo-900/50 text-[10px] font-bold text-indigo-700 dark:text-indigo-300">
-              {user.name?.charAt(0)?.toUpperCase() || "U"}
-              <div className="flex h-5 w-5 items-center justify-center rounded-full bg-indigo-100 dark:bg-indigo-900/50 text-[10px] font-bold text-indigo-700 dark:text-indigo-300 overflow-hidden">
-                {user?.avatar_url ? (
-                  <img src={user.avatar_url} alt={user?.name || "Avatar"} className="h-full w-full object-cover" />
-                ) : (
-                  user.name?.charAt(0)?.toUpperCase() || "U"
-                )}
-              </div>
-              <span className="font-medium text-gray-800 dark:text-slate-200 text-xs">{user.name}</span>
-              <span
-                className={`rounded-full border px-2 py-0.5 text-[10px] font-semibold tracking-wide ${roleBadges[user.role] || "bg-gray-100 dark:bg-[#131422] text-gray-700 dark:text-slate-300 border-gray-200 dark:border-[#272844]"
-                  }`}
-              >
-                {user.role?.replaceAll("_", " ")}
-              </span>
+            <div className="flex h-5 w-5 items-center justify-center rounded-full bg-indigo-100 dark:bg-indigo-900/50 text-[10px] font-bold text-indigo-700 dark:text-indigo-300 overflow-hidden">
+              {user?.avatar_url ? (
+                <img src={user.avatar_url} alt={user?.name || "Avatar"} className="h-full w-full object-cover" />
+              ) : (
+                user.name?.charAt(0)?.toUpperCase() || "U"
+              )}
             </div>
-        )}
+            <span className="font-medium text-gray-800 dark:text-slate-200 text-xs">{user.name}</span>
+            <span
+              className={`rounded-full border px-2 py-0.5 text-[10px] font-semibold tracking-wide ${
+                roleBadges[user.role] || "bg-gray-100 dark:bg-[#131422] text-gray-700 dark:text-slate-300 border-gray-200 dark:border-[#272844]"
+              }`}
+            >
+              {user.role?.replaceAll("_", " ")}
+            </span>
           </div>
+        )}
+
+      </div>
     </header>
   );
 }

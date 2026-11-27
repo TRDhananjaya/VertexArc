@@ -4,7 +4,13 @@ import { SunIcon, MoonIcon, ArrowLeftIcon, AlertCircleIcon, LockIcon, CheckIcon 
 import { VertexArcEmblem } from "../components/VertexArcLogo";
 
 function Login({ onLogin, sessionMessage, onBack, theme, onToggleTheme }) {
-  const [mode, setMode] = useState("login"); // "login" | "forgot" | "reset"
+  // If the user arrives via the email reset link (?token=...), start directly in reset mode.
+  // Read the URL once at mount time using a state initializer — no useEffect needed.
+  const [mode, setMode] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get("token") ? "reset" : "login";
+  });
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -13,7 +19,15 @@ function Login({ onLogin, sessionMessage, onBack, theme, onToggleTheme }) {
 
   // Forgot password & Reset password fields
   const [resetEmail, setResetEmail] = useState("");
-  const [resetToken, setResetToken] = useState("");
+  const [resetToken, setResetToken] = useState(() => {
+    // Pre-fill the token from the URL query param if present, then clean the URL
+    const params = new URLSearchParams(window.location.search);
+    const tokenFromUrl = params.get("token") || "";
+    if (tokenFromUrl) {
+      window.history.replaceState({}, "", window.location.pathname);
+    }
+    return tokenFromUrl;
+  });
   const [newPassword, setNewPassword] = useState("");
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
 
@@ -127,7 +141,7 @@ function Login({ onLogin, sessionMessage, onBack, theme, onToggleTheme }) {
             {mode === "login"
               ? "Secure Software Development & Engineering Platform"
               : mode === "forgot"
-              ? "Account recovery requires administrator assistance"
+              ? "Enter your email to receive a one-time reset link"
               : "Enter your verification token and your new password"}
           </p>
         </div>
@@ -231,23 +245,60 @@ function Login({ onLogin, sessionMessage, onBack, theme, onToggleTheme }) {
         {/* ── MODE 2: FORGOT PASSWORD ── */}
         {mode === "forgot" && (
           <form onSubmit={handleForgotSubmit} className="space-y-4">
-              <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-3.5 text-xs text-amber-800 dark:text-amber-300 leading-relaxed">
-                Self-service password recovery is currently disabled until private email delivery is configured. Please contact your system administrator to reset your password.
-              </div>
+            <div>
+              <label
+                htmlFor="reset-email"
+                className="mb-1.5 block text-xs font-semibold text-gray-700 dark:text-slate-300"
+              >
+                Email address
+              </label>
+              <input
+                id="reset-email"
+                type="email"
+                required
+                autoComplete="email"
+                value={resetEmail}
+                onChange={(e) => setResetEmail(e.target.value)}
+                placeholder="you@company.com"
+                className="w-full rounded-xl border border-gray-200 dark:border-[#1c1d30] bg-gray-50 dark:bg-[#050505] px-4 py-2.5 text-sm text-gray-900 dark:text-white outline-none transition focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20"
+              />
+              <p className="mt-1.5 text-[11px] text-gray-400 dark:text-slate-500">
+                If your account exists, a one-time reset link will be emailed to you. It expires in 15 minutes.
+              </p>
+            </div>
 
-              <div className="flex items-center justify-between pt-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setError("");
-                    setSuccessMsg("");
-                    setMode("login");
-                  }}
-                  className="text-xs text-gray-500 hover:text-gray-900 dark:hover:text-white transition"
-                >
-                  ← Back to Login
-                </button>
-              </div>
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full rounded-xl bg-gradient-to-r from-[#3A0CA3] to-[#4c1d95] hover:from-[#4313b8] hover:to-[#5b21b6] text-white py-3 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-60 shadow-lg shadow-[#3A0CA3]/25"
+            >
+              {loading ? "Sending reset link..." : "Send Reset Link"}
+            </button>
+
+            <div className="flex items-center justify-between pt-1">
+              <button
+                type="button"
+                onClick={() => {
+                  setError("");
+                  setSuccessMsg("");
+                  setMode("login");
+                }}
+                className="text-xs text-gray-500 hover:text-gray-900 dark:hover:text-white transition"
+              >
+                ← Back to Login
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setError("");
+                  setSuccessMsg("");
+                  setMode("reset");
+                }}
+                className="text-xs text-[#3A0CA3] dark:text-[#a78bfa] hover:underline"
+              >
+                I already have a token →
+              </button>
+            </div>
           </form>
         )}
 
@@ -263,7 +314,7 @@ function Login({ onLogin, sessionMessage, onBack, theme, onToggleTheme }) {
                   Verification Security Token
                 </label>
                 <span className="text-[10px] text-gray-400 dark:text-slate-500">
-                  Auto-populated for testing
+                  From your reset email link
                 </span>
               </div>
               <input
